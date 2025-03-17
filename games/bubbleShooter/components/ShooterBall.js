@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 
+//Luodaan pallot, joita ammutaan
 const Ball = ({ x, y, size, color }) => {
   return (
     <View style={[styles.ball, { left: x - size / 2, top: y - size / 2, width: size, height: size, backgroundColor: color }]} />

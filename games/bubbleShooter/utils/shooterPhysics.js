@@ -4,16 +4,16 @@ import Matter from 'matter-js';
 export const createPhysics = () => {
   const engine = Matter.Engine.create();
   const world = engine.world;
-  engine.world.gravity.x = 0;
+  engine.world.gravity.x = 0; //poistetaan painovoima käytöstä
   engine.world.gravity.y = 0;
 
   return { engine, world };
 };
 
-// Luo ammuntapallon, joka ei pomppaa ennen ampumista
+// Luodaan ammuntapallo
 export const createShooterBall = (world, x, y, radius) => {
   const ball = Matter.Bodies.circle(x, y, radius, {
-    restitution: 0, // Ei pomppua, kun pallo ei ole ammuttu
+    restitution: 0, 
     frictionAir: 0.01,
     density: 0.001,
     inertia: Infinity,
@@ -43,7 +43,7 @@ export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
   return staticBallsArray;
 };
 
-// Päivittää fysiikan ja tarkistaa törmäykset
+// Päivitetään fysiikka ja tarkistetaan törmäykset
 export const updatePhysics = (engine, shooterBall, staticBalls, resetShooter) => {
   Matter.Engine.update(engine);
 

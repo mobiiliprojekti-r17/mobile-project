@@ -3,7 +3,7 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
-import GameScreen from './games/bubbleShooter/screens/ShooterScreen';  // Pelikomponentti
+import GameScreen from './games/bubbleShooter/screens/ShooterScreen'; 
 
 const Stack = createStackNavigator();
 

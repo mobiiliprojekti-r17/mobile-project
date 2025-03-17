@@ -15,7 +15,7 @@ const GameBoard = () => {
 
   useEffect(() => {
     shooterBall.current = createShooterBall(world, width / 2, height - 200, 25);
-
+    //luodaan peliruutu
     const wallOptions = { isStatic: true, restitution: 1 };
     const ground = Matter.Bodies.rectangle(width / 2, height - 80, width, 50, { isStatic: true });
     const leftWall = Matter.Bodies.rectangle(0, height / 2, 50, height, wallOptions);
@@ -38,10 +38,10 @@ const GameBoard = () => {
           Matter.World.remove(world, ballToRemove);
           setStaticBalls((prev) => prev.filter((b) => b !== ballToRemove));
 
-          resetShooterBall(); // Palautetaan pallo
+          resetShooterBall();
         }
 
-        // 🔥 **Jos shooterBall osuu lattiaan, salli uusi laukaus**
+        //Jos shooterBall osuu lattiaan, sallitaan uusi laukaus
             if (bodyA === shooterBall.current && bodyB === ceiling || 
             bodyB === shooterBall.current && bodyA === ceiling) {
             
@@ -73,12 +73,12 @@ const GameBoard = () => {
   
 //---------------------------------------------------------------------------------------------------------
 const resetShooterBall = () => {
-    // Varmista, että pallo on liikkumaton ennen uuden ammunnan sallimista
+    // Varmistetaan, että pallo ei liiku ennen uutta laukausta
     Matter.Body.setPosition(shooterBall.current, { x: width / 2, y: height - 224 });
     Matter.Body.setVelocity(shooterBall.current, { x: 0, y: 0 });
     Matter.Body.set(shooterBall.current, {
-        restitution: 0,  // Poista pomppiminen
-        frictionAir: 0,  // Pieni kitka, että pallo ei liu'u liikaa¨
+        restitution: 0, 
+        frictionAir: 0, 
         isStatic: true,
 
       });
@@ -102,8 +102,8 @@ const handleTouch = (event) => {
     const magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
   
     // Aseta vakio nopeus, joka on aina sama riippumatta kosketuspaikasta
-    const speed = 20; // Tämä määrittää pallo liikkeen nopeuden, voit säätää tätä arvoa
-    const normalizedX = (directionX / magnitude) * speed; // Normalisoi suunta ja kerro nopeudella
+    const speed = 20; //pallon nopeus
+    const normalizedX = (directionX / magnitude) * speed; 
     const normalizedY = (directionY / magnitude) * speed;
   
     // Aseta pallon nopeus vakiona, riippumatta kosketuksesta
