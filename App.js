@@ -3,7 +3,8 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
-import GameScreen from './games/bubbleShooter/screens/ShooterScreen'; 
+import GameScreen from './games/bubbleShooter/screens/ShooterScreen';  // Pelikomponentti
+import BrickBreakerScreen from './games/brickBreaker/screens/BreakerScreen';
 
 const Stack = createStackNavigator();
 
@@ -13,7 +14,8 @@ const App = () => {
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="GameScreen" component={GameScreen} />
-      </Stack.Navigator>
+        <Stack.Screen name="BrickBreaker" component={BrickBreakerScreen} />
+        </Stack.Navigator>
     </NavigationContainer>
   );
 };
