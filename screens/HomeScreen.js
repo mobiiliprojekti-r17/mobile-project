@@ -18,6 +18,10 @@ const HomeScreen = ({ navigation }) => {
         title="Sudoku"
         onPress={() => navigation.navigate('Sudoku')}
       />
+      <Button
+        title="Color Sort"
+        onPress={() => navigation.navigate('ColorGame')}
+      />
     </View>
   );
 };
