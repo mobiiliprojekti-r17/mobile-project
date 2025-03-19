@@ -23,6 +23,16 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to the Game!</Text>
+      
+      {/* 2048 linkki */}
+      <TouchableOpacity 
+        style={styles.gameButton} 
+        onPress={() => navigation.navigate("2048")}
+      >
+        <Text style={styles.gameButtonText}>2048</Text>
+      </TouchableOpacity>
+
+      {/* Muut pelilinkit */}
       <Button
         title="Bubble Shooter"
         onPress={() => navigation.navigate('GameScreen')}
@@ -49,6 +59,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  gameButton: {
+    backgroundColor: 'blue',
+    padding: 10,
+    marginVertical: 10,
+    borderRadius: 5,
+  },
+  gameButtonText: {
+    color: 'white',
+    fontSize: 18,
   },
 });
 

@@ -1,7 +1,4 @@
-
-
 import Matter from "matter-js";
-
 
 
 export const Physics = (entities, { time, dispatch }) => {
