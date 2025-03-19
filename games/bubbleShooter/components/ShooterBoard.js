@@ -6,7 +6,7 @@ import Ball from './ShooterBall';
 
 const { width, height } = Dimensions.get('window');
 
-const GameBoard = () => {
+const BubbleShooter = () => {
   const { engine, world } = createPhysics();
   const shooterBall = useRef(null);
   const [ballPosition, setBallPosition] = useState({ x: width / 2, y: height - 200 });
@@ -130,4 +130,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GameBoard;
+export default BubbleShooter;

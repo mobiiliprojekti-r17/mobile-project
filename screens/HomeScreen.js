@@ -22,10 +22,11 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to the Game!</Text>
+      <Text style={styles.title}>Minigames</Text>
+      <Text style={styles.Text}>By Gamebits</Text>
       <Button
         title="Bubble Shooter"
-        onPress={() => navigation.navigate('GameScreen')}
+        onPress={() => navigation.navigate('BubbleShooter')}
       />
       <Button
         title="Brick Breaker"
