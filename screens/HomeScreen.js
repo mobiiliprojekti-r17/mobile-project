@@ -1,11 +1,28 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 
 const HomeScreen = ({ navigation }) => {
+  
+  const newSudokuGame = () => {
+    Alert.alert(
+      "Choose difficulty",
+      "",
+      [
+        { text: "Easy", onPress: () => startSudokuGame("easy") },
+        { text: "Medium", onPress: () => startSudokuGame("medium") },
+        { text: "Hard", onPress: () => startSudokuGame("hard") },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const startSudokuGame = (difficulty) => {
+    navigation.navigate("Sudoku", { difficulty, autoStart: true });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to the Game!</Text>
-      {/* Painikkeet eri peleille */}
       <Button
         title="Bubble Shooter"
         onPress={() => navigation.navigate('GameScreen')}
@@ -14,10 +31,9 @@ const HomeScreen = ({ navigation }) => {
         title="Brick Breaker"
         onPress={() => navigation.navigate('BrickBreaker')}
       />
-      <Button
-        title="Sudoku"
-        onPress={() => navigation.navigate('Sudoku')}
-      />
+      <TouchableOpacity style={styles.gameButton} onPress={newSudokuGame}>
+        <Text style={styles.gameButtonText}>Sudoku</Text>
+      </TouchableOpacity>
     </View>
   );
 };
