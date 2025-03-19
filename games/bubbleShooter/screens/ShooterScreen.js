@@ -5,7 +5,7 @@ import GameBoard from '../components/ShooterBoard';
 const GameScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <GameBoard />
+      <GameBoard /> 
       <Button title="Back to Home" onPress={() => navigation.goBack()} />
     </View>
   );
