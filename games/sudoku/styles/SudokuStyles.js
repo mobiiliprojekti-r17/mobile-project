@@ -5,14 +5,8 @@ const styles = StyleSheet.create({
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: "#f8f8f8",
+      backgroundColor: 'lightblue',
       padding: 10,
-    },
-    title: {
-      fontSize: 28,
-      fontWeight: "bold",
-      marginBottom: 20,
-      color: "#333",
     },
       header: {
         flexDirection: "row",
@@ -58,6 +52,7 @@ const styles = StyleSheet.create({
       selectedCell: {
         backgroundColor: "lightblue",
       },
+      
     cellText: {
       fontSize: 18,
       fontWeight: "bold",
@@ -76,45 +71,54 @@ const styles = StyleSheet.create({
       flexWrap: "wrap",
       justifyContent: "center",
       marginTop: 20,
+      marginRight: 20,
+      marginLeft: 10,
     },
     numberButton: {
-      width: 40,
-      height: 40,
+        width: 70,
+        height: 40,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: "#4CAF50",
+      backgroundColor: "#C8A2C8",
       margin: 5,
       borderRadius: 5,
+      marginLeft: 20,
+      marginRight: 10,
     },
-    numberText: {
-      fontSize: 18,
-      color: "#fff",
-    },
-    clearButton: {
-        width: 40,
+
+      numberPadContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        marginVertical: 10,
+      },
+
+      clearButton: {
+        width: 70,
         height: 40,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#4CAF50",
+        backgroundColor: "#C8A2C8",
         margin: 5,
         borderRadius: 5,
+        marginLeft: 20,
+        marginRight: 10,
       },
-      clearButtonText: {
-        fontSize: 18,
-        color: "#fff",
+
+      CheckButton:{
+        width: 170,
+        height: 40,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "#C8A2C8",
+      margin: 5,
+      borderRadius: 5,
+      marginLeft: 20,
+      marginRight: 10,
       },
-    buttonContainer: {
-      flexDirection: "row",
-      marginTop: 20,
-    },
-    button: {
-      marginHorizontal: 10,
-      paddingVertical: 10,
-      paddingHorizontal: 20,
-    },
+
     cellError: {
         backgroundColor: 'red',
-        borderColor: 'darkred',
       },
   });
   export default styles;

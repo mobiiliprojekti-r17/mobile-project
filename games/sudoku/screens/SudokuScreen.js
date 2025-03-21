@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { Button } from "react-native-paper";
 import Toast from "react-native-toast-message";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import sudoku from "sudoku";
 import styles from "../styles/SudokuStyles";
 
@@ -86,10 +87,10 @@ export default function Sudoku({ route, navigation }) {
   const handleNumberPress = (number) => {
     if (selectedCell) {
       const { row, col } = selectedCell;
-      const newBoard = board.map((r) => r.map((cell) => ({ ...cell }))); // Syväkopio
+      const newBoard = board.map((r) => r.map((cell) => ({ ...cell })));
 
       if (!newBoard[row][col].preFilled) {
-        newBoard[row][col].value = number.toString(); // Asetetaan numero
+        newBoard[row][col].value = number.toString();
         setBoard(newBoard); // Päivitetään peli
       } else {
         Toast.show({
@@ -109,7 +110,7 @@ export default function Sudoku({ route, navigation }) {
   const handleClearPress = () => {
     if (selectedCell) {
       const { row, col } = selectedCell;
-      const newBoard = board.map((r) => r.map((cell) => ({ ...cell }))); // Syväkopio
+      const newBoard = board.map((r) => r.map((cell) => ({ ...cell })));
       if (!newBoard[row][col].preFilled) {
         newBoard[row][col].value = "";
       }
@@ -127,31 +128,35 @@ export default function Sudoku({ route, navigation }) {
     let isCorrect = true;
     const newBoard = board.map((row, rowIndex) => {
       return row.map((cell, colIndex) => {
-        const correctValue = solution[rowIndex * 9 + colIndex] !== null ? 
-          (solution[rowIndex * 9 + colIndex] + 1).toString() : "";
+        const correctValue =
+          solution[rowIndex * 9 + colIndex] !== null
+            ? (solution[rowIndex * 9 + colIndex] + 1).toString()
+            : "";
   
         if (cell.value !== correctValue) {
           isCorrect = false;
-          return { ...cell, isError: true };  // Merkitään virheellinen
+          return { ...cell, isError: true };
         }
-        return { ...cell, isError: false }; // Oikeat solut pysyvät normaaleina
+        return { ...cell, isError: false };
       });
     });
   
-    setBoard(newBoard); // Päivitetään UI
+    setBoard(newBoard);
   
     if (isCorrect) {
       setIsRunning(false);
-      Alert.alert("Sudoku ratkaistu!", "Kaikki numerot ovat oikein!", [{ text: "OK" }]);
+      navigation.replace("SudokuResult", { time: timer, difficulty });
+
     } else {
-      Alert.alert("Virheitä löytyi!", "Korjaa punaiset ruudut ja yritä uudelleen.", [{ text: "OK" }]);
+      Alert.alert("Virheitä löytyi!", "Korjaa punaiset ruudut ja yritä uudelleen.", [
+        { text: "OK" },
+      ]);
     }
   };
   
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sudoku</Text>
       <View style={styles.header}>
         <Text style={styles.difficultyText}>Difficulty: {difficulty}</Text>
         <Text style={styles.timerText}>Time: {formatTime(timer)}</Text>
@@ -189,24 +194,28 @@ export default function Sudoku({ route, navigation }) {
             ))}
           </View>
         ))}
-        
-      {/* Numeron painikkeet */}
-      <View style={styles.numberPad}>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
-          <Button
-            key={number}
-            style={styles.numberButton}
-            mode="contained"
-            onPress={() => handleNumberPress(number)}
-          >
-            {number}
-          </Button>
-        ))}
-      </View>
 
-      {/* Pelin toiminnot */}
-      <Button mode="contained" onPress={checkSudoku}>Tarkista Sudoku</Button>
-      <Button mode="contained" onPress={handleClearPress}>Tyhjennä valittu kenttä</Button>
+{/* Numeron painikkeet ja roskakorinappi */}
+<View style={styles.numberPadContainer}>
+  <View style={styles.numberPad}>
+    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
+      <Button
+        key={number}
+        style={styles.numberButton}
+        textColor="black"
+        mode="contained"
+        onPress={() => handleNumberPress(number)}
+      >
+        {number}
+      </Button>
+    ))}
+      <Button style={styles.clearButton} mode="contained" onPress={handleClearPress}>
+  <MaterialCommunityIcons name="delete" size={24} color="black" />
+</Button>
+<Button style={styles.CheckButton} textColor='black' mode="contained" onPress={checkSudoku}>Check Sudoku</Button>
+  </View>
+
+</View>
     </View>
   );
 }
