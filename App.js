@@ -1,10 +1,12 @@
-// App.js
 import * as React from 'react';
+import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
-import GameScreen from './games/bubbleShooter/screens/ShooterScreen';  // Pelikomponentti
+import GameScreen from './games/bubbleShooter/screens/ShooterScreen';  
 import BrickBreakerScreen from './games/brickBreaker/screens/BreakerScreen';
+import Sudoku from './games/sudoku/screens/SudokuScreen';
+import Game2048Screen from './games/2048/screens/2048Screen'; // Lisää tämä rivi!
 
 const Stack = createStackNavigator();
 
@@ -15,7 +17,9 @@ const App = () => {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="GameScreen" component={GameScreen} />
         <Stack.Screen name="BrickBreaker" component={BrickBreakerScreen} />
-        </Stack.Navigator>
+        <Stack.Screen name="Sudoku" component={Sudoku} />
+        <Stack.Screen name="2048" component={Game2048Screen} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };
