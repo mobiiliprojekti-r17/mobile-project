@@ -1,3 +1,6 @@
+
+
+
 import React, { useRef, useState } from "react";
 import { View, StyleSheet, PanResponder, Text, Button } from "react-native";
 import { GameEngine } from "react-native-game-engine";
@@ -15,7 +18,8 @@ const setupWorld = (level = 1) => {
   const world = engine.world;
   
   engine.world.gravity.y = 0;
-
+//----------------------------------------------------------------------------------
+//Siirretäänkö brickbreakrenderers.js
   const ball = Matter.Bodies.circle(200, 300, 10, {
     label: "ball",
     restitution: 1.0,
@@ -47,23 +51,46 @@ const setupWorld = (level = 1) => {
   Matter.Body.setVelocity(ball, { x: 5, y: -5 });
 
   const bricks = [];
-  for (let i = 0; i < 5 + level; i++) {
-    for (let j = 0; j < 3 + Math.floor(level / 2); j++) {
-      let brick = Matter.Bodies.rectangle(50 + i * 60, 100 + j * 30, 50, 20, { 
-        label: `brick_${i}_${j}`,
-        isStatic: true,
-        collisionFilter: { category: 0x0008, mask: 0x0004 }
-      });
+  const brickCols = 6;
+  const brickRows = 6;
+  const brickWidth = 50;
+  const brickHeight = 30;
+  const spacingX = 8;
+  const spacingY = 10;
+  
+  const totalBrickWidth = brickCols * brickWidth + (brickCols - 1) * spacingX;
+  const startX = (400 - totalBrickWidth) / 2;
+  
+  const specialBrickIndex = Math.floor(Math.random() * (brickCols * 4)); 
+
+  for (let i = 0; i < brickCols; i++) {
+    for (let j = 0; j < brickRows; j++) {
+      const x = startX + i * (brickWidth + spacingX) + brickWidth / 2;
+      const y = 100 + j * (brickHeight + spacingY);
       
+      const index = i * brickRows + j;
+      const isSpecial = index === specialBrickIndex && j < 4;
+
+      const brick = Matter.Bodies.rectangle(
+        x,
+        y,
+        brickWidth,
+        brickHeight,
+        {
+          label: isSpecial ? `brick_special_${i}_${j}` : `brick_${i}_${j}`,
+          isStatic: true,
+          collisionFilter: { category: 0x0008, mask: 0x0004 }
+        }
+      );
+
       bricks.push(brick);
-      Matter.World.add(world, brick);
     }
   }
 
   Matter.World.add(world, [ball, paddle]);
   return { engine, world, ball, paddle, bricks, level, wallLeft, wallRight, ceiling };
 };
-
+//--------------------------------------------------------------------------------------------
 export default function brickBreaker() {
   const gameEngine = useRef(null);
   const [gameState, setGameState] = useState(setupWorld());
@@ -113,6 +140,7 @@ const Restart = () => {
     }
   };
   
+
 
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
@@ -176,4 +204,4 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 });
- 
+

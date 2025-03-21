@@ -23,6 +23,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to the Game!</Text>
+
       
       {/* 2048 linkki */}
       <TouchableOpacity 
