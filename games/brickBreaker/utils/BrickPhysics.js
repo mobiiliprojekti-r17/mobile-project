@@ -1,142 +1,110 @@
 
-
 import Matter from "matter-js";
 
-
-
 export const Physics = (entities, { time, dispatch }) => {
-  let engine = entities.physics.engine;
-  const fixedDeltaTime = 1000 / 60;
-  Matter.Engine.update(engine, fixedDeltaTime);
-  
+  const engine = entities.physics.engine;
+  Matter.Engine.update(engine, time.delta);
 
-  let ball = entities.ball.body;
-  let paddle = entities.paddle.body;
-  let bricks = Object.keys(entities).filter((key) => key.startsWith("brick_"));
+  Object.keys(entities)
+    .filter((key) => key.startsWith("ball"))
+    .forEach((key) => {
+      const ball = entities[key].body;
+      const paddle = entities.paddle.body;
 
-  if (ball.position.y > 600) {  
-    dispatch({ type: "game-over" });
-  }
+      const paddleCollision = Matter.Collision.collides(ball, paddle);
+      if (paddleCollision) {
+        let relativeIntersectX = (ball.position.x - paddle.position.x) /
+          (paddle.bounds.max.x - paddle.bounds.min.x);
+        let bounceAngle = relativeIntersectX * (Math.PI / 4);
+        let speed = Math.sqrt(ball.velocity.x ** 2 + ball.velocity.y ** 2);
 
-  const paddleCollision = Matter.Collision.collides(ball, paddle);
-if (paddleCollision) {
-    let offset = ((ball.position.x - paddle.position.x) / (paddle.bounds.max.x - paddle.bounds.min.x)) * 2 - 1;
-    let speed = Math.sqrt(ball.velocity.x ** 2 + ball.velocity.y ** 2);
+        let newVelocity = {
+          x: Math.sin(bounceAngle) * speed,
+          y: -Math.abs(Math.cos(bounceAngle) * speed),
+        };
+        Matter.Body.setVelocity(ball, newVelocity);
+      }
 
-    let bounceAngle = offset * (Math.PI / 4); // Max ±45 astetta
+      let bricksLeft = false;
+      Object.keys(entities)
+        .filter((key) => key.startsWith("brick_"))
+        .forEach((brickKey) => {
+          let brick = entities[brickKey]?.body;
+          if (!brick) return;
 
-    let newVelocity = {
-        x: Math.sin(bounceAngle) * speed,  // X määräytyy osumakohdan mukaan
-        y: -Math.abs(Math.cos(bounceAngle) * speed),  // Y on aina negatiivinen (pallo menee ylöspäin)
-    };
+          bricksLeft = true; 
 
-    Matter.Body.setVelocity(ball, newVelocity);
-}
+          const collision = Matter.Collision.collides(ball, brick);
+          if (collision) {
+            const closestX = Math.max(brick.bounds.min.x, Math.min(ball.position.x, brick.bounds.max.x));
+            const closestY = Math.max(brick.bounds.min.y, Math.min(ball.position.y, brick.bounds.max.y));
+            const contactPoint = Matter.Vector.create(closestX, closestY);
+            const normal = Matter.Vector.normalise(Matter.Vector.sub(ball.position, contactPoint));
+            const velocity = Matter.Vector.create(ball.velocity.x, ball.velocity.y);
+            const dotProduct = Matter.Vector.dot(velocity, normal);
+            const reflection = Matter.Vector.sub(velocity, Matter.Vector.mult(normal, 2 * dotProduct));
 
-  
-  Matter.Events.on(engine, "collisionStart", (event) => {
-    event.pairs.forEach((collision) => {
-      let { bodyA, bodyB } = collision;
-      
-      if (bodyA.label === "ball" && bodyB.label.startsWith("brick")) {
-        Matter.World.remove(engine.world, bodyB);
-        dispatch({ type: "increase-score" });
-      } else if (bodyB.label === "ball" && bodyA.label.startsWith("brick")) {
-        Matter.World.remove(engine.world, bodyA);
-        dispatch({ type: "increase-score" });
+            Matter.Body.setVelocity(ball, { x: reflection.x, y: reflection.y });
+
+            Matter.World.remove(engine.world, brick);
+            delete entities[brickKey];
+            dispatch({ type: "increase-score" });
+
+            if (brick.label.includes("special")) {
+              const newBall = Matter.Bodies.circle(
+                ball.position.x,
+                ball.position.y,
+                10,
+                {
+                  label: `ball_extra_${Date.now()}`, 
+                  restitution: 1, 
+                  friction: 0,
+                  frictionAir: 0,
+                  inertia: Infinity,
+                  collisionFilter: { group: 0 }, 
+                }
+              );
+
+              Matter.Body.setVelocity(newBall, { x: 3, y: -5 });
+              Matter.World.add(engine.world, newBall);
+
+              entities[`ball_extra_${Date.now()}`] = {
+                body: newBall,
+                renderer: entities.ball.renderer, 
+              };
+
+              console.log("Extra ball added:", newBall);
+            }
+          }
+        });
+
+      if (!bricksLeft) {
+        dispatch({ type: "game-over" });
+      }
+
+      const wallLeft = entities.wallLeft.body;
+      const wallRight = entities.wallRight.body;
+      const ceiling = entities.ceiling.body;
+
+      if (Matter.Collision.collides(ball, wallLeft)) {
+        Matter.Body.setVelocity(ball, { x: Math.abs(ball.velocity.x), y: ball.velocity.y });
+      }
+      if (Matter.Collision.collides(ball, wallRight)) {
+        Matter.Body.setVelocity(ball, { x: -Math.abs(ball.velocity.x), y: ball.velocity.y });
+      }
+      if (Matter.Collision.collides(ball, ceiling)) {
+        Matter.Body.setVelocity(ball, { x: ball.velocity.x, y: Math.abs(ball.velocity.y) });
+      }
+
+      const minSpeed = 2;
+      if (Math.abs(ball.velocity.x) < minSpeed) {
+        Matter.Body.setVelocity(ball, { x: Math.sign(ball.velocity.x) * minSpeed, y: ball.velocity.y });
+      }
+      if (Math.abs(ball.velocity.y) < minSpeed) {
+        Matter.Body.setVelocity(ball, { x: ball.velocity.x, y: Math.sign(ball.velocity.y) * minSpeed });
       }
     });
-  });
 
-
-  bricks.forEach((key) => {
-    let brick = entities[key]?.body;
-    if (!brick) return;
-    let dx = Math.abs(ball.position.x - brick.position.x);
-    let dy = Math.abs(ball.position.y - brick.position.y);
-  
-    if (dx < 30 && dy < 15) { 
-      Matter.World.remove(engine.world, brick);
-      dispatch({ type: "remove-brick", key });
-  
-      Matter.Body.setVelocity(ball, {
-        x: ball.velocity.x,
-        y: -ball.velocity.y,
-      });
-    }
-    const collision = Matter.Collision.collides(ball, brick);
-    if (collision) {
-      Matter.World.remove(engine.world, brick);
-      dispatch({ type: "increase-score" });
-    
-      delete entities[key];
-    
-    
-
-      let ballVelocity = ball.velocity;
-      let ballPos = ball.position;
-      let brickPos = brick.position;
-
-      let impactFromTopOrBottom = Math.abs(ballPos.y - brickPos.y) > Math.abs(ballPos.x - brickPos.x);
-      let newVelocityX = ballVelocity.x;
-      let newVelocityY = ballVelocity.y;
-
-      if (impactFromTopOrBottom) {
-        newVelocityY = -newVelocityY;
-      } else {
-        newVelocityX = -newVelocityX;
-      }
-
-      Matter.Body.setVelocity(ball, { x: newVelocityX, y: newVelocityY });
-    }
-  });
-
-  const maxSpeed = 3; 
-
-  if (Math.abs(ball.velocity.x) > maxSpeed) {
-    Matter.Body.setVelocity(ball, { x: Math.sign(ball.velocity.x) * maxSpeed, y: ball.velocity.y });
-  }
-  
-  if (Math.abs(ball.velocity.y) > maxSpeed) {
-    Matter.Body.setVelocity(ball, { x: ball.velocity.x, y: Math.sign(ball.velocity.y) * maxSpeed });
-  }
-  
-  
-  const substeps = 6; 
-for (let i = 0; i < substeps; i++) {
-  Matter.Engine.update(engine, time.delta / substeps);
-}
-
-  if (Math.abs(ball.velocity.x) < 2) {
-    Matter.Body.setVelocity(ball, { x: ball.velocity.x > 0 ? 2 : -2, y: ball.velocity.y });
-  }
-  if (Math.abs(ball.velocity.y) < 2) {
-    Matter.Body.setVelocity(ball, { x: ball.velocity.x, y: ball.velocity.y > 0 ? 2 : -2 });
-  }
-
-  const wallLeft = entities.wallLeft.body;
-  const wallRight = entities.wallRight.body;
-  const ceiling = entities.ceiling.body;
-
-  const leftCollision = Matter.Collision.collides(ball, wallLeft);
-  if (leftCollision) {
-    Matter.Body.setVelocity(ball, { x: Math.abs(ball.velocity.x), y: ball.velocity.y });
-  }
-
-  const rightCollision = Matter.Collision.collides(ball, wallRight);
-  if (rightCollision) {
-    Matter.Body.setVelocity(ball, { x: -Math.abs(ball.velocity.x), y: ball.velocity.y });
-  }
-
-  const ceilingCollision = Matter.Collision.collides(ball, ceiling);
-  if (ceilingCollision) {
-    Matter.Body.setVelocity(ball, { x: ball.velocity.x, y: Math.abs(ball.velocity.y) });
-  }
-
-  const remainingBricks = Object.keys(entities).filter((key) => key.startsWith("brick_"));
-  if (remainingBricks.length === 0) {
-    dispatch({ type: "game-over" });
-  }
 
   return entities;
 };

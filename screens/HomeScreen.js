@@ -5,7 +5,6 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to the Game!</Text>
-      {/* Painikkeet eri peleille */}
       <Button
         title="Bubble Shooter"
         onPress={() => navigation.navigate('GameScreen')}
