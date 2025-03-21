@@ -13,7 +13,7 @@ export const createPhysics = () => {
 // Luo ammuntapallon, joka ei pomppaa ennen ampumista
 export const createShooterBall = (world, x, y, radius) => {
   const ball = Matter.Bodies.circle(x, y, radius, {
-    restitution: 0, // Ei pomppua, kun pallo ei ole ammuttu
+    restitution: 0, 
     frictionAir: 0.01,
     density: 0.001,
     inertia: Infinity,

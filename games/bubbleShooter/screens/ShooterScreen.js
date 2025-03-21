@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, Button, StyleSheet } from 'react-native';
-import GameBoard from '../components/ShooterBoard';
+import BubbleShooter from '../components/ShooterBoard';
 
-const GameScreen = ({ navigation }) => {
+const BubbleShooterScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <GameBoard />
-      <Button title="Back to Home" onPress={() => navigation.goBack()} />
+      <BubbleShooter /> 
     </View>
   );
 };
@@ -21,4 +20,4 @@ const styles = StyleSheet.create({
     },
   });
   
-  export default GameScreen;
+  export default BubbleShooterScreen;

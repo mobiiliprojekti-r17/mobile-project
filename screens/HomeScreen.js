@@ -65,6 +65,7 @@ const HomeScreen = ({ navigation }) => {
         placeholder="Enter your nickname"
         value={nickname}
         onChangeText={saveNickname}
+        />
       
       {/* 2048 linkki */}
       <TouchableOpacity 
@@ -77,16 +78,12 @@ const HomeScreen = ({ navigation }) => {
       {/* Muut pelilinkit */}
       <Button
         title="Bubble Shooter"
-        onPress={() => navigation.navigate('GameScreen')}
+        onPress={() => navigation.navigate('BubbleShooter')}
       />
       <Button
         title="Brick Breaker"
         onPress={() => navigation.navigate('BrickBreaker')}
       />
-
-      <Button title="Bubble Shooter" onPress={() => navigation.navigate('GameScreen')} />
-      <Button title="Brick Breaker" onPress={() => navigation.navigate('BrickBreaker')} />
-
       <TouchableOpacity style={styles.gameButton} onPress={newSudokuGame}>
         <Text style={styles.gameButtonText}>Start Sudoku</Text>
       </TouchableOpacity>

@@ -3,7 +3,7 @@ import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
-import GameScreen from './games/bubbleShooter/screens/ShooterScreen';  
+import BubbleShooterScreen from './games/bubbleShooter/screens/ShooterScreen';
 import BrickBreakerScreen from './games/brickBreaker/screens/BreakerScreen';
 import Sudoku from './games/sudoku/screens/SudokuScreen';
 import SudokuResult from './games/sudoku/screens/SudokuResultScreen';
@@ -17,11 +17,10 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="GameScreen" component={GameScreen} />
+        <Stack.Screen name="BubbleShooter" component={BubbleShooterScreen} />
         <Stack.Screen name="BrickBreaker" component={BrickBreakerScreen} />
         <Stack.Screen name="Sudoku" component={Sudoku} />
         <Stack.Screen name="SudokuResult" component={SudokuResult} />
-        </Stack.Navigator>
         <Stack.Screen name="2048" component={Game2048Screen} />
       </Stack.Navigator>
     </NavigationContainer>
