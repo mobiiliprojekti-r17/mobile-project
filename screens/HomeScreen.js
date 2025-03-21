@@ -58,12 +58,30 @@ const HomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to the Game!</Text>
 
+
       {/* Nickname syöttökenttä */}
       <TextInput
         style={styles.input}
         placeholder="Enter your nickname"
         value={nickname}
         onChangeText={saveNickname}
+      
+      {/* 2048 linkki */}
+      <TouchableOpacity 
+        style={styles.gameButton} 
+        onPress={() => navigation.navigate("2048")}
+      >
+        <Text style={styles.gameButtonText}>2048</Text>
+      </TouchableOpacity>
+
+      {/* Muut pelilinkit */}
+      <Button
+        title="Bubble Shooter"
+        onPress={() => navigation.navigate('GameScreen')}
+      />
+      <Button
+        title="Brick Breaker"
+        onPress={() => navigation.navigate('BrickBreaker')}
       />
 
       <Button title="Bubble Shooter" onPress={() => navigation.navigate('GameScreen')} />
@@ -88,6 +106,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
+
   input: {
     width: 200,
     height: 40,
@@ -99,16 +118,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   gameButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#4CAF50",
+    backgroundColor: 'blue',
     padding: 10,
+    marginVertical: 10,
     borderRadius: 5,
-    marginTop: 10,
   },
   gameButtonText: {
-    fontSize: 18,
     color: 'white',
+    fontSize: 18,
+
   },
 });
 
