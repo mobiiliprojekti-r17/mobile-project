@@ -1,6 +1,3 @@
-
-
-
 import React, { useRef, useState } from "react";
 import { View, StyleSheet, PanResponder, Text, Button } from "react-native";
 import { GameEngine } from "react-native-game-engine";

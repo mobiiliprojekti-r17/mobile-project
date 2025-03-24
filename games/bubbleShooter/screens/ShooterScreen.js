@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import BubbleShooter from '../components/ShooterBoard';
+import BubbleShooter from '../components/BubbleShooter';
 
 const BubbleShooterScreen = ({ navigation }) => {
   return (

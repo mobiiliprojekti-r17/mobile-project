@@ -7,7 +7,7 @@ import Ball from './ShooterBall';
 const { width, height } = Dimensions.get('window');
 
 const BubbleShooter = ({ navigation }) => {
-  const { engine, world } = createPhysics();
+  const { engine, world, ceiling } = createPhysics(width, height);
   const shooterBall = useRef(null);
   const [ballPosition, setBallPosition] = useState({ x: width / 2, y: height - 200 });
   const [staticBalls, setStaticBalls] = useState([]);
@@ -17,20 +17,9 @@ const BubbleShooter = ({ navigation }) => {
 
   useEffect(() => {
     shooterBall.current = createShooterBall(world, width / 2, height - 200, 25);
-    shooterBall.current.color = getRandomPastelColor(); 
-
-    const wallOptions = { isStatic: true, restitution: 1 };
-    const ground = Matter.Bodies.rectangle(width / 2, height - 80, width, 50, { isStatic: true });
-    const leftWall = Matter.Bodies.rectangle(0, height / 2, 50, height, wallOptions);
-    const rightWall = Matter.Bodies.rectangle(width, height / 2, 50, height, wallOptions);
-    const ceiling = Matter.Bodies.rectangle(width / 2, 0, width, 50, wallOptions);
-
-    Matter.World.add(world, [ground, leftWall, rightWall, ceiling]);
+    shooterBall.current.color = getRandomPastelColor();
 
     const staticBallsArray = createStaticBalls(world, 3, 7, width);
-    staticBallsArray.forEach(ball => {
-      ball.color = getRandomPastelColor();
-    });
     setStaticBalls(staticBallsArray);
     setBallsInitialized(true);
 
@@ -46,15 +35,15 @@ const BubbleShooter = ({ navigation }) => {
           resetShooterBall();
         }
 
-        if (bodyA === shooterBall.current && bodyB === ceiling || 
-            bodyB === shooterBall.current && bodyA === ceiling) {
+        if ((bodyA === shooterBall.current && bodyB === ceiling) ||
+            (bodyB === shooterBall.current && bodyA === ceiling)) {
           resetShooterBall();
-        } 
+        }
       });
     });
 
     const update = () => {
-      updatePhysics(engine, shooterBall.current, staticBalls, resetShooterBall);
+      updatePhysics(engine);
       const { x, y } = shooterBall.current.position;
       setBallPosition({ x, y });
       requestAnimationFrame(update);
@@ -80,12 +69,12 @@ const BubbleShooter = ({ navigation }) => {
     Matter.Body.setPosition(shooterBall.current, { x: width / 2, y: height - 224 });
     Matter.Body.setVelocity(shooterBall.current, { x: 0, y: 0 });
     Matter.Body.set(shooterBall.current, {
-      restitution: 0, 
-      frictionAir: 0, 
+      restitution: 0,
+      frictionAir: 0,
       isStatic: true,
     });
-    shooterBall.current.color = getRandomPastelColor(); 
-    setIsBallAtCenter(true); 
+    shooterBall.current.color = getRandomPastelColor();
+    setIsBallAtCenter(true);
   };
 
   const handleTouch = (event) => {
@@ -95,11 +84,11 @@ const BubbleShooter = ({ navigation }) => {
     const directionX = touchX - shooterBall.current.position.x;
     const directionY = touchY - shooterBall.current.position.y;
     const magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
-    const speed = 20; 
-    const normalizedX = (directionX / magnitude) * speed; 
+    const speed = 20;
+    const normalizedX = (directionX / magnitude) * speed;
     const normalizedY = (directionY / magnitude) * speed;
     Matter.Body.setVelocity(shooterBall.current, { x: normalizedX, y: normalizedY });
-    setIsBallAtCenter(false); 
+    setIsBallAtCenter(false);
   };
 
   return (
@@ -108,7 +97,7 @@ const BubbleShooter = ({ navigation }) => {
         {staticBalls.map((ball, index) => (
           <Ball key={index} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
         ))}
-        <Ball x={ballPosition.x} y={ballPosition.y} size={50} color={shooterBall.current?.color || 'blue'} />
+        <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
       </View>
     </TouchableWithoutFeedback>
   );
