@@ -1,11 +1,18 @@
 import Matter from 'matter-js';
 
 export const getRandomPastelColor = () => {
-  const r = Math.floor(Math.random() * 127 + 128);
-  const g = Math.floor(Math.random() * 127 + 128);
-  const b = Math.floor(Math.random() * 127 + 128);
-  return `rgb(${r}, ${g}, ${b})`;
+  const pastelColors = [
+    '#F8BBD0', // vaaleanpunainen (pinkki)
+    '#E1BEE7', // vaalea liila
+    '#B2EBF2', // vaalea turkoosi
+    '#C8E6C9', // vaalea vihreä
+    '#FFF9C4', // vaalea keltainen
+  ];
+
+  const randomIndex = Math.floor(Math.random() * pastelColors.length);
+  return pastelColors[randomIndex];
 };
+
 
 export const createPhysics = (screenWidth, screenHeight) => {
   const engine = Matter.Engine.create();

@@ -24,34 +24,45 @@ const BubbleShooter = ({ navigation }) => {
 
     Matter.Events.on(engine, 'collisionStart', (event) => {
       const pairs = event.pairs;
-
+    
       pairs.forEach(({ bodyA, bodyB }) => {
         const shooter = shooterBall.current;
-
         if (!shooter) return;
-
+    
         const isShooterA = bodyA === shooter;
         const otherBall = isShooterA ? bodyB : bodyA;
-
-        // Törmäys staattiseen palloon
-        if (staticBallsArray.includes(otherBall)) {
+    
+        // Tarkista osuuko johonkin static palloon
+        const isStaticBall = staticBallsArray.some((b) => b.id === otherBall.id);
+    
+        if (isStaticBall) {
           if (shooter.color === otherBall.color) {
+            // SAMA VÄRI: poistetaan staattinen pallo
             Matter.World.remove(world, otherBall);
-            setStaticBalls((prev) => prev.filter((b) => b !== otherBall));
+            setStaticBalls((prev) => prev.filter((b) => b.id !== otherBall.id));
+            shooterBall.current = null;
+            resetShooterBall();
           } else {
+            // ERI VÄRI: ammuttu pallo jää kentälle uutena staattisena pallona
             Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
+            Matter.Body.setPosition(shooter, { x: shooter.position.x, y: shooter.position.y });
             Matter.Body.setStatic(shooter, true);
             staticBallsArray.push(shooter);
+            setStaticBalls([...staticBallsArray]);
+            shooterBall.current = null;
+            resetShooterBall();
           }
-          resetShooterBall();
         }
-
+    
         // Törmäys kattoon
         if ((bodyA === shooter && bodyB === ceiling) || (bodyB === shooter && bodyA === ceiling)) {
+          shooterBall.current = null;
           resetShooterBall();
         }
       });
     });
+    
+    
 
     const update = () => {
       updatePhysics(engine);
