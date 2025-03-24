@@ -16,8 +16,7 @@ const BubbleShooter = ({ navigation }) => {
   const [gameOver, setGameOver] = useState(false);
 
   useEffect(() => {
-    shooterBall.current = createShooterBall(world, width / 2, height - 200, 25);
-    shooterBall.current.color = getRandomPastelColor();
+    initShooterBall();
 
     const staticBallsArray = createStaticBalls(world, 3, 7, width);
     setStaticBalls(staticBallsArray);
@@ -27,16 +26,28 @@ const BubbleShooter = ({ navigation }) => {
       const pairs = event.pairs;
 
       pairs.forEach(({ bodyA, bodyB }) => {
-        if ((bodyA === shooterBall.current && staticBallsArray.includes(bodyB)) ||
-            (bodyB === shooterBall.current && staticBallsArray.includes(bodyA))) {
-          const ballToRemove = staticBallsArray.includes(bodyA) ? bodyA : bodyB;
-          Matter.World.remove(world, ballToRemove);
-          setStaticBalls((prev) => prev.filter((b) => b !== ballToRemove));
+        const shooter = shooterBall.current;
+
+        if (!shooter) return;
+
+        const isShooterA = bodyA === shooter;
+        const otherBall = isShooterA ? bodyB : bodyA;
+
+        // Törmäys staattiseen palloon
+        if (staticBallsArray.includes(otherBall)) {
+          if (shooter.color === otherBall.color) {
+            Matter.World.remove(world, otherBall);
+            setStaticBalls((prev) => prev.filter((b) => b !== otherBall));
+          } else {
+            Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
+            Matter.Body.setStatic(shooter, true);
+            staticBallsArray.push(shooter);
+          }
           resetShooterBall();
         }
 
-        if ((bodyA === shooterBall.current && bodyB === ceiling) ||
-            (bodyB === shooterBall.current && bodyA === ceiling)) {
+        // Törmäys kattoon
+        if ((bodyA === shooter && bodyB === ceiling) || (bodyB === shooter && bodyA === ceiling)) {
           resetShooterBall();
         }
       });
@@ -59,21 +70,13 @@ const BubbleShooter = ({ navigation }) => {
     }
   }, [staticBalls, ballsInitialized]);
 
-  useEffect(() => {
-    if (!isBallAtCenter && shooterBall.current) {
-      Matter.Body.setStatic(shooterBall.current, false);
-    }
-  }, [isBallAtCenter]);
+  const initShooterBall = () => {
+    shooterBall.current = createShooterBall(world, width / 2, height - 200, 25, getRandomPastelColor());
+    Matter.Body.setStatic(shooterBall.current, true);
+  };
 
   const resetShooterBall = () => {
-    Matter.Body.setPosition(shooterBall.current, { x: width / 2, y: height - 224 });
-    Matter.Body.setVelocity(shooterBall.current, { x: 0, y: 0 });
-    Matter.Body.set(shooterBall.current, {
-      restitution: 0,
-      frictionAir: 0,
-      isStatic: true,
-    });
-    shooterBall.current.color = getRandomPastelColor();
+    initShooterBall();
     setIsBallAtCenter(true);
   };
 
@@ -87,6 +90,7 @@ const BubbleShooter = ({ navigation }) => {
     const speed = 20;
     const normalizedX = (directionX / magnitude) * speed;
     const normalizedY = (directionY / magnitude) * speed;
+    Matter.Body.setStatic(shooterBall.current, false);
     Matter.Body.setVelocity(shooterBall.current, { x: normalizedX, y: normalizedY });
     setIsBallAtCenter(false);
   };

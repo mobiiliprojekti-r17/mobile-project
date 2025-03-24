@@ -12,8 +12,6 @@ export const createPhysics = (screenWidth, screenHeight) => {
   const world = engine.world;
   engine.world.gravity.x = 0;
   engine.world.gravity.y = 0;
-
-  // Seinä ja katto -rakenteet
   const wallOptions = { isStatic: true, restitution: 1 };
   const ground = Matter.Bodies.rectangle(screenWidth / 2, screenHeight - 80, screenWidth, 50, wallOptions);
   const leftWall = Matter.Bodies.rectangle(0, screenHeight / 2, 50, screenHeight, wallOptions);
