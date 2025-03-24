@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
       paddingBottom: 40,
     },
     button: {
-      paddingTop: 20  // Lisää etäisyyttä napin yläpuolelle
+      paddingTop: 20 
     },
   });
   

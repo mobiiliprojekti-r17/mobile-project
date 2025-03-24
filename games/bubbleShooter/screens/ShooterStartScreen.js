@@ -7,7 +7,7 @@ const ShooterStartScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Button 
         title="Start Game" 
-        onPress={() => navigation.navigate('GameScreen')} // Navigoi GameScreeniin
+        onPress={() => navigation.navigate('GameScreen')}
       />
     </View>
   );

@@ -1,6 +1,12 @@
 import Matter from 'matter-js';
 
-// Luo pelin fysiikkamoottorin ja maailman
+
+export const getRandomPastelColor = () => {
+  const r = Math.floor(Math.random() * 127 + 128);
+  const g = Math.floor(Math.random() * 127 + 128);
+  const b = Math.floor(Math.random() * 127 + 128);
+  return `rgb(${r}, ${g}, ${b})`;
+};
 export const createPhysics = () => {
   const engine = Matter.Engine.create();
   const world = engine.world;
@@ -10,22 +16,23 @@ export const createPhysics = () => {
   return { engine, world };
 };
 
-// Luo ammuntapallon, joka ei pomppaa ennen ampumista
-export const createShooterBall = (world, x, y, radius) => {
+export const createShooterBall = (world, x, y, radius, color) => {
   const ball = Matter.Bodies.circle(x, y, radius, {
-    restitution: 0, 
+    restitution: 0.4,
     frictionAir: 0.01,
     density: 0.001,
     inertia: Infinity,
     friction: 0,
-    
+    collisionFilter: {
+      category: 0x0002,
+      mask: 0x0001 | 0x0002,
+    },
   });
-
+  ball.color = color;
   Matter.World.add(world, ball);
   return ball;
 };
 
-// Luo staattiset pallot pelissä
 export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
   const staticBallRadius = 20;
   const staticBallsArray = [];
@@ -36,6 +43,7 @@ export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
       const yPos = 100 + row * (staticBallRadius * 2 + 10);
       const staticBall = Matter.Bodies.circle(xPos, yPos, staticBallRadius, { isStatic: true });
       Matter.World.add(world, staticBall);
+      staticBall.color = getRandomPastelColor();
       staticBallsArray.push(staticBall);
     }
   }
@@ -43,13 +51,11 @@ export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
   return staticBallsArray;
 };
 
-// Päivittää fysiikan ja tarkistaa törmäykset
 export const updatePhysics = (engine, shooterBall, staticBalls, resetShooter) => {
   Matter.Engine.update(engine);
 
-  // Jos pallo on ammuttu, määritellään restitution uudelleen
   if (shooterBall && shooterBall.restitution === 0) {
-    shooterBall.restitution = 0.4; // Aseta pallo pomppimaan normaalisti
+    shooterBall.restitution = 0.4; 
   }
 
   staticBalls.forEach((ball, index) => {
