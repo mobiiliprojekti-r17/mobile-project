@@ -6,8 +6,12 @@ import { styles, getTileStyle } from "../styles/2048Styles";
 
 const Game2048Screen = () => {
   const [grid, setGrid] = useState(initializeGrid());
+  const [swipeCooldown, setSwipeCooldown] = useState(false); // Estetään moninkertaiset pyyhkäisyt
 
   const handleSwipe = (event) => {
+    if (swipeCooldown) return; // Jos throttle on päällä, estetään uusi siirto
+    setSwipeCooldown(true); // Aktivoidaan throttle
+
     const { translationX, translationY } = event.nativeEvent;
     let direction = null;
 
@@ -23,6 +27,8 @@ const Game2048Screen = () => {
     if (checkGameOver(newGrid)) {
       Alert.alert("Peli päättyi!", "Ei enää mahdollisia siirtoja!");
     }
+
+    setTimeout(() => setSwipeCooldown(false), 150); // Vapautetaan throttle 150ms jälkeen
   };
 
   return (
