@@ -108,7 +108,7 @@ export default function Sudoku({ route, navigation }) {
         });
       }
 
-      setSelectedCell(null); // Nollataan valittu solu
+      setSelectedCell(null); // Nollataan vittu solu
     }
   };
 
