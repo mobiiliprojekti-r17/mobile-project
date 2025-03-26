@@ -1,21 +1,24 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, TouchableWithoutFeedback, Dimensions, StyleSheet } from 'react-native';
 import Matter from 'matter-js';
-import { createPhysics, createShooterBall, createStaticBalls, updatePhysics } from '../utils/shooterPhysics';
+import { createPhysics, createShooterBall, createStaticBalls, updatePhysics, getRandomPastelColor } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
 
 const { width, height } = Dimensions.get('window');
 
-const BubbleShooter = () => {
+const BubbleShooter = ({ navigation }) => {
   const { engine, world } = createPhysics();
   const shooterBall = useRef(null);
   const [ballPosition, setBallPosition] = useState({ x: width / 2, y: height - 200 });
   const [staticBalls, setStaticBalls] = useState([]);
+  const [ballsInitialized, setBallsInitialized] = useState(false);
   const [isBallAtCenter, setIsBallAtCenter] = useState(true);
+  const [gameOver, setGameOver] = useState(false);
 
   useEffect(() => {
     shooterBall.current = createShooterBall(world, width / 2, height - 200, 25);
-    //luodaan peliruutu
+    shooterBall.current.color = getRandomPastelColor(); 
+
     const wallOptions = { isStatic: true, restitution: 1 };
     const ground = Matter.Bodies.rectangle(width / 2, height - 80, width, 50, { isStatic: true });
     const leftWall = Matter.Bodies.rectangle(0, height / 2, 50, height, wallOptions);
@@ -24,9 +27,12 @@ const BubbleShooter = () => {
 
     Matter.World.add(world, [ground, leftWall, rightWall, ceiling]);
 
-    // Luo staattiset pallot
     const staticBallsArray = createStaticBalls(world, 3, 7, width);
+    staticBallsArray.forEach(ball => {
+      ball.color = getRandomPastelColor();
+    });
     setStaticBalls(staticBallsArray);
+    setBallsInitialized(true);
 
     Matter.Events.on(engine, 'collisionStart', (event) => {
       const pairs = event.pairs;
@@ -37,14 +43,11 @@ const BubbleShooter = () => {
           const ballToRemove = staticBallsArray.includes(bodyA) ? bodyA : bodyB;
           Matter.World.remove(world, ballToRemove);
           setStaticBalls((prev) => prev.filter((b) => b !== ballToRemove));
-
           resetShooterBall();
         }
 
-        //Jos shooterBall osuu lattiaan, sallitaan uusi laukaus
-            if (bodyA === shooterBall.current && bodyB === ceiling || 
+        if (bodyA === shooterBall.current && bodyB === ceiling || 
             bodyB === shooterBall.current && bodyA === ceiling) {
-            
           resetShooterBall();
         } 
       });
@@ -52,72 +55,60 @@ const BubbleShooter = () => {
 
     const update = () => {
       updatePhysics(engine, shooterBall.current, staticBalls, resetShooterBall);
-
       const { x, y } = shooterBall.current.position;
       setBallPosition({ x, y });
-
       requestAnimationFrame(update);
     };
 
     update();
   }, []);
 
+  useEffect(() => {
+    if (ballsInitialized && staticBalls.length === 0 && !gameOver) {
+      setGameOver(true);
+      navigation.replace('ShooterGameOver');
+    }
+  }, [staticBalls, ballsInitialized]);
 
   useEffect(() => {
     if (!isBallAtCenter && shooterBall.current) {
-      // Asetetaan pallon isStatic false, kun pallo ei ole keskellä
       Matter.Body.setStatic(shooterBall.current, false);
     }
   }, [isBallAtCenter]);
 
-  
-//---------------------------------------------------------------------------------------------------------
-const resetShooterBall = () => {
-    // Varmistetaan, että pallo ei liiku ennen uutta laukausta
+  const resetShooterBall = () => {
     Matter.Body.setPosition(shooterBall.current, { x: width / 2, y: height - 224 });
     Matter.Body.setVelocity(shooterBall.current, { x: 0, y: 0 });
     Matter.Body.set(shooterBall.current, {
-        restitution: 0, 
-        frictionAir: 0, 
-        isStatic: true,
-
-      });
-    // Kun pallo on palautettu alkuperäiseen paikkaansa, sallitaan uusi ammunta
-    setIsBallAtCenter(true) ; 
-    
+      restitution: 0, 
+      frictionAir: 0, 
+      isStatic: true,
+    });
+    shooterBall.current.color = getRandomPastelColor(); 
+    setIsBallAtCenter(true); 
   };
-//----------------------------------------------------------------------------------------------------------
 
-const handleTouch = (event) => {
-    if (!isBallAtCenter) return;
-  
+  const handleTouch = (event) => {
+    if (!isBallAtCenter || gameOver) return;
     const touchX = event.nativeEvent.pageX;
     const touchY = event.nativeEvent.pageY;
-  
-    // Laske suunta (kosketuspaikka ja pallo)
     const directionX = touchX - shooterBall.current.position.x;
     const directionY = touchY - shooterBall.current.position.y;
-  
-    // Laske suuntavektorin pituus
     const magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
-  
-    // Aseta vakio nopeus, joka on aina sama riippumatta kosketuspaikasta
-    const speed = 20; //pallon nopeus
+    const speed = 20; 
     const normalizedX = (directionX / magnitude) * speed; 
     const normalizedY = (directionY / magnitude) * speed;
-  
-    // Aseta pallon nopeus vakiona, riippumatta kosketuksesta
     Matter.Body.setVelocity(shooterBall.current, { x: normalizedX, y: normalizedY });
-  
-    setIsBallAtCenter(false); // Estää ammunnan ennen kuin pallo on palannut
+    setIsBallAtCenter(false); 
   };
+
   return (
     <TouchableWithoutFeedback onPress={handleTouch}>
       <View style={styles.container}>
         {staticBalls.map((ball, index) => (
-          <Ball key={index} x={ball.position.x} y={ball.position.y} size={40} color="red" />
+          <Ball key={index} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
         ))}
-        <Ball x={ballPosition.x} y={ballPosition.y} size={50} color="blue" />
+        <Ball x={ballPosition.x} y={ballPosition.y} size={50} color={shooterBall.current?.color || 'blue'} />
       </View>
     </TouchableWithoutFeedback>
   );

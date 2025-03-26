@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
 import BubbleShooterScreen from './games/bubbleShooter/screens/ShooterScreen';
+import ShooterGameOver from './games/bubbleShooter/screens/ShooterGameOverScreen';
 import BrickBreakerScreen from './games/brickBreaker/screens/BreakerScreen';
 import Sudoku from './games/sudoku/screens/SudokuScreen';
 import SudokuResult from './games/sudoku/screens/SudokuResultScreen';
@@ -20,6 +21,7 @@ const App = () => {
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="BubbleShooter" component={BubbleShooterScreen} />
+        <Stack.Screen name="ShooterGameOver" component={ShooterGameOver} /> 
         <Stack.Screen name="BrickBreaker" component={BrickBreakerScreen} />
         <Stack.Screen name="Sudoku" component={Sudoku} />
         <Stack.Screen name="SudokuResult" component={SudokuResult} />
