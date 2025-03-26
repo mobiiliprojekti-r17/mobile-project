@@ -5,14 +5,23 @@ import Toast from "react-native-toast-message";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import sudoku from "sudoku";
 import styles from "../styles/SudokuStyles";
+import { db, collection, addDoc, getDocs } from "../../../firebase/Config"
 
 export default function Sudoku({ route, navigation }) {
   const [board, setBoard] = useState([]);
   const [solution, setSolution] = useState(null);
   const [selectedCell, setSelectedCell] = useState(null);
+  const [Nickname, setNickname] = useState('');
   const [difficulty, setDifficulty] = useState(route.params?.difficulty);
   const [timer, setTimer] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
+
+
+  useEffect(() => {
+    if (route.params?.nickname) {
+      setNickname(route.params.nickname);
+    }
+  }, [route.params?.nickname]);
 
   useEffect(() => {
     let interval;
@@ -119,15 +128,15 @@ export default function Sudoku({ route, navigation }) {
     }
   };
 
-  const checkSudoku = () => {
+  const checkSudoku = async () => {
     if (!solution) {
       Toast.show({ type: "error", text1: "Ratkaisua ei löydy!" });
       return;
     }
   
     let isCorrect = true;
-    const newBoard = board.map((row, rowIndex) => {
-      return row.map((cell, colIndex) => {
+    const newBoard = board.map((row, rowIndex) =>
+      row.map((cell, colIndex) => {
         const correctValue =
           solution[rowIndex * 9 + colIndex] !== null
             ? (solution[rowIndex * 9 + colIndex] + 1).toString()
@@ -138,23 +147,38 @@ export default function Sudoku({ route, navigation }) {
           return { ...cell, isError: true };
         }
         return { ...cell, isError: false };
-      });
-    });
+      })
+    );
   
     setBoard(newBoard);
   
     if (isCorrect) {
       setIsRunning(false);
-      navigation.replace("SudokuResult", { time: timer, difficulty });
+  
+      // Aikamuotoilun korjaus: aika tallennetaan valmiiksi muotoiltuna
+      const formattedTime = formatTime(timer); // Aika muotoillaan "mm:ss"
+  
+      // Tallennetaan pelin tulos Firestoreen
+      try {
+        const gameResultsRef = collection(db, "SudokuGameResults");
+        await addDoc(gameResultsRef, {
+         
+          Nickname: Nickname,  // Pelaajan nimimerkki
+          difficulty: difficulty, // Pelin vaikeustaso
+          time: formattedTime,  // Tallennetaan muotoiltu aika
+        });
+        console.log("Pelitulos tallennettu Firebaseen");
+      } catch (error) {
+        console.error("Virhe tallennettaessa tulosta: ", error);
+      }
 
+      navigation.replace("SudokuResult", { time: timer, Nickname, difficulty });
     } else {
-      Alert.alert("Virheitä löytyi!", "Korjaa punaiset ruudut ja yritä uudelleen.", [
-        { text: "OK" },
-      ]);
+      Alert.alert("Virheitä löytyi!", "Korjaa punaiset ruudut ja yritä uudelleen.", [{ text: "OK" }]);
     }
   };
   
-
+  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
