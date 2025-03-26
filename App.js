@@ -9,6 +9,9 @@ import BrickBreakerScreen from './games/brickBreaker/screens/BreakerScreen';
 import Sudoku from './games/sudoku/screens/SudokuScreen';
 import SudokuResult from './games/sudoku/screens/SudokuResultScreen';
 import Game2048Screen from './games/2048/screens/2048Screen'; 
+import TictactoeMultiplayer from './games/tictactoe/screens/TictactoeMulti';
+import TictactoeSingleplayer from './games/tictactoe/screens/TictactoeSingle';
+import Connect4 from './games/Connect4/screens/Connect4Screen';
 
 const Stack = createStackNavigator();
 
@@ -23,6 +26,9 @@ const App = () => {
         <Stack.Screen name="Sudoku" component={Sudoku} />
         <Stack.Screen name="SudokuResult" component={SudokuResult} />
         <Stack.Screen name="2048" component={Game2048Screen} />
+        <Stack.Screen name="TictactoeMultiplayer" component={TictactoeMultiplayer} />
+        <Stack.Screen name="TictactoeSingleplayer" component={TictactoeSingleplayer} />
+        <Stack.Screen name="Connect4" component={Connect4} />
       </Stack.Navigator>
     </NavigationContainer>
   );
