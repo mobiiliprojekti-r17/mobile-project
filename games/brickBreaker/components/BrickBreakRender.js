@@ -26,23 +26,19 @@ export const Paddle = (props) => {
 };
 
 export const Ball = (props) => {
-  const { body } = props;
-  const radius = body.circleRadius;
-  const x = body.position.x - radius;
-  const y = body.position.y - radius;
+  const { body, color } = props;
+  const { position } = body;
 
   return (
-    <View
-      style={{
-        position: "absolute",
-        left: x,
-        top: y,
-        width: radius * 1.8,
-        height: radius * 1.8,
-        borderRadius: radius,
-        backgroundColor: "red",
-      }}
-    />
+    <View style={{
+      position: 'absolute',
+      width: 20,
+      height: 20,
+      backgroundColor: color || 'red',  
+      borderRadius: 10,
+      left: position.x - 10,
+      top: position.y - 10,
+    }} />
   );
 };
 
