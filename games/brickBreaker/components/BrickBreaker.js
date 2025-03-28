@@ -1,4 +1,6 @@
-import React, { useRef, useState } from "react";
+
+
+import React, { useRef, useState, useMemo } from "react";
 import { View, StyleSheet, PanResponder, Text, Button } from "react-native";
 import { GameEngine } from "react-native-game-engine";
 import Matter from "matter-js";
@@ -13,39 +15,27 @@ Matter.Resolver._frictionNormalMultiplier = 1.0;
 const setupWorld = (level = 1) => {
   const engine = Matter.Engine.create({ enableSleeping: false });
   const world = engine.world;
-  
   engine.world.gravity.y = 0;
-//----------------------------------------------------------------------------------
-//Siirretäänkö brickbreakrenderers.js
-  const ball = Matter.Bodies.circle(200, 300, 10, {
+
+  const ball = Matter.Bodies.circle(200, 520, 10, {
+    isStatic: true,
     label: "ball",
     restitution: 1.0,
     friction: 0,
     frictionAir: 0,
     inertia: Infinity,
     isStatic: false,
-    collisionFilter: { group: -1 }, 
-  });
-  
-
-  ball.plugin = { continuous: true }; 
-  
-  Matter.Body.set(ball, {
-    slop: 0, 
-    timeScale: 1,
+    collisionFilter: { group: -1 },
   });
 
-  const paddle = Matter.Bodies.rectangle(200, 550, 100, 20, { 
+  const paddle = Matter.Bodies.rectangle(200, 550, 100, 20, {
     isStatic: true,
     collisionFilter: { category: 0x0002, mask: 0x0004 }
   });
 
-  const wallLeft = Matter.Bodies.rectangle(0, 300, 20, 600, { isStatic: true });  
-  const wallRight = Matter.Bodies.rectangle(400, 300, 20, 600, { isStatic: true }); 
-  const ceiling = Matter.Bodies.rectangle(200, 0, 400, 20, { isStatic: true }); 
-
-  Matter.World.add(world, [wallLeft, wallRight, ceiling]);
-  Matter.Body.setVelocity(ball, { x: 5, y: -5 });
+  const wallLeft = Matter.Bodies.rectangle(0, 300, 20, 600, { isStatic: true });
+  const wallRight = Matter.Bodies.rectangle(400, 300, 20, 600, { isStatic: true });
+  const ceiling = Matter.Bodies.rectangle(200, 0, 400, 20, { isStatic: true });
 
   const bricks = [];
   const brickCols = 6;
@@ -54,109 +44,159 @@ const setupWorld = (level = 1) => {
   const brickHeight = 30;
   const spacingX = 8;
   const spacingY = 10;
-  
+
   const totalBrickWidth = brickCols * brickWidth + (brickCols - 1) * spacingX;
   const startX = (400 - totalBrickWidth) / 2;
-  
-  const specialBrickIndex = Math.floor(Math.random() * (brickCols * 4)); 
+  const specialBrickIndex = new Set();
+while (specialBrickIndex.size < 2) {
+  specialBrickIndex.add(Math.floor(Math.random() * (brickCols * brickRows)));
+}
 
   for (let i = 0; i < brickCols; i++) {
     for (let j = 0; j < brickRows; j++) {
       const x = startX + i * (brickWidth + spacingX) + brickWidth / 2;
       const y = 100 + j * (brickHeight + spacingY);
-      
       const index = i * brickRows + j;
-      const isSpecial = index === specialBrickIndex && j < 4;
+      const isSpecial = specialBrickIndex.has(index) && j < 4;
 
-      const brick = Matter.Bodies.rectangle(
-        x,
-        y,
-        brickWidth,
-        brickHeight,
-        {
-          label: isSpecial ? `brick_special_${i}_${j}` : `brick_${i}_${j}`,
-          isStatic: true,
-          collisionFilter: { category: 0x0008, mask: 0x0004 }
-        }
-      );
+      const brick = Matter.Bodies.rectangle(x, y, brickWidth, brickHeight, {
+        label: isSpecial ? `brick_special_${i}_${j}` : `brick_${i}_${j}`,
+        isStatic: true,
+        collisionFilter: { category: 0x0008, mask: 0x0004 }
+      });
 
       bricks.push(brick);
     }
   }
 
-  Matter.World.add(world, [ball, paddle]);
+  Matter.World.add(world, [wallLeft, wallRight, ceiling, ball, paddle, ...bricks]);
+    const baseSpeed = 3;
+    const speed = baseSpeed + level * 1; 
+//---------------------------------------------------------------------------------------------------------------------- 
+    //Matter.Body.setVelocity(ball, { x: speed, y: -speed });
+//----------------------------------------------------------------------------------------------------------------------
   return { engine, world, ball, paddle, bricks, level, wallLeft, wallRight, ceiling };
 };
-//--------------------------------------------------------------------------------------------
-export default function brickBreaker() {
+
+export default function BrickBreaker() {
   const gameEngine = useRef(null);
   const [gameState, setGameState] = useState(setupWorld());
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [levelCleared, setLevelCleared] = useState(false); 
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (event, gesture) => {
-        const maxX = 400 - 50;
-        const minX = 50;
+  const panResponder = useMemo(() => PanResponder.create({
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderMove: (event, gesture) => {
+      const maxX = 400 - 50;
+      const minX = 50;
+      if (gameState.paddle) {
         Matter.Body.setPosition(gameState.paddle, {
           x: Math.min(Math.max(gesture.moveX, minX), maxX),
-          y: 550
+          y: 550,
         });
-      },
-    })
-  ).current;
+      }
+    },
+  }), [gameState.paddle]);
 
 
-const Restart = () => {
-    const newGameState = setupWorld(1); 
+  const nextLevel = () => {
+    const newLevel = gameState.level + 1;
+    const newGameState = setupWorld(newLevel);
     setGameState(newGameState);
     setGameOver(false);
-    setScore(0);
-    
-    if (gameEngine.current) {
-      gameEngine.current.stop(); 
-    
-      setTimeout(() => {
-        gameEngine.current.swap({
-          physics: { engine: newGameState.engine, world: newGameState.world },
-          ball: { body: newGameState.ball, renderer: Ball },
-          paddle: { body: newGameState.paddle, renderer: Paddle },
-          wallLeft: { body: newGameState.wallLeft },
-          wallRight: { body: newGameState.wallRight },
-          ceiling: { body: newGameState.ceiling },
-          ...newGameState.bricks.reduce((acc, brick, index) => {
-            acc[`brick_${index}`] = { body: brick, renderer: Brick };
-            return acc;
-          }, {}),
-        });
-  
-        gameEngine.current.start(); 
-      }, 100); 
-    }
+    setGameStarted(false);
+    setLevelCleared(false);
+
+    setTimeout(() => {
+      gameEngine.current.swap({
+        physics: { engine: newGameState.engine, world: newGameState.world },
+        ball: { body: newGameState.ball, renderer: Ball },
+        paddle: { body: newGameState.paddle, renderer: Paddle },
+        wallLeft: { body: newGameState.wallLeft },
+        wallRight: { body: newGameState.wallRight },
+        ceiling: { body: newGameState.ceiling },
+        ...newGameState.bricks.reduce((acc, brick, index) => {
+          acc[`brick_${index}`] = { body: brick, renderer: Brick };
+          return acc;
+        }, {}),
+      });
+    }, 50);
   };
-  
+
+  const gameOverHandler = () => {
+    setGameOver(true);
+    setGameStarted(false);
+    setLevelCleared(false);
+    gameEngine.current.stop();
+  };
+
 
 
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
       <Text style={styles.score}>Pisteet: {score} | Taso: {gameState.level}</Text>
+
       {gameOver && (
+  <View style={styles.overlay}>
+    <Text style={styles.gameOverText}>Peli päättyi!</Text>
+    <Button
+      title="Try Again"
+      onPress={() => {
+        const newGameState = setupWorld(1);
+        setGameOver(false);
+        setLevelCleared(false);
+        setScore(0);
+        setGameStarted(false);
+        setGameState(newGameState);
+
+        setTimeout(() => {
+          gameEngine.current.swap({
+            physics: { engine: newGameState.engine, world: newGameState.world },
+            ball: { body: newGameState.ball, renderer: Ball },
+            paddle: { body: newGameState.paddle, renderer: Paddle },
+            wallLeft: { body: newGameState.wallLeft },
+            wallRight: { body: newGameState.wallRight },
+            ceiling: { body: newGameState.ceiling },
+            ...newGameState.bricks.reduce((acc, brick, index) => {
+              acc[`brick_${index}`] = { body: brick, renderer: Brick };
+              return acc;
+            }, {}),
+          });
+        }, 50);
+      }}
+    />
+  </View>
+)}
+
+      {levelCleared && (
         <View style={styles.overlay}>
-          <Text style={styles.gameOverText}>Peli päättyi!</Text>
-          <Button title="Restart" onPress={Restart} />
+          <Text style={styles.gameOverText}>Taso läpäisty!</Text>
+          <Button title="Next Level" onPress={nextLevel} />
         </View>
       )}
 
-      
+      {!gameOver && !levelCleared && !gameStarted && (
+        <View style={styles.overlay}>
+          <Text style={styles.gameOverText}>Press to Start</Text>
+         
+          <Button title="Start" onPress={() => {setGameStarted(true); 
+          const baseSpeed = 3;
+          const speed = baseSpeed + gameState.level; 
+          Matter.Body.setVelocity(gameState.ball, { x: speed, y: -speed });
+          }} />
+        </View>
+      )}
+
       <GameEngine
         ref={gameEngine}
         style={styles.gameContainer}
         systems={[Physics]}
+        running={gameStarted}
         entities={{
           physics: { engine: gameState.engine, world: gameState.world },
-          ball: { body: gameState.ball, renderer: Ball },
+          ball: { body: gameState.ball, renderer: Ball, color: 'white' },
           paddle: { body: gameState.paddle, renderer: Paddle },
           wallLeft: { body: gameState.wallLeft },
           wallRight: { body: gameState.wallRight },
@@ -165,18 +205,22 @@ const Restart = () => {
             acc[`brick_${index}`] = { body: brick, renderer: Brick };
             return acc;
           }, {}),
+          ...Object.keys(gameState).filter((key) => key.startsWith('ball_extra')).reduce((acc, key) => {
+            acc[key] = { body: gameState[key].body, renderer: Ball, color: gameState[key].color }; 
+            return acc;
+          }, {}),
         }}
         onEvent={(e) => {
           if (e.type === "increase-score") {
             setScore((prev) => prev + 1);
           } else if (e.type === "game-over") {
-            setGameOver(true);
-            gameEngine.current.stop(); 
+            gameOverHandler();
+          } else if (e.type === "level-cleared") {
+            setLevelCleared(true);
+            setGameStarted(false);
           }
         }}
-        
       />
-      
     </View>
   );
 }
@@ -194,6 +238,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.7)",
+    zIndex: 10,
   },
   gameOverText: {
     color: "white",
@@ -201,4 +246,3 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 });
-

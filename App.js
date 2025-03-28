@@ -5,7 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
 import BubbleShooterScreen from './games/bubbleShooter/screens/ShooterScreen';
 import ShooterGameOver from './games/bubbleShooter/screens/ShooterGameOverScreen';
-import BrickBreakerScreen from './games/brickBreaker/screens/BreakerScreen';
+import BrickBreakerScreen from './games/brickBreaker/screens/BreakerScreen'
 import Sudoku from './games/sudoku/screens/SudokuScreen';
 import SudokuResult from './games/sudoku/screens/SudokuResultScreen';
 import Game2048Screen from './games/2048/screens/2048Screen'; 

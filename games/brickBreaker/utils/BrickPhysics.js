@@ -1,4 +1,7 @@
+
+
 import Matter from "matter-js";
+import { Paddle, Ball, Brick } from "../components/BrickBreakRender";
 
 export const Physics = (entities, { time, dispatch }) => {
   const engine = entities.physics.engine;
@@ -50,17 +53,21 @@ export const Physics = (entities, { time, dispatch }) => {
             dispatch({ type: "increase-score" });
 
             if (brick.label.includes("special")) {
+
+            
+              const newBallId = `ball_extra_${Date.now()}`;
+  
               const newBall = Matter.Bodies.circle(
                 ball.position.x,
                 ball.position.y,
                 10,
                 {
-                  label: `ball_extra_${Date.now()}`, 
-                  restitution: 1, 
+                  label: newBallId,
+                  restitution: 1,
                   friction: 0,
                   frictionAir: 0,
                   inertia: Infinity,
-                  collisionFilter: { group: 0 }, 
+                  collisionFilter: { group: 0 },
                 }
               );
 
@@ -72,14 +79,27 @@ export const Physics = (entities, { time, dispatch }) => {
                 renderer: entities.ball.renderer, 
               };
 
-              console.log("Extra ball added:", newBall);
+             // console.log("Extra ball added:", newBall);
             }
           }
         });
+//Yksikin pallo tippuu = ohi
+  if (ball.position.y > 600) {
+  Matter.World.remove(engine.world, ball);
+  delete entities[key];
+  
+  // Jos kaikki pallot on poistettu:
+  const ballsRemaining = Object.keys(entities).filter((k) => k.startsWith("ball_") || k === "ball");
+  if (ballsRemaining.length === 0) {
+    dispatch({ type: "game-over" });
+  }
+}
 
-      if (!bricksLeft) {
-        dispatch({ type: "game-over" });
-      }
+
+        if (!bricksLeft) {
+          dispatch({ type: "level-cleared" }); 
+        }
+        
 
       const wallLeft = entities.wallLeft.body;
       const wallRight = entities.wallRight.body;
@@ -95,6 +115,9 @@ export const Physics = (entities, { time, dispatch }) => {
         Matter.Body.setVelocity(ball, { x: ball.velocity.x, y: Math.abs(ball.velocity.y) });
       }
 
+
+
+     
       const minSpeed = 2;
       if (Math.abs(ball.velocity.x) < minSpeed) {
         Matter.Body.setVelocity(ball, { x: Math.sign(ball.velocity.x) * minSpeed, y: ball.velocity.y });
@@ -104,6 +127,5 @@ export const Physics = (entities, { time, dispatch }) => {
       }
     });
 
-
-  return entities;
+return entities;
 };
