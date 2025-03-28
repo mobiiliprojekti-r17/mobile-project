@@ -101,7 +101,6 @@ const Connect4 = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Connect 4</Text>
       <Text>Current Player: {currentPlayer}</Text>
       {winner && <Text style={styles.winnerText}>{winner} Wins!</Text>}
       <View style={styles.board}>{renderBoard()}</View>
