@@ -41,6 +41,7 @@ const slide = (row) => {
     let newRow = row.filter((num) => num !== 0);
     let result = [];
     let skipNext = false;
+    let pointsEarned = 0; // Tallennetaan ansaitut pisteet
 
     for (let i = 0; i < newRow.length; i++) {
         if (skipNext) {
@@ -49,7 +50,9 @@ const slide = (row) => {
         }
 
         if (i < newRow.length - 1 && newRow[i] === newRow[i + 1]) {
-            result.push(newRow[i] * 2);
+            let mergedValue = newRow[i] * 2;
+            result.push(mergedValue);
+            pointsEarned += mergedValue; // Lisätään pisteisiin yhdistetyn laatan arvo
             skipNext = true;
         } else {
             result.push(newRow[i]);
@@ -60,40 +63,47 @@ const slide = (row) => {
         result.push(0);
     }
 
-    return result;
+    return { newRow: result, pointsEarned };
 };
 
 export const moveTiles = (grid, direction) => {
     let newGrid = grid.map((row) => [...row]);
     let originalGrid = JSON.stringify(grid);
+    let totalPoints = 0;
 
     if (direction === "left") {
         for (let i = 0; i < 4; i++) {
-            newGrid[i] = slide(newGrid[i]);
+            let { newRow, pointsEarned } = slide(newGrid[i]);
+            newGrid[i] = newRow;
+            totalPoints += pointsEarned;
         }
     } else if (direction === "right") {
         for (let i = 0; i < 4; i++) {
-            newGrid[i] = slide(newGrid[i].reverse()).reverse();
+            let { newRow, pointsEarned } = slide(newGrid[i].reverse());
+            newGrid[i] = newRow.reverse();
+            totalPoints += pointsEarned;
         }
     } else if (direction === "up") {
         for (let i = 0; i < 4; i++) {
             let col = newGrid.map((row) => row[i]);
-            let newCol = slide(col);
-            newCol.forEach((val, j) => (newGrid[j][i] = val));
+            let { newRow, pointsEarned } = slide(col);
+            newRow.forEach((val, j) => (newGrid[j][i] = val));
+            totalPoints += pointsEarned;
         }
     } else if (direction === "down") {
         for (let i = 0; i < 4; i++) {
             let col = newGrid.map((row) => row[i]).reverse();
-            let newCol = slide(col).reverse();
-            newCol.forEach((val, j) => (newGrid[j][i] = val));
+            let { newRow, pointsEarned } = slide(col);
+            newRow.reverse().forEach((val, j) => (newGrid[j][i] = val));
+            totalPoints += pointsEarned;
         }
     }
 
     if (JSON.stringify(newGrid) !== originalGrid) {
-        addSingleTile(newGrid); // Lisätään vain yksi uusi laatta
+        addSingleTile(newGrid);
     }
 
-    return newGrid;
+    return { newGrid, totalPoints }; // Palautetaan myös pisteet
 };
 
 export const checkGameOver = (grid) => {
