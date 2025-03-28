@@ -1,41 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, TouchableOpacity, TextInput, Alert, StyleSheet } from 'react-native';
-import { firestore } from '../firebase/Config'
+import { View, Text, TouchableOpacity, TextInput, Alert, StyleSheet } from 'react-native';
+import { db, collection, addDoc, getDocs } from '../firebase/Config'; 
 
 const HomeScreen = ({ navigation }) => {
-  const [nickname, setNickname] = useState('');
-  const [userId, setUserId] = useState(null); // Käyttäjän tunniste
+  const [nickname, setNickname] = useState(''); 
+  const [nicknames, setNicknames] = useState([]); 
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => null,
+      gestureEnabled: false,  
+    });
+  }, [navigation]);
 
   // Ladataan käyttäjän nickname Firestoresta (jos tallennettu)
-  useEffect(() => {
-    const fetchNickname = async () => {
-      try {
-        const userDoc = await firestore().collection('users').doc('user1').get(); // Käytä esim. autentikoitua UID:ta
-        if (userDoc.exists) {
-          setNickname(userDoc.data().nickname);
-        }
-      } catch (error) {
-        console.error("Error fetching nickname:", error);
-      }
-    };
-    fetchNickname();
-  }, []);
+  const fetchNicknames = async () => {
+    const querySnapshot = await getDocs(collection(db, "NicknameList"));
+    let nicknameList = [];
+    querySnapshot.forEach((doc) => {
+      nicknameList.push({ id: doc.id, ...doc.data() });
+    });
+    setNicknames(nicknameList);
+  };
 
-  // Tallennetaan nickname Firestoreen
-  const saveNickname = async (name) => {
-    setNickname(name);
+  const addNickname = async () => {
+    if (!nickname.trim()) {
+      Alert.alert("Error", "Nickname cannot be empty!");
+      return;
+    }
+  
     try {
-      await firestore().collection('users').doc('user1').set({ nickname: name });
-      console.log("Nickname saved to Firestore!");
+      // Tallenna nimimerkki Firestoreen
+      const docRef = await addDoc(collection(db, "NicknameList"), { Nickname: nickname });
+  
+      // Päivitä tila oikein (käytetään 'nickname' nimeä React-komponentissa):
+      setNicknames((prevNicknames) => [...prevNicknames, { id: docRef.id, Nickname: nickname }]);
+  
+      Alert.alert("Success", "Nickname saved!");
     } catch (error) {
-      console.error("Error saving nickname:", error);
+      Alert.alert("Error", "Failed to save nickname: " + error.message);
+      console.error("Firestore error:", error);
     }
   };
+
+  useEffect(() => {
+    fetchNicknames();
+  }, []);
 
   const newSudokuGame = () => {
     if (!nickname.trim()) {
       Alert.alert("Warning", "Please enter a nickname first!");
-
       return;
     }
     Alert.alert(
@@ -45,47 +59,78 @@ const HomeScreen = ({ navigation }) => {
         { text: "Easy", onPress: () => startSudokuGame("easy") },
         { text: "Medium", onPress: () => startSudokuGame("medium") },
         { text: "Hard", onPress: () => startSudokuGame("hard") },
+        { text: "Cancel", style: "cancel" },
       ],
       { cancelable: false }
     );
-    
   };
+
   const startSudokuGame = (difficulty) => {
-    navigation.navigate("Sudoku", { difficulty, autoStart: true });
+    navigation.navigate("Sudoku", { nickname, difficulty, autoStart: true });
   };
+
+  // Get the most recent nickname (last added)
+  const recentNickname = nicknames.length > 0 ? nicknames[nicknames.length - 1].name : '';
+
+
+  
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to the Game!</Text>
-
 
       {/* Nickname syöttökenttä */}
       <TextInput
         style={styles.input}
         placeholder="Enter your nickname"
         value={nickname}
-        onChangeText={saveNickname}
-        />
-      
-      {/* 2048 linkki */}
-      <TouchableOpacity 
-        style={styles.gameButton} 
-        onPress={() => navigation.navigate("2048")}
-      >
-        <Text style={styles.gameButtonText}>2048</Text>
+        onChangeText={setNickname}
+      />
+      <TouchableOpacity style={styles.button} onPress={addNickname}>
+        <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
 
-      {/* Muut pelilinkit */}
-      <Button
-        title="Bubble Shooter"
-        onPress={() => navigation.navigate('BubbleShooter')}
-      />
-      <Button
-        title="Brick Breaker"
-        onPress={() => navigation.navigate('BrickBreaker')}
-      />
+      {/* Display the most recent nickname */}
+      {recentNickname ? (
+        <Text style={styles.nicknameText}>Nickname: {recentNickname}</Text>
+      ) : (
+        <Text style={styles.nicknameText}>No nickname saved yet.</Text>
+      )}
+           <Text>Singleplayer games!</Text>
+      <TouchableOpacity 
+        style={styles.gameButton} 
+        onPress={() => navigation.navigate("2048")}>
+        <Text style={styles.gameButtonText}>2048</Text>
+      </TouchableOpacity>
+      <TouchableOpacity 
+        style={styles.gameButton} 
+        onPress={() => navigation.navigate('BubbleShooter')}>
+        <Text style={styles.gameButtonText}>BubbleShooter</Text>
+      </TouchableOpacity>
+      <TouchableOpacity 
+        style={styles.gameButton} 
+        onPress={() => navigation.navigate('BrickBreaker')}>
+        <Text style={styles.gameButtonText}>BrickBreaker</Text>
+      </TouchableOpacity>
+      <TouchableOpacity 
+        style={styles.gameButton} 
+        onPress={() => navigation.navigate('TictactoeSingleplayer')}>
+        <Text style={styles.gameButtonText}>Tictactoe</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.gameButton} onPress={newSudokuGame}>
-        <Text style={styles.gameButtonText}>Start Sudoku</Text>
+        <Text style={styles.gameButtonText}>Sudoku</Text>
+      </TouchableOpacity>
+
+     <Text>Multiplayer games!</Text>
+     <TouchableOpacity 
+        style={styles.gameButton} 
+        onPress={() => navigation.navigate('TictactoeMultiplayer')}>
+        <Text style={styles.gameButtonText}>Tictactoe</Text>
+      </TouchableOpacity>
+      <TouchableOpacity 
+        style={styles.gameButton} 
+        onPress={() => navigation.navigate('Connect4')}>
+        <Text style={styles.gameButtonText}>Connect4</Text>
       </TouchableOpacity>
     </View>
   );
@@ -103,7 +148,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-
   input: {
     width: 200,
     height: 40,
@@ -123,7 +167,12 @@ const styles = StyleSheet.create({
   gameButtonText: {
     color: 'white',
     fontSize: 18,
-
+  },
+  nicknameText: {
+    fontSize: 18,
+    marginBottom: 20,
+    fontWeight: 'bold',
+    color: 'darkblue',
   },
 });
 

@@ -28,18 +28,18 @@ export const styles = StyleSheet.create({
 export const getTileStyle = (value) => {
   const tileColors = {
     0: { backgroundColor: "#e6f5ff", color: "#f9f6f2" },
-    2: { backgroundColor: "#b3e0ff", color: "#776e65" },
-    4: { backgroundColor: "#80ccff", color: "#776e65" },
-    8: { backgroundColor: "#66c2ff", color: "#f9f6f2" },
-    16: { backgroundColor: "#33adff", color: "#f9f6f2" },
-    32: { backgroundColor: "#0099ff", color: "#f9f6f2" },
-    64: { backgroundColor: "#007acc", color: "#f9f6f2" },
-    128: { backgroundColor: "#005c99", color: "#f9f6f2" },
-    256: { backgroundColor: "#003d66", color: "#f9f6f2" },
-    512: { backgroundColor: "#002e4d", color: "#f9f6f2" },
-    1024: { backgroundColor: "#001f33", color: "#f9f6f2" },
-    2048: { backgroundColor: "#000f1a", color: "#f9f6f2" },
-    default: { backgroundColor: "#3c3a32", color: "#f9f6f2" }, // Suuremmat numerot
+    2: { backgroundColor: "rgb(252, 158, 158)", color: "#776e65" },
+    4: { backgroundColor: "rgb(255, 134, 134)", color: "#776e65" },
+    8: { backgroundColor: "rgb(255, 197, 135)", color: "#f9f6f2" },
+    16: { backgroundColor: "rgb(255, 175, 88)", color: "#f9f6f2" },
+    32: { backgroundColor: "rgb(251, 222, 116)", color: "#f9f6f2" },
+    64: { backgroundColor: "rgb(255, 216, 75)", color: "#f9f6f2" },
+    128: { backgroundColor: "rgb(137, 225, 152)", color: "#f9f6f2" },
+    256: { backgroundColor: "rgb(117, 221, 134)", color: "#f9f6f2" },
+    512: { backgroundColor: "rgb(77, 171, 247)", color: "#f9f6f2" },
+    1024: { backgroundColor: "rgb(77, 171, 247)", color: "#f9f6f2" },
+    2048: { backgroundColor: "rgb(208, 191, 255)", color: "#f9f6f2" },
+    default: { backgroundColor: "rgb(208, 191, 255)", color: "#f9f6f2" }, // Suuremmat numerot
   };
 
   return tileColors[value] || tileColors.default;
