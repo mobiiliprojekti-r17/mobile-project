@@ -35,7 +35,7 @@ const BubbleShooter = ({ navigation }) => {
         // Tarkista osuuko johonkin static palloon
         const isStaticBall = staticBallsArray.some((b) => b.id === otherBall.id);
     
-        if (isStaticBall) {
+        /*if (isStaticBall) {
           if (shooter.color === otherBall.color) {
             // SAMA VÄRI: poistetaan staattinen pallo
             Matter.World.remove(world, otherBall);
@@ -52,8 +52,39 @@ const BubbleShooter = ({ navigation }) => {
             shooterBall.current = null;
             resetShooterBall();
           }
-        }
-    
+        }*/ 
+          if (isStaticBall) {
+            if (shooter.color === otherBall.color) {
+              // ✅ Poistetaan samanvärinen staattinen pallo
+              Matter.World.remove(world, otherBall);
+              setStaticBalls((prev) => prev.filter((b) => b.id !== otherBall.id));
+          
+              // Poistetaan myös ammuttu pallo, koska se on ollut "staattinen"
+              Matter.World.remove(world, shooter); // Poistetaan vanha ammuttu pallo
+              shooterBall.current = null;
+              resetShooterBall();
+            } else {
+              // ✅ Tee ammuttavasta pallosta kunnolla staattinen
+              Matter.Body.setVelocity(shooter, { x: 0, y: 0 });  // Nollaa liike
+              Matter.Body.setAngularVelocity(shooter, 0);  // Nollaa pyöriminen
+              Matter.Body.setStatic(shooter, true);  // Muuta staattiseksi
+          
+              // ✅ Asetetaan törmäyssuodattimet oikein
+              // Staattiset pallot saavat olla vuorovaikutuksessa muiden dynaamisten pallojen kanssa
+              shooter.collisionFilter = {
+                category: 0x0001,  // Sama kategoria kuin alkuperäisillä staattisilla
+                mask: 0x0002,      // Vain dynaamiset pallot voivat törmätä niihin
+              };
+          
+              // ✅ Lisää se staattisten pallojen listalle
+              setStaticBalls((prev) => [...prev, shooter]);
+          
+              shooterBall.current = null;
+              resetShooterBall();
+            }
+          }
+          
+          
         // Törmäys kattoon
         if ((bodyA === shooter && bodyB === ceiling) || (bodyB === shooter && bodyA === ceiling)) {
           shooterBall.current = null;
@@ -80,6 +111,7 @@ const BubbleShooter = ({ navigation }) => {
       navigation.replace('ShooterGameOver');
     }
   }, [staticBalls, ballsInitialized]);
+  
 
   const initShooterBall = () => {
     shooterBall.current = createShooterBall(world, width / 2, height - 200, 25, getRandomPastelColor());
@@ -87,9 +119,17 @@ const BubbleShooter = ({ navigation }) => {
   };
 
   const resetShooterBall = () => {
-    initShooterBall();
-    setIsBallAtCenter(true);
+    const newBall = createShooterBall(world, width / 2, height - 200, 25, getRandomPastelColor());
+  
+    Matter.Body.setStatic(newBall, true);  // Alussa pallo ei liiku
+    shooterBall.current = newBall;  // TÄRKEÄÄ: päivitä viittaus uuteen palloon
+    
+    setBallPosition({ x: newBall.position.x, y: newBall.position.y }); // Päivitä UI
+  
+    setIsBallAtCenter(true);  // Salli ammunta uudelleen
   };
+  
+  
 
   const handleTouch = (event) => {
     if (!isBallAtCenter || gameOver) return;
@@ -109,9 +149,9 @@ const BubbleShooter = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={handleTouch}>
       <View style={styles.container}>
-        {staticBalls.map((ball, index) => (
-          <Ball key={index} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
-        ))}
+        {staticBalls.map((ball) => (
+      <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
+      ))}
         <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
       </View>
     </TouchableWithoutFeedback>
