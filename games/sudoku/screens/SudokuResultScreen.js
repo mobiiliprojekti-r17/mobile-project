@@ -15,6 +15,7 @@ export default function SudokuResult({ route, navigation }) {
           orderBy("time")
         );
         
+        
         const querySnapshot = await getDocs(scoresQuery);
         const scoresList = querySnapshot.docs.map((doc) => {
           const data = doc.data();
@@ -46,10 +47,10 @@ export default function SudokuResult({ route, navigation }) {
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold" }}>Peli päättyi!</Text>
-      <Text style={{ fontSize: 18 }}>Käyttäjä: {Nickname}</Text>
-      <Text style={{ fontSize: 18 }}>Vaikeustaso: {difficulty}</Text>
-      <Text style={{ fontSize: 18 }}>Aika: {formattedTime(time)}</Text>
+      <Text style={{ fontSize: 24, fontWeight: "bold" }}>GAME OVER!</Text>
+      <Text style={{ fontSize: 18 }}>Nickname: {Nickname}</Text>
+      <Text style={{ fontSize: 18 }}>Difficulty: {difficulty}</Text>
+      <Text style={{ fontSize: 18 }}>Time: {formattedTime(time)}</Text>
 
       {/* Tulokset-lista */}
       <Text style={{ fontSize: 18 }}>Top list:</Text>
@@ -57,9 +58,9 @@ export default function SudokuResult({ route, navigation }) {
         {scores.length > 0 ? (
           scores.map((score, index) => (
             <View key={index} style={{ marginBottom: 10 }}>
-              <Text>Käyttäjä: {score.Nickname}</Text>
-              <Text>Vaikeustaso: {score.difficulty}</Text>
-              <Text>Aika: {formattedTime(score.timeInSeconds)}</Text>
+              <Text>Nickname: {score.Nickname}</Text>
+              <Text>Difficulty: {score.difficulty}</Text>
+              <Text>Time: {formattedTime(score.timeInSeconds)}</Text>
             </View>
           ))
         ) : (
@@ -67,7 +68,7 @@ export default function SudokuResult({ route, navigation }) {
         )}
       </ScrollView>
 
-      <Button title="Palaa päävalikkoon" onPress={() => navigation.navigate("Home")} />
+      <Button title="Home" onPress={() => navigation.navigate("Home")} />
     </View>
   );
 }

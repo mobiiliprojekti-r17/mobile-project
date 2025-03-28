@@ -41,7 +41,23 @@ export default function Sudoku({ route, navigation }) {
     }
   }, [difficulty]);
 
+  // Hae nimimerkki AsyncStoragesta
+  useEffect(() => {
+    const loadNickname = async () => {
+      const savedNickname = await AsyncStorage.getItem('nickname');
+      if (savedNickname) {
+        setNickname(savedNickname);
+      }
+    };
+    loadNickname();
+  }, []);
 
+  // Tallenna nimimerkki AsyncStorageen
+  const saveNickname = async (nickname) => {
+    await AsyncStorage.setItem('nickname', nickname);
+    setNickname(nickname);
+  };
+  
   const setBoardForDifficulty = (level) => {
     let filledCells;
     switch (level) {
@@ -171,7 +187,6 @@ export default function Sudoku({ route, navigation }) {
       } catch (error) {
         console.error("Virhe tallennettaessa tulosta: ", error);
       }
-
       navigation.replace("SudokuResult", { time: timer, Nickname, difficulty });
     } else {
       Alert.alert("Virheitä löytyi!", "Korjaa punaiset ruudut ja yritä uudelleen.", [{ text: "OK" }]);
