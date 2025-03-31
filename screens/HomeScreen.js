@@ -13,7 +13,6 @@ const HomeScreen = ({ navigation }) => {
     });
   }, [navigation]);
 
-  // Ladataan käyttäjän nickname Firestoresta (jos tallennettu)
   const fetchNicknames = async () => {
     const querySnapshot = await getDocs(collection(db, "NicknameList"));
     let nicknameList = [];
@@ -30,10 +29,8 @@ const HomeScreen = ({ navigation }) => {
     }
   
     try {
-      // Tallenna nimimerkki Firestoreen
       const docRef = await addDoc(collection(db, "NicknameList"), { Nickname: nickname });
   
-      // Päivitä tila oikein (käytetään 'nickname' nimeä React-komponentissa):
       setNicknames((prevNicknames) => [...prevNicknames, { id: docRef.id, Nickname: nickname }]);
   
       Alert.alert("Success", "Nickname saved!");
@@ -69,7 +66,6 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate("Sudoku", { nickname, difficulty, autoStart: true });
   };
 
-  // Get the most recent nickname (last added)
   const recentNickname = nicknames.length > 0 ? nicknames[nicknames.length - 1].name : '';
 
 
@@ -79,7 +75,6 @@ const HomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to the Game!</Text>
 
-      {/* Nickname syöttökenttä */}
       <TextInput
         style={styles.input}
         placeholder="Enter your nickname"
@@ -90,7 +85,6 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
 
-      {/* Display the most recent nickname */}
       {recentNickname ? (
         <Text style={styles.nicknameText}>Nickname: {recentNickname}</Text>
       ) : (
