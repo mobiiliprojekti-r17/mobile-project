@@ -1,4 +1,4 @@
-
+  
 import React, { useEffect, useState, useRef } from 'react';
 import { View, TouchableWithoutFeedback, Dimensions, StyleSheet } from 'react-native';
 import Matter from 'matter-js';
@@ -39,7 +39,6 @@ const BubbleShooter = ({ navigation }) => {
         } else if (bodyB === shooter) {
           other = bodyA;
         }
-
         if (other) {
           const isStaticBall = staticBallsRef.current.some((b) => b.id === other.id);
           if (isStaticBall) {
@@ -51,7 +50,7 @@ const BubbleShooter = ({ navigation }) => {
             const dy = shooter.position.y - other.position.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
             if (dist !== 0) {
-              const targetDistance = BALL_RADIUS + BALL_RADIUS; 
+              const targetDistance = BALL_RADIUS + BALL_RADIUS; // 20 + 20 = 40
               const factor = targetDistance / dist;
               const newX = other.position.x + dx * factor;
               const newY = other.position.y + dy * factor;
@@ -70,7 +69,6 @@ const BubbleShooter = ({ navigation }) => {
             break;
           }
         }
-
         if ((bodyA === shooter && bodyB === ceiling) || (bodyB === shooter && bodyA === ceiling)) {
           Matter.World.remove(world, shooter);
           shooterBall.current = null;
@@ -123,6 +121,7 @@ const BubbleShooter = ({ navigation }) => {
     const normalizedX = (directionX / magnitude) * speed;
     const normalizedY = (directionY / magnitude) * speed;
     Matter.Body.setStatic(shooterBall.current, false);
+    Matter.Body.set(shooterBall.current, { restitution: 1, friction: 0, frictionAir: 0 });
     Matter.Body.setVelocity(shooterBall.current, { x: normalizedX, y: normalizedY });
     setIsBallAtCenter(false);
   };
