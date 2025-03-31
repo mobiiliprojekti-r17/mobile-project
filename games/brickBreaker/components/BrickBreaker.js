@@ -72,9 +72,7 @@ while (specialBrickIndex.size < 2) {
   Matter.World.add(world, [wallLeft, wallRight, ceiling, ball, paddle, ...bricks]);
     const baseSpeed = 3;
     const speed = baseSpeed + level * 1; 
-//---------------------------------------------------------------------------------------------------------------------- 
-    //Matter.Body.setVelocity(ball, { x: speed, y: -speed });
-//----------------------------------------------------------------------------------------------------------------------
+    const maxSpeed = baseSpeed + level *1;
   return { engine, world, ball, paddle, bricks, level, wallLeft, wallRight, ceiling };
 };
 
@@ -124,6 +122,7 @@ export default function BrickBreaker() {
       });
     }, 50);
   };
+
 
   const gameOverHandler = () => {
     setGameOver(true);
@@ -188,7 +187,7 @@ export default function BrickBreaker() {
           }} />
         </View>
       )}
-
+      
       <GameEngine
         ref={gameEngine}
         style={styles.gameContainer}
@@ -196,7 +195,7 @@ export default function BrickBreaker() {
         running={gameStarted}
         entities={{
           physics: { engine: gameState.engine, world: gameState.world },
-          ball: { body: gameState.ball, renderer: Ball, color: 'white' },
+          ball: { body: gameState.ball, renderer: Ball, color: 'red' },
           paddle: { body: gameState.paddle, renderer: Paddle },
           wallLeft: { body: gameState.wallLeft },
           wallRight: { body: gameState.wallRight },
@@ -226,7 +225,7 @@ export default function BrickBreaker() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "black" },
+  container: { flex: 1, backgroundColor: "#483471" },  //taustan väri
   gameContainer: { flex: 1 },
   score: { color: "white", fontSize: 20, textAlign: "center", margin: 10 },
   overlay: {
