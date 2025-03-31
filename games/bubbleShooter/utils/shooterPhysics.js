@@ -13,12 +13,11 @@ export const getRandomPastelColor = () => {
   return pastelColors[randomIndex];
 };
 
-
 export const createPhysics = (screenWidth, screenHeight) => {
   const engine = Matter.Engine.create();
   const world = engine.world;
   engine.world.gravity.x = 0;
-  engine.world.gravity.y = 0;
+  engine.world.gravity.y = 0.1; 
   const wallOptions = { isStatic: true, restitution: 1 };
   const ground = Matter.Bodies.rectangle(screenWidth / 2, screenHeight - 80, screenWidth, 50, wallOptions);
   const leftWall = Matter.Bodies.rectangle(0, screenHeight / 2, 50, screenHeight, wallOptions);
@@ -50,34 +49,34 @@ export const createShooterBall = (world, x, y, radius, color) => {
   return ball;
 };
 
-
 export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
-    const staticBallRadius = 20;
-    const staticBallsArray = [];
+  const staticBallRadius = 20;
+  const staticBallsArray = [];
+  const horizontalSpacing = staticBallRadius * 2 * 1.05;  
+  const verticalSpacing = staticBallRadius * 2 * 1.05;    
+  for (let row = 0; row < numRows; row++) {
+    for (let col = 0; col < numCols; col++) {
+      const xPos = (col + 1) * horizontalSpacing;  
+      const yPos = 80 + row * verticalSpacing;    
 
-    for (let row = 0; row < numRows; row++) {
-        for (let col = 0; col < numCols; col++) {
-            const xPos = (screenWidth / (numCols + 1)) * (col + 1);
-            const yPos = 100 + row * (staticBallRadius * 2 + 10);
-            
-            const staticBall = Matter.Bodies.circle(xPos, yPos, staticBallRadius, {
-                isStatic: true,
-                restitution: 0,
-                collisionFilter: {
-                    category: 0x0001,
-                    mask: 0x0002,
-                },
-            });
+      const staticBall = Matter.Bodies.circle(xPos, yPos, staticBallRadius, {
+        isStatic: true,
+        restitution: 0,
+        collisionFilter: {
+          category: 0x0001,
+          mask: 0x0002,
+        },
+      });
 
-            staticBall.color = getRandomPastelColor();
-            staticBall.id = `static-${row}-${col}`; 
+      staticBall.color = getRandomPastelColor();
+      staticBall.id = `static-${row}-${col}`;
 
-            Matter.World.add(world, staticBall);
-            staticBallsArray.push(staticBall);
-        }
+      Matter.World.add(world, staticBall);
+      staticBallsArray.push(staticBall);
     }
+  }
 
-    return staticBallsArray;
+  return staticBallsArray;
 };
 
 
