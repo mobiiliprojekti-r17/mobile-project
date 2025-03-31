@@ -1,6 +1,5 @@
-  
 import React, { useEffect, useState, useRef } from 'react';
-import { View, TouchableWithoutFeedback, Dimensions, StyleSheet } from 'react-native';
+import { View, TouchableWithoutFeedback, Dimensions, StyleSheet, Text } from 'react-native';
 import Matter from 'matter-js';
 import { createPhysics, createShooterBall, createStaticBalls, updatePhysics, getRandomPastelColor } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
@@ -17,6 +16,9 @@ const BubbleShooter = ({ navigation }) => {
   const [ballsInitialized, setBallsInitialized] = useState(false);
   const [isBallAtCenter, setIsBallAtCenter] = useState(true);
   const [gameOver, setGameOver] = useState(false);
+  const [score, setScore] = useState(0); // Initialize score
+  const [time, setTime] = useState(0); // Initialize timer
+  const timerRef = useRef(null);
 
   useEffect(() => {
     staticBallsRef.current = staticBalls;
@@ -27,6 +29,13 @@ const BubbleShooter = ({ navigation }) => {
     const initialStaticBalls = createStaticBalls(world, 3, 7, width);
     setStaticBalls(initialStaticBalls);
     setBallsInitialized(true);
+
+    // Start the timer when the game starts
+    if (!gameOver) {
+      timerRef.current = setInterval(() => {
+        setTime((prevTime) => prevTime + 1); // Increment time by 1 second
+      }, 1000);
+    }
 
     Matter.Events.on(engine, 'collisionStart', (event) => {
       for (let i = 0; i < event.pairs.length; i++) {
@@ -61,6 +70,7 @@ const BubbleShooter = ({ navigation }) => {
               Matter.World.remove(world, other);
               setStaticBalls((prev) => prev.filter((b) => b.id !== other.id));
               Matter.World.remove(world, shooter);
+              setScore((prevScore) => prevScore + 10); // Increase score by 10
             } else {
               setStaticBalls((prev) => [...prev, shooter]);
             }
@@ -93,6 +103,7 @@ const BubbleShooter = ({ navigation }) => {
   useEffect(() => {
     if (ballsInitialized && staticBalls.length === 0 && !gameOver) {
       setGameOver(true);
+      clearInterval(timerRef.current); // Stop the timer
       navigation.replace('ShooterGameOver');
     }
   }, [staticBalls, ballsInitialized]);
@@ -120,15 +131,18 @@ const BubbleShooter = ({ navigation }) => {
     const speed = 20;
     const normalizedX = (directionX / magnitude) * speed;
     const normalizedY = (directionY / magnitude) * speed;
+
     Matter.Body.setStatic(shooterBall.current, false);
     Matter.Body.set(shooterBall.current, { restitution: 1, friction: 0, frictionAir: 0 });
     Matter.Body.setVelocity(shooterBall.current, { x: normalizedX, y: normalizedY });
+
     setIsBallAtCenter(false);
   };
 
   return (
     <TouchableWithoutFeedback onPress={handleTouch}>
       <View style={styles.container}>
+        <Text style={styles.score}>Pisteet: {score} | Aika: {time}s</Text>
         {staticBalls.map((ball) => (
           <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
         ))}
@@ -142,6 +156,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'skyblue',
+  },
+  score: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    fontSize: 20,
+    color: 'white',
   },
 });
 
