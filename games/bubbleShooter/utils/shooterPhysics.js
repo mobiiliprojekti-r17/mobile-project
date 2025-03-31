@@ -32,7 +32,7 @@ export const createPhysics = (screenWidth, screenHeight) => {
 
 export const createShooterBall = (world, x, y, radius, color) => {
   const ball = Matter.Bodies.circle(x, y, radius, {
-    restitution: 0.4, // Pomppivuus
+    restitution: 0, 
     frictionAir: 0.01,
     density: 0.001,
     inertia: Infinity,
@@ -44,9 +44,9 @@ export const createShooterBall = (world, x, y, radius, color) => {
   });
 
   ball.color = color;
-  ball.id = ball.id || Matter.Common.nextId(); // Varmista uniikki ID
+  ball.id = ball.id || Matter.Common.nextId();
   Matter.World.add(world, ball);
-  
+
   return ball;
 };
 
@@ -64,13 +64,13 @@ export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
                 isStatic: true,
                 restitution: 0,
                 collisionFilter: {
-                    category: 0x0001, // Sama collision kuin uusilla staattisilla
+                    category: 0x0001,
                     mask: 0x0002,
                 },
             });
 
             staticBall.color = getRandomPastelColor();
-            staticBall.id = `static-${row}-${col}`; // Uniikki ID
+            staticBall.id = `static-${row}-${col}`; 
 
             Matter.World.add(world, staticBall);
             staticBallsArray.push(staticBall);

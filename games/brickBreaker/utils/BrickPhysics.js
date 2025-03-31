@@ -79,16 +79,13 @@ export const Physics = (entities, { time, dispatch }) => {
                 renderer: entities.ball.renderer, 
               };
 
-             // console.log("Extra ball added:", newBall);
             }
           }
         });
-//Yksikin pallo tippuu = ohi
   if (ball.position.y > 600) {
   Matter.World.remove(engine.world, ball);
   delete entities[key];
   
-  // Jos kaikki pallot on poistettu:
   const ballsRemaining = Object.keys(entities).filter((k) => k.startsWith("ball_") || k === "ball");
   if (ballsRemaining.length === 0) {
     dispatch({ type: "game-over" });
@@ -117,7 +114,6 @@ export const Physics = (entities, { time, dispatch }) => {
 
 
 
-     
       const minSpeed = 2;
       if (Math.abs(ball.velocity.x) < minSpeed) {
         Matter.Body.setVelocity(ball, { x: Math.sign(ball.velocity.x) * minSpeed, y: ball.velocity.y });
