@@ -1,5 +1,6 @@
 
 
+
 import Matter from "matter-js";
 import { Paddle, Ball, Brick } from "../components/BrickBreakRender";
 
@@ -47,6 +48,30 @@ export const Physics = (entities, { time, dispatch }) => {
             const reflection = Matter.Vector.sub(velocity, Matter.Vector.mult(normal, 2 * dotProduct));
 
             Matter.Body.setVelocity(ball, { x: reflection.x, y: reflection.y });
+
+            //---------------------------------------------------------------------------------------------------------------
+            const desiredSpeed = entities.ball.fixedSpeed || 3;
+            const currentSpeed = Math.sqrt(reflection.x ** 2 + reflection.y ** 2);
+            if (currentSpeed > 0) {
+              const scale = desiredSpeed / currentSpeed;
+              const newVelocity = {
+                x: reflection.x * scale,
+                y: reflection.y * scale
+              };
+              Matter.Body.setVelocity(ball, newVelocity);
+            }
+            if (key === "ball") {
+              const desiredSpeed = entities.ball.fixedSpeed || 3;
+              const currentSpeedFinal = Math.sqrt(ball.velocity.x ** 2 + ball.velocity.y ** 2);
+              if (currentSpeedFinal > 0) {
+                const scale = desiredSpeed / currentSpeedFinal;
+                Matter.Body.setVelocity(ball, {
+                  x: ball.velocity.x * scale,
+                  y: ball.velocity.y * scale,
+                });
+              }
+            }
+            //---------------------------------------------------------------------------------------------------------------
 
             Matter.World.remove(engine.world, brick);
             delete entities[brickKey];
@@ -114,7 +139,7 @@ export const Physics = (entities, { time, dispatch }) => {
 
 
 
-      const minSpeed = 2;
+      const minSpeed = 3;
       if (Math.abs(ball.velocity.x) < minSpeed) {
         Matter.Body.setVelocity(ball, { x: Math.sign(ball.velocity.x) * minSpeed, y: ball.velocity.y });
       }
