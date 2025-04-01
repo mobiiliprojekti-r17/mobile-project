@@ -14,15 +14,14 @@ export default function SudokuResult({ route, navigation }) {
           collection(db, "SudokuGameResults"),
           orderBy("time")
         );
-        
-        
+  
         const querySnapshot = await getDocs(scoresQuery);
         const scoresList = querySnapshot.docs.map((doc) => {
           const data = doc.data();
   
           if (data.time) {
             const timeParts = data.time.split(":");
-            data.timeInSeconds = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]); // Laskee sekunnit
+            data.timeInSeconds = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]);
           } else {
             data.timeInSeconds = 0;
           }

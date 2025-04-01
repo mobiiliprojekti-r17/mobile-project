@@ -102,10 +102,10 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.gameButtonText}>BubbleShooter</Text>
       </TouchableOpacity>
       <TouchableOpacity 
-        style={styles.gameButton} 
-        onPress={() => navigation.navigate('BrickBreaker')}>
-        <Text style={styles.gameButtonText}>BrickBreaker</Text>
-      </TouchableOpacity>
+  style={styles.gameButton} 
+  onPress={() => navigation.navigate('BrickBreaker', { Nickname })}>
+  <Text style={styles.gameButtonText}>BrickBreaker</Text>
+</TouchableOpacity>
       <TouchableOpacity 
         style={styles.gameButton} 
         onPress={() => navigation.navigate('TictactoeSingleplayer')}>

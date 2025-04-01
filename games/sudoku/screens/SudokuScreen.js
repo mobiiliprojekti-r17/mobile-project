@@ -5,7 +5,7 @@ import Toast from "react-native-toast-message";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import sudoku from "sudoku";
 import styles from "../styles/SudokuStyles";
-import { db, collection, addDoc, getDocs } from "../../../firebase/Config"
+import { db, collection, addDoc } from "../../../firebase/Config"
 
 export default function Sudoku({ route, navigation }) {
   const [board, setBoard] = useState([]);
@@ -41,22 +41,6 @@ export default function Sudoku({ route, navigation }) {
     }
   }, [difficulty]);
 
-  // Hae nimimerkki AsyncStoragesta
-  useEffect(() => {
-    const loadNickname = async () => {
-      const savedNickname = await AsyncStorage.getItem('nickname');
-      if (savedNickname) {
-        setNickname(savedNickname);
-      }
-    };
-    loadNickname();
-  }, []);
-
-  // Tallenna nimimerkki AsyncStorageen
-  const saveNickname = async (nickname) => {
-    await AsyncStorage.setItem('nickname', nickname);
-    setNickname(nickname);
-  };
   
   const setBoardForDifficulty = (level) => {
     let filledCells;

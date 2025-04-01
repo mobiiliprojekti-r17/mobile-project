@@ -84,3 +84,4 @@ export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
 export const updatePhysics = (engine) => {
   Matter.Engine.update(engine);
 };
+

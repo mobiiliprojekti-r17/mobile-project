@@ -16,4 +16,4 @@ const app = initializeApp(firebaseConfig);
 // Alustetaan Firestore ja annetaan sille muuttujan nimi "db"
 const db = getFirestore(app);
 
-export { db, collection, addDoc, getDocs };  // Viedään db, collection, addDoc ja getDocs
+export { db, collection, addDoc, getDocs }; 
