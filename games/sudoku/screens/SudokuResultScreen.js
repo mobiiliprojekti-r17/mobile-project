@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, ScrollView } from "react-native";
-import { db } from "../../../firebase/Config"; 
-import { collection, getDocs, query, orderBy } from "firebase/firestore"; 
+import { View, Text, Button, ScrollView, TouchableOpacity } from "react-native";
+import { db } from "../../../firebase/Config";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import styles from "../styles/SudokuResultStyles";
 
 export default function SudokuResult({ route, navigation }) {
   const { time, difficulty, Nickname } = route.params;
-  const [scores, setScores] = useState([]); 
+  const [scores, setScores] = useState([]);
+  const [selectedDifficulty, setSelectedDifficulty] = useState(""); // Uusi tila valitulle vaikeustasolle
 
   useEffect(() => {
     const fetchScores = async () => {
@@ -14,18 +16,16 @@ export default function SudokuResult({ route, navigation }) {
           collection(db, "SudokuGameResults"),
           orderBy("time")
         );
-  
+
         const querySnapshot = await getDocs(scoresQuery);
         const scoresList = querySnapshot.docs.map((doc) => {
           const data = doc.data();
-  
           if (data.time) {
             const timeParts = data.time.split(":");
             data.timeInSeconds = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]);
           } else {
             data.timeInSeconds = 0;
           }
-  
           return data;
         });
         setScores(scoresList);
@@ -33,41 +33,98 @@ export default function SudokuResult({ route, navigation }) {
         console.error("Virhe tulosten hakemisessa: ", error);
       }
     };
-  
+
     fetchScores();
   }, [navigation]);
-  
-  // Muotoillaan aika takaisin "mm:ss"-muotoon
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => null, // Poistaa takaisin-napin
+      gestureEnabled: false,  // Estää pyyhkäisypalautuksen
+    });
+  }, [navigation]);
+
   const formattedTime = (timeInSeconds) => {
+    if (timeInSeconds == null) return "N/A"; // Varmistetaan, ettei null tai undefined mene läpi
     const minutes = Math.floor(timeInSeconds / 60);
     const secs = timeInSeconds % 60;
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
+  // Ryhmän jako vaikeustason mukaan
+  const groupedScores = scores.reduce((acc, score) => {
+    if (!acc[score.difficulty]) acc[score.difficulty] = [];
+    acc[score.difficulty].push(score);
+    return acc;
+  }, {});
+
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold" }}>GAME OVER!</Text>
-      <Text style={{ fontSize: 18 }}>Nickname: {Nickname}</Text>
-      <Text style={{ fontSize: 18 }}>Difficulty: {difficulty}</Text>
-      <Text style={{ fontSize: 18 }}>Time: {formattedTime(time)}</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>GAME OVER!</Text>
+      <Text style={styles.title}>Your result:</Text>
+      <View style={styles.resultBox}>
+        <Text style={styles.infoText}>Nickname: {Nickname}</Text>
+        <Text style={styles.infoText}>Difficulty: {difficulty}</Text>
+        <Text style={styles.infoText}>Time: {time ? formattedTime(time) : "N/A"}</Text>
+      </View>
 
-      {/* Tulokset-lista */}
-      <Text style={{ fontSize: 18 }}>Top list:</Text>
-      <ScrollView>
-        {scores.length > 0 ? (
-          scores.map((score, index) => (
-            <View key={index} style={{ marginBottom: 10 }}>
-              <Text>Nickname: {score.Nickname}</Text>
-              <Text>Difficulty: {score.difficulty}</Text>
-              <Text>Time: {formattedTime(score.timeInSeconds)}</Text>
-            </View>
-          ))
-        ) : (
-          <Text>No scores yet!</Text>
-        )}
-      </ScrollView>
+      <Text style={styles.subtitle}>Top list:</Text>
 
-      <Button title="Home" onPress={() => navigation.navigate("Home")} />
+ {/* Vaikeustason valinta napilla */}
+<View style={styles.buttonContainer}>
+  {["", "easy", "medium", "hard"].map((level) => (
+    <TouchableOpacity
+      key={level}
+      style={[
+        styles.filterButton,
+        selectedDifficulty === level && styles.selectedButton,
+      ]}
+      onPress={() => {
+        setSelectedDifficulty(level);
+        console.log("Selected Difficulty:", level);  // Lisää debuggausta
+      }}
+    >
+      <Text style={styles.buttonText}>
+        {level === "" ? "Show all" : level.toUpperCase()}
+      </Text>
+    </TouchableOpacity>
+  ))}
+</View>
+
+{/* Vaikeustason mukaan ryhmiteltyjen tulosten renderöinti */}
+<ScrollView style={styles.scrollView}>
+  {Object.keys(groupedScores).length > 0 ? (
+    Object.keys(groupedScores)
+      .filter((diffLevel) => !selectedDifficulty || diffLevel === selectedDifficulty)
+      .map((diffLevel) => (
+        <View key={diffLevel} style={styles.difficultySection}>
+          <Text style={styles.difficultyTitle}>
+            {diffLevel ? diffLevel.toUpperCase() : "ALL"}
+          </Text>
+          {groupedScores[diffLevel]
+            .sort((a, b) => a.timeInSeconds - b.timeInSeconds) // Järjestetään ajan mukaan
+            .map((score, index) => (
+              <View key={index} style={styles.scoreItem}>
+                <Text style={styles.rank}>#{index + 1}</Text> {/* Sijoitus numero erilleen */}
+                <Text style={styles.scoreText}>
+                  Nickname: {score.Nickname ? score.Nickname : "Unknown"}
+                </Text>
+                <Text style={styles.scoreText}>
+                  Difficulty: {score.difficulty ? score.difficulty : "Unknown"}
+                </Text>
+                <Text style={styles.scoreText}>
+                  Time: {score.timeInSeconds != null ? formattedTime(score.timeInSeconds) : "N/A"}
+                </Text>
+              </View>
+            ))}
+        </View>
+      ))
+  ) : (
+    <Text style={styles.noScores}>No scores yet!</Text>
+  )}
+</ScrollView>
+
+      <Button title="Home" onPress={() => navigation.navigate("Home")} color="#6200EE" />
     </View>
   );
 }

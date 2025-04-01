@@ -46,13 +46,13 @@ export default function Sudoku({ route, navigation }) {
     let filledCells;
     switch (level) {
       case "easy":
-        filledCells = 80;
+        filledCells = 80; //60
         break;
       case "medium":
-        filledCells = 40;
+        filledCells = 80; //40
         break;
       case "hard":
-        filledCells = 30;
+        filledCells = 80; //30
         break;
       default:
         filledCells = 40;
