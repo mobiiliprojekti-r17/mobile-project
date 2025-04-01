@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
   },
   undoButtonContainer: {
     position: "absolute",
-    top: 175,
+    top: 140,
     right: 40, 
     backgroundColor: "rgb(106, 106, 106)",
     padding: 5, 

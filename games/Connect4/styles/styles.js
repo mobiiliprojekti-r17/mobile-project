@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+export default StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -17,23 +17,31 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   board: {
-    marginTop: 20,
+    backgroundColor: '#0074cc', // Klassinen sininen lauta
+    padding: 10,
+    borderRadius: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
   },
   row: {
     flexDirection: 'row',
+    justifyContent: 'center',
   },
   cell: {
-    width: 50,
-    height: 50,
-    borderWidth: 2,
-    borderColor: 'black',
-    justifyContent: 'center',
+    width: 40,  
+    height: 40, 
+    backgroundColor: 'white',
+    borderRadius: 25, 
+    margin: 5,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   disc: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 22.5, 
   },
   button: {
     marginTop: 20,
@@ -47,4 +55,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default styles;

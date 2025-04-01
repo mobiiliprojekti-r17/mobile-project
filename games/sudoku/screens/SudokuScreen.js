@@ -5,7 +5,7 @@ import Toast from "react-native-toast-message";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import sudoku from "sudoku";
 import styles from "../styles/SudokuStyles";
-import { db, collection, addDoc, getDocs } from "../../../firebase/Config"
+import { db, collection, addDoc } from "../../../firebase/Config"
 
 export default function Sudoku({ route, navigation }) {
   const [board, setBoard] = useState([]);
@@ -41,18 +41,18 @@ export default function Sudoku({ route, navigation }) {
     }
   }, [difficulty]);
 
-
+  
   const setBoardForDifficulty = (level) => {
     let filledCells;
     switch (level) {
       case "easy":
-        filledCells = 80;
+        filledCells = 80; //60
         break;
       case "medium":
-        filledCells = 40;
+        filledCells = 80; //40
         break;
       case "hard":
-        filledCells = 30;
+        filledCells = 80; //30
         break;
       default:
         filledCells = 40;
@@ -171,7 +171,6 @@ export default function Sudoku({ route, navigation }) {
       } catch (error) {
         console.error("Virhe tallennettaessa tulosta: ", error);
       }
-
       navigation.replace("SudokuResult", { time: timer, Nickname, difficulty });
     } else {
       Alert.alert("Virheitä löytyi!", "Korjaa punaiset ruudut ja yritä uudelleen.", [{ text: "OK" }]);
