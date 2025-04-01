@@ -6,7 +6,6 @@ const BrickBreakerScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <BrickBreaker navigation={navigation} />
-      <Button title="Back to Home" onPress={() => navigation.goBack()} />
     </View>
   );
 };
