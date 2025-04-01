@@ -7,6 +7,33 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#faf8ef",
   },
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "81%",
+    marginBottom: 10,
+  },
+  scoreText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  timerText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  undoButtonContainer: {
+    position: "absolute",
+    top: 175,
+    right: 40, 
+    backgroundColor: "rgb(106, 106, 106)",
+    padding: 5, 
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+},
+
   row: {
     flexDirection: "row",
   },
@@ -19,7 +46,7 @@ export const styles = StyleSheet.create({
     borderRadius: 5,
   },
   tileText: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: "bold",
   },
 });
@@ -39,7 +66,7 @@ export const getTileStyle = (value) => {
     512: { backgroundColor: "rgb(77, 171, 247)", color: "#f9f6f2" },
     1024: { backgroundColor: "rgb(77, 171, 247)", color: "#f9f6f2" },
     2048: { backgroundColor: "rgb(208, 191, 255)", color: "#f9f6f2" },
-    default: { backgroundColor: "rgb(208, 191, 255)", color: "#f9f6f2" }, // Suuremmat numerot
+    default: { backgroundColor: "rgb(208, 191, 255)", color: "#f9f6f2" },
   };
 
   return tileColors[value] || tileColors.default;
