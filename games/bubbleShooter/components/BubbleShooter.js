@@ -16,8 +16,10 @@ const BubbleShooter = ({ navigation }) => {
   const [ballsInitialized, setBallsInitialized] = useState(false);
   const [isBallAtCenter, setIsBallAtCenter] = useState(true);
   const [gameOver, setGameOver] = useState(false);
-  const [score, setScore] = useState(0); // Initialize score
-  const [time, setTime] = useState(0); // Initialize timer
+  const [score, setScore] = useState(0);
+  const [time, setTime] = useState(0);
+  const [angle, setAngle] = useState(0); 
+  const [power, setPower] = useState(0); 
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -26,14 +28,13 @@ const BubbleShooter = ({ navigation }) => {
 
   useEffect(() => {
     initShooterBall();
-    const initialStaticBalls = createStaticBalls(world, 3, 7, width);
+    const initialStaticBalls = createStaticBalls(world, 6, 9, width);
     setStaticBalls(initialStaticBalls);
     setBallsInitialized(true);
 
-    // Start the timer when the game starts
     if (!gameOver) {
       timerRef.current = setInterval(() => {
-        setTime((prevTime) => prevTime + 1); // Increment time by 1 second
+        setTime((prevTime) => prevTime + 1);
       }, 1000);
     }
 
@@ -43,42 +44,52 @@ const BubbleShooter = ({ navigation }) => {
         const { bodyA, bodyB } = event.pairs[i];
         const shooter = shooterBall.current;
         let other = null;
+
         if (bodyA === shooter) {
           other = bodyB;
         } else if (bodyB === shooter) {
           other = bodyA;
         }
+
         if (other) {
           const isStaticBall = staticBallsRef.current.some((b) => b.id === other.id);
           if (isStaticBall) {
             Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
             Matter.Body.setAngularVelocity(shooter, 0);
             Matter.Body.setStatic(shooter, true);
-
             const dx = shooter.position.x - other.position.x;
             const dy = shooter.position.y - other.position.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
+
             if (dist !== 0) {
-              const targetDistance = BALL_RADIUS + BALL_RADIUS; // 20 + 20 = 40
+              const targetDistance = BALL_RADIUS + BALL_RADIUS;
               const factor = targetDistance / dist;
               const newX = other.position.x + dx * factor;
               const newY = other.position.y + dy * factor;
-              Matter.Body.setPosition(shooter, { x: newX, y: newY });
+
+              // Optional: Add logic here to move it to the nearest open spot if necessary.
+              // For example, loop through the static balls and check the nearest available position.
+
+              let adjustedX = newX;
+              let adjustedY = newY;
+              Matter.Body.setPosition(shooter, { x: adjustedX, y: adjustedY });
             }
 
             if (shooter.color === other.color) {
               Matter.World.remove(world, other);
               setStaticBalls((prev) => prev.filter((b) => b.id !== other.id));
               Matter.World.remove(world, shooter);
-              setScore((prevScore) => prevScore + 10); // Increase score by 10
+              setScore((prevScore) => prevScore + 10);
             } else {
               setStaticBalls((prev) => [...prev, shooter]);
             }
+
             shooterBall.current = null;
             resetShooterBall();
             break;
           }
         }
+
         if ((bodyA === shooter && bodyB === ceiling) || (bodyB === shooter && bodyA === ceiling)) {
           Matter.World.remove(world, shooter);
           shooterBall.current = null;
@@ -103,7 +114,7 @@ const BubbleShooter = ({ navigation }) => {
   useEffect(() => {
     if (ballsInitialized && staticBalls.length === 0 && !gameOver) {
       setGameOver(true);
-      clearInterval(timerRef.current); // Stop the timer
+      clearInterval(timerRef.current);
       navigation.replace('ShooterGameOver');
     }
   }, [staticBalls, ballsInitialized]);
@@ -123,14 +134,18 @@ const BubbleShooter = ({ navigation }) => {
 
   const handleTouch = (event) => {
     if (!isBallAtCenter || gameOver) return;
+
     const touchX = event.nativeEvent.pageX;
     const touchY = event.nativeEvent.pageY;
     const directionX = touchX - shooterBall.current.position.x;
     const directionY = touchY - shooterBall.current.position.y;
+
+    const angle = Math.atan2(directionY, directionX);
     const magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
-    const speed = 20;
-    const normalizedX = (directionX / magnitude) * speed;
-    const normalizedY = (directionY / magnitude) * speed;
+    const speed = Math.min(magnitude / 10, 20); 
+
+    const normalizedX = Math.cos(angle) * speed;
+    const normalizedY = Math.sin(angle) * speed;
 
     Matter.Body.setStatic(shooterBall.current, false);
     Matter.Body.set(shooterBall.current, { restitution: 1, friction: 0, frictionAir: 0 });
