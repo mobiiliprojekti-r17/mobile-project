@@ -13,7 +13,27 @@ export const Physics = (entities, { time, dispatch }) => {
     .forEach((key) => {
       const ball = entities[key].body;
       const paddle = entities.paddle.body;
+//-------------------------------------------------------------------
 
+const paddleCollision = Matter.Collision.collides(ball, paddle);
+if (paddleCollision && ball.velocity.y > 0 && ball.position.y < paddle.position.y) {
+  const paddleWidth = paddle.bounds.max.x - paddle.bounds.min.x;
+  let relativeIntersectX = (ball.position.x - paddle.position.x) / (paddleWidth / 2);
+  relativeIntersectX = Math.max(-1, Math.min(1, relativeIntersectX));
+  
+  const maxBounceAngle = Math.PI / 4;
+  const bounceAngle = relativeIntersectX * maxBounceAngle;
+  
+  // Maintain ball's speed after collision
+  const speed = Math.sqrt(ball.velocity.x ** 2 + ball.velocity.y ** 2);
+  const newVelX = speed * Math.sin(bounceAngle);
+  const newVelY = -speed * Math.cos(bounceAngle);
+  
+  Matter.Body.setVelocity(ball, { x: newVelX, y: newVelY });
+}
+
+//------------------------------------------------------------------
+/*
       const paddleCollision = Matter.Collision.collides(ball, paddle);
       if (paddleCollision) {
         let relativeIntersectX = (ball.position.x - paddle.position.x) /
@@ -27,7 +47,7 @@ export const Physics = (entities, { time, dispatch }) => {
         };
         Matter.Body.setVelocity(ball, newVelocity);
       }
-
+*/
       let bricksLeft = false;
       Object.keys(entities)
         .filter((key) => key.startsWith("brick_"))
