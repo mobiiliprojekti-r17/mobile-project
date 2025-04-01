@@ -65,6 +65,7 @@ const HomeScreen = ({ navigation }) => {
   const startSudokuGame = (difficulty) => {
     navigation.navigate("Sudoku", { nickname, difficulty, autoStart: true });
   };
+
 const startBubbleShooter = () => {
   if (!nickname.trim()) {
     Alert.alert("Warning", "Please enter a nickname first!");
@@ -72,6 +73,14 @@ const startBubbleShooter = () => {
   }
   navigation.navigate("BubbleShooter", { nickname });
 }
+const startBrickBreaker = () => {
+  if (!nickname.trim()) {
+    Alert.alert("Warning", "Please enter a nickname first!");
+    return;
+  }
+  navigation.navigate("BrickBreaker", { nickname});
+}
+
   const recentNickname = nicknames.length > 0 ? nicknames[nicknames.length - 1].name : '';
 
 
@@ -105,8 +114,7 @@ const startBubbleShooter = () => {
         <Text style={styles.gameButtonText}>BubbleShooter</Text>
       </TouchableOpacity>
       <TouchableOpacity 
-  style={styles.gameButton} 
-  onPress={() => navigation.navigate('BrickBreaker')}>
+  style={styles.gameButton} onPress={startBrickBreaker}>
   <Text style={styles.gameButtonText}>BrickBreaker</Text>
 </TouchableOpacity>
       <TouchableOpacity 
