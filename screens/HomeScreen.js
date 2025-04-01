@@ -66,10 +66,15 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate("Sudoku", { nickname, difficulty, autoStart: true });
   };
 
+  const new2048Game = () => {
+    if (!nickname.trim()) {
+      Alert.alert("Warning", "Please enter a nickname first!");
+      return;
+    }
+    navigation.navigate("2048", { nickname });
+  };
+
   const recentNickname = nicknames.length > 0 ? nicknames[nicknames.length - 1].name : '';
-
-
-  
 
   return (
     <View style={styles.container}>
@@ -90,10 +95,9 @@ const HomeScreen = ({ navigation }) => {
       ) : (
         <Text style={styles.nicknameText}>No nickname saved yet.</Text>
       )}
-           <Text>Singleplayer games!</Text>
-      <TouchableOpacity 
-        style={styles.gameButton} 
-        onPress={() => navigation.navigate("2048")}>
+
+      <Text>Singleplayer games!</Text>
+      <TouchableOpacity style={styles.gameButton} onPress={new2048Game}>
         <Text style={styles.gameButtonText}>2048</Text>
       </TouchableOpacity>
       <TouchableOpacity 

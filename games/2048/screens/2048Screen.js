@@ -5,17 +5,27 @@ import { initializeGrid, moveTiles, checkGameOver } from "../utils/2048Logic";
 import { styles, getTileStyle } from "../styles/2048Styles";
 import Icon from "react-native-vector-icons/Feather";
 import { TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { db, collection, addDoc, getDocs } from "../../../firebase/Config"
 
-const Game2048Screen = () => {
+const Game2048Screen = ({route}) => {
+  const navigation = useNavigation();
+  const [Nickname, setNickname] = useState('');
   const [grid, setGrid] = useState(initializeGrid());
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
   const [isGameActive, setIsGameActive] = useState(true);
   const [swipeCooldown, setSwipeCooldown] = useState(false);
-  
+
   // Tallennetaan edellinen tila peruutusta varten
   const [previousGrid, setPreviousGrid] = useState(null);
   const [previousScore, setPreviousScore] = useState(0);
+
+  useEffect(() => {
+      if (route.params?.nickname) {
+        setNickname(route.params.nickname);
+      }
+    }, [route.params?.nickname]);
 
   useEffect(() => {
     let timer;
@@ -40,9 +50,14 @@ const Game2048Screen = () => {
     setSwipeCooldown(true);
 
     const { translationX, translationY } = event.nativeEvent;
-    let direction = Math.abs(translationX) > Math.abs(translationY) ? 
-                    (translationX > 0 ? "right" : "left") : 
-                    (translationY > 0 ? "down" : "up");
+    let direction =
+      Math.abs(translationX) > Math.abs(translationY)
+        ? translationX > 0
+          ? "right"
+          : "left"
+        : translationY > 0
+        ? "down"
+        : "up";
 
     // Tallennetaan edellinen ruudukko ja pisteet ennen siirtoa
     setPreviousGrid([...grid]);
@@ -52,13 +67,17 @@ const Game2048Screen = () => {
     setGrid([...newGrid]);
     setScore(score + totalPoints);
 
-    if (checkGameOver(newGrid)) {
+    const handleGameOver = () => {
       setIsGameActive(false);
-      Alert.alert(
-        "Game over!",
-        `Score: ${score}\nTime: ${formatTime(time)}`,
-        [{ text: "OK", onPress: resetGame }]
-      );
+      navigation.replace("Game2048ResultScreen", {
+        Nickname, 
+        score,
+        time: formatTime(time),
+      });
+    };
+
+    if (checkGameOver(newGrid)) {
+      handleGameOver();
     }
 
     setTimeout(() => setSwipeCooldown(false), 150);
@@ -81,7 +100,7 @@ const Game2048Screen = () => {
       setPreviousScore(null);
     }
   };
-  
+
   const resetGame = () => {
     setGrid(initializeGrid());
     setScore(0);
@@ -97,7 +116,7 @@ const Game2048Screen = () => {
         <TouchableOpacity style={styles.undoButtonContainer} onPress={handleUndo}>
           <Icon name="corner-up-left" size={24} color="#fff" />
         </TouchableOpacity>
-        
+
         <View style={styles.topBar}>
           <Text style={styles.scoreText}>Score: {score}</Text>
           <Text style={styles.timerText}>Time: {formatTime(time)}</Text>
@@ -108,8 +127,12 @@ const Game2048Screen = () => {
             {row.map((cell, cellIndex) => {
               const tileStyle = getTileStyle(cell);
               return (
-                <View key={cellIndex} style={[styles.tile, { backgroundColor: tileStyle.backgroundColor }]}>
-                  <Text style={[styles.tileText, { color: tileStyle.color }]}>{cell !== 0 ? cell : ""}</Text>
+                <View
+                  key={cellIndex}
+                  style={[styles.tile, { backgroundColor: tileStyle.backgroundColor }]} >
+                  <Text style={[styles.tileText, { color: tileStyle.color }]}>
+                    {cell !== 0 ? cell : ""}
+                  </Text>
                 </View>
               );
             })}
