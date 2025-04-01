@@ -67,9 +67,6 @@ const BubbleShooter = ({ navigation }) => {
               const newX = other.position.x + dx * factor;
               const newY = other.position.y + dy * factor;
 
-              // Optional: Add logic here to move it to the nearest open spot if necessary.
-              // For example, loop through the static balls and check the nearest available position.
-
               let adjustedX = newX;
               let adjustedY = newY;
               Matter.Body.setPosition(shooter, { x: adjustedX, y: adjustedY });
@@ -170,14 +167,20 @@ const BubbleShooter = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'skyblue',
+    backgroundColor: '#F5C7FF', // Light pastel pink background
+    alignItems: 'center', // Center content
+    justifyContent: 'center',
   },
   score: {
     position: 'absolute',
     top: 10,
     left: 10,
-    fontSize: 20,
-    color: 'white',
+    fontSize: 24,
+    color: 'deeppink',
+    fontFamily: 'Comic Sans MS',
+    textShadowColor: '#FF69B4', 
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 10,
   },
 });
 
