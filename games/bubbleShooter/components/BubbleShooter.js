@@ -177,7 +177,6 @@ const styles = StyleSheet.create({
     left: 10,
     fontSize: 24,
     color: 'deeppink',
-    fontFamily: 'Comic Sans MS',
     textShadowColor: '#FF69B4', 
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 10,

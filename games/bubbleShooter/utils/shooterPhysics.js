@@ -3,7 +3,7 @@ import Matter from 'matter-js';
 export const getRandomPastelColor = () => {
   const pastelColors = [
     '#F8BBD0', 
-    '#E1BEE7', 
+    '#e4bdff', 
     '#B2EBF2', 
     '#C8E6C9', 
     '#FFF9C4', 
