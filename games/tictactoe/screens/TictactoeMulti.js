@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, Button } from 'react-native';
-import styles from '../styles/Multistyles';
+import styles from '../styles/TictactoeStyles';
 
 const checkWinner = (board) => {
   const lines = [
@@ -75,7 +75,6 @@ export default function TictactoeMultiplayer({navigation}) {
       </View>
       <Text style={styles.turnText}>Vuoro: {isXNext ? "X" : "O"}</Text>
       <Button title="Restart" onPress={resetGame} />
-      <Button title="Palaa päävalikkoon" onPress={() => navigation.navigate("Home")} />
     </View>
   );
 }

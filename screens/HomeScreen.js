@@ -73,6 +73,7 @@ const startBubbleShooter = () => {
   }
   navigation.navigate("BubbleShooter", { nickname });
 }
+
 const startBrickBreaker = () => {
   if (!nickname.trim()) {
     Alert.alert("Warning", "Please enter a nickname first!");
@@ -81,7 +82,7 @@ const startBrickBreaker = () => {
   navigation.navigate("BrickBreaker", { nickname});
 }
 
-  const recentNickname = nicknames.length > 0 ? nicknames[nicknames.length - 1].name : '';
+ const recentNickname = nicknames.length > 0 ? nicknames[nicknames.length - 1].name : '';
 
 
   return (
