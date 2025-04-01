@@ -28,7 +28,7 @@ const BubbleShooter = ({ navigation }) => {
 
   useEffect(() => {
     initShooterBall();
-    const initialStaticBalls = createStaticBalls(world, 4, 9, width);
+    const initialStaticBalls = createStaticBalls(world, 6, 9, width);
     setStaticBalls(initialStaticBalls);
     setBallsInitialized(true);
 
@@ -57,13 +57,10 @@ const BubbleShooter = ({ navigation }) => {
             Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
             Matter.Body.setAngularVelocity(shooter, 0);
             Matter.Body.setStatic(shooter, true);
-
-            // Calculate the distance between the shooter and the static ball
             const dx = shooter.position.x - other.position.x;
             const dy = shooter.position.y - other.position.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            // If distance is small enough, move shooter to a nearby empty spot
             if (dist !== 0) {
               const targetDistance = BALL_RADIUS + BALL_RADIUS;
               const factor = targetDistance / dist;
@@ -143,10 +140,9 @@ const BubbleShooter = ({ navigation }) => {
     const directionX = touchX - shooterBall.current.position.x;
     const directionY = touchY - shooterBall.current.position.y;
 
-    // Calculate the angle and power of the shot
     const angle = Math.atan2(directionY, directionX);
     const magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
-    const speed = Math.min(magnitude / 10, 20); // Cap the speed
+    const speed = Math.min(magnitude / 10, 20); 
 
     const normalizedX = Math.cos(angle) * speed;
     const normalizedY = Math.sin(angle) * speed;

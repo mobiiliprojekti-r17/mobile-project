@@ -52,12 +52,19 @@ export const createShooterBall = (world, x, y, radius, color) => {
 export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
   const staticBallRadius = 20;
   const staticBallsArray = [];
-  const horizontalSpacing = staticBallRadius * 2 * 1.05;  
-  const verticalSpacing = staticBallRadius * 2 * 1.05;    
+  const horizontalSpacing = staticBallRadius * 2; 
+  const verticalSpacing = staticBallRadius * Math.sqrt(3); // korkeus
+  const offsetX = (screenWidth - (numCols * horizontalSpacing)) / 2; // Keskittää pallot ruudulle
+
   for (let row = 0; row < numRows; row++) {
     for (let col = 0; col < numCols; col++) {
-      const xPos = (col + 1) * horizontalSpacing;  
-      const yPos = 80 + row * verticalSpacing;    
+      let xPos = offsetX + col * horizontalSpacing;
+      let yPos = 80 + row * verticalSpacing;
+
+      // Lomitettu kuusikulmio:joka toinen rivi puoli askelta oikealle
+      if (row % 2 !== 0) {
+        xPos += horizontalSpacing / 2;
+      }
 
       const staticBall = Matter.Bodies.circle(xPos, yPos, staticBallRadius, {
         isStatic: true,
@@ -78,7 +85,6 @@ export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
 
   return staticBallsArray;
 };
-
 
 export const updatePhysics = (engine) => {
   Matter.Engine.update(engine);
