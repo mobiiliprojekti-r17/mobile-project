@@ -111,7 +111,6 @@ export default function BrickBreaker() {
         Nickname: nickname,
         level: gameState.level,
         score: score,
-        timestamp: Date.now(),
       });
       console.log("Result stored in Firestore.");
     } catch (error) {
@@ -272,12 +271,6 @@ export default function BrickBreaker() {
             acc[`brick_${index}`] = { body: brick, renderer: Brick };
             return acc;
           }, {}),
-         /* ...Object.keys(gameState)
-            .filter((key) => key.startsWith("ball_extra"))
-            .reduce((acc, key) => {
-              acc[key] = { body: gameState[key].body, renderer: Ball, color: gameState[key].color };
-              return acc;
-            }, {}),*/
         }}
         onEvent={(e) => {
           if (e.type === "increase-score") {
@@ -293,7 +286,6 @@ export default function BrickBreaker() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#483471" },
   gameContainer: { flex: 1 },
