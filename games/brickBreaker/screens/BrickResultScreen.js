@@ -26,6 +26,15 @@ export default function BreakerResult({ route, navigation }) {
     fetchResults();
   }, [navigation]);
 
+
+  useEffect(() => {
+      navigation.setOptions({
+        headerLeft: () => null, 
+        gestureEnabled: false, 
+      });
+    }, [navigation]);
+
+
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Text style={{ fontSize: 24, fontWeight: "bold" }}>Peli päättyi!</Text>
