@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";  // Lisää getDocs tuontiin
+import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore"; 
 
 const firebaseConfig = {
   apiKey: "AIzaSyBfG_fvEg9aoYsYzN_NJM0jszXN6iHLbDM",
@@ -10,10 +10,8 @@ const firebaseConfig = {
   appId: "1:846863822774:web:905bb91a92f3aa7062db17"
 };
 
-// Alustetaan Firebase-sovellus
 const app = initializeApp(firebaseConfig);
 
-// Alustetaan Firestore ja annetaan sille muuttujan nimi "db"
 const db = getFirestore(app);
 
-export { db, collection, addDoc, getDocs };  // Viedään db, collection, addDoc ja getDocs
+export { db, collection, addDoc, getDocs }; 

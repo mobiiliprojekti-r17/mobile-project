@@ -5,20 +5,19 @@ import BrickBreaker from '../components/BrickBreaker';
 const BrickBreakerScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <BrickBreaker />
-      <Button title="Back to Home" onPress={() => navigation.goBack()} />
+      <BrickBreaker navigation={navigation} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      paddingBottom: 40,
-    },
-    button: {
-      paddingTop: 20 
-    },
-  });
-  
-  export default BrickBreakerScreen;
+  container: {
+    flex: 1,
+    paddingBottom: 40,
+  },
+  button: {
+    paddingTop: 20 
+  },
+});
+
+export default BrickBreakerScreen;

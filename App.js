@@ -13,6 +13,7 @@ import Game2048ResultScreen from "./games/2048/screens/2048ResultScreen";
 import TictactoeMultiplayer from './games/tictactoe/screens/TictactoeMulti';
 import TictactoeSingleplayer from './games/tictactoe/screens/TictactoeSingle';
 import Connect4 from './games/Connect4/screens/Connect4Screen';
+import BreakerResult from './games/brickBreaker/screens/BrickResultScreen';
 
 const Stack = createStackNavigator();
 
@@ -24,6 +25,7 @@ const App = () => {
         <Stack.Screen name="BubbleShooter" component={BubbleShooterScreen} />
         <Stack.Screen name="ShooterGameOver" component={ShooterGameOver} /> 
         <Stack.Screen name="BrickBreaker" component={BrickBreakerScreen} />
+        <Stack.Screen name="BreakerResults" component={BreakerResult} />
         <Stack.Screen name="Sudoku" component={Sudoku} />
         <Stack.Screen name="SudokuResult" component={SudokuResult} />
         <Stack.Screen name="2048" component={Game2048Screen} />

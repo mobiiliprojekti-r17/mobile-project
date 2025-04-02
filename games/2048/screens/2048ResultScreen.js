@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Button, ScrollView } from "react-native";
 import { db } from "../../../firebase/Config"; 
-import { collection, getDocs, query, orderBy } from "firebase/firestore"; 
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 
 export default function Game2048ResultScreen({ route, navigation }) {
   const { Nickname,score, time } = route.params;
