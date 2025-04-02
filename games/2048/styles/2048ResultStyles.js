@@ -1,25 +1,25 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#faf8ef",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: "#faf8ef",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+      },
   title: {
-    fontSize: 28,
+    fontSize: 35,
     fontWeight: "bold",
     color: "#BB86FC", // Game Over -otsikko
     marginBottom: 20,
   },
   resultBox: {
-    backgroundColor: "rgb(180, 160, 255)", // Tuloksille tausta
+    backgroundColor: "rgb(180, 160, 255)", // äsk. tuloksille tausta
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
-    width: "60%",
+    width: "80%",
     alignItems: "center",
   },
   infoText: {
@@ -38,7 +38,6 @@ const styles = StyleSheet.create({
     width: "80%",
   },
 
-  /*** 🔥 UUSI SCORE ITEM -TYYLIT 🔥 ***/
   scoreItem: {
     flexDirection: "row", // Rank vasemmalle ja tekstit keskelle
     alignItems: "center",
@@ -47,9 +46,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 8,
     marginBottom: 10,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
   },
   rankContainer: {
     width: 50, // Kiinteä leveys, jotta rankit pysyvät linjassa
