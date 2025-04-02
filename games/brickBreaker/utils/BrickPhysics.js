@@ -1,6 +1,5 @@
 
 
-
 import Matter from "matter-js";
 import { Paddle, Ball, Brick } from "../components/BrickBreakRender";
 
@@ -15,17 +14,18 @@ export const Physics = (entities, { time, dispatch }) => {
       const paddle = entities.paddle.body;
 
       const paddleCollision = Matter.Collision.collides(ball, paddle);
-      if (paddleCollision) {
-        let relativeIntersectX = (ball.position.x - paddle.position.x) /
-          (paddle.bounds.max.x - paddle.bounds.min.x);
-        let bounceAngle = relativeIntersectX * (Math.PI / 4);
-        let speed = Math.sqrt(ball.velocity.x ** 2 + ball.velocity.y ** 2);
+      if (paddleCollision && ball.velocity.y > 0 && ball.position.y < paddle.position.y) {
+        const paddleWidth = paddle.bounds.max.x - paddle.bounds.min.x;
+        let relativeIntersectX = (ball.position.x - paddle.position.x) / (paddleWidth / 2);
+        relativeIntersectX = Math.max(-1, Math.min(1, relativeIntersectX));
 
-        let newVelocity = {
-          x: Math.sin(bounceAngle) * speed,
-          y: -Math.abs(Math.cos(bounceAngle) * speed),
-        };
-        Matter.Body.setVelocity(ball, newVelocity);
+        const maxBounceAngle = Math.PI / 4;
+        const bounceAngle = relativeIntersectX * maxBounceAngle;
+
+        const speed = Math.sqrt(ball.velocity.x ** 2 + ball.velocity.y ** 2);
+        const newVelX = speed * Math.sin(bounceAngle);
+        const newVelY = -speed * Math.cos(bounceAngle);
+        Matter.Body.setVelocity(ball, { x: newVelX, y: newVelY });
       }
 
       let bricksLeft = false;
@@ -34,8 +34,7 @@ export const Physics = (entities, { time, dispatch }) => {
         .forEach((brickKey) => {
           let brick = entities[brickKey]?.body;
           if (!brick) return;
-
-          bricksLeft = true; 
+          bricksLeft = true;
 
           const collision = Matter.Collision.collides(ball, brick);
           if (collision) {
@@ -49,39 +48,13 @@ export const Physics = (entities, { time, dispatch }) => {
 
             Matter.Body.setVelocity(ball, { x: reflection.x, y: reflection.y });
 
-            //---------------------------------------------------------------------------------------------------------------
-            const desiredSpeed = entities.ball.fixedSpeed || 3;
-            const currentSpeed = Math.sqrt(reflection.x ** 2 + reflection.y ** 2);
-            if (currentSpeed > 0) {
-              const scale = desiredSpeed / currentSpeed;
-              const newVelocity = {
-                x: reflection.x * scale,
-                y: reflection.y * scale
-              };
-              Matter.Body.setVelocity(ball, newVelocity);
-            }
-            if (key === "ball") {
-              const desiredSpeed = entities.ball.fixedSpeed || 3;
-              const currentSpeedFinal = Math.sqrt(ball.velocity.x ** 2 + ball.velocity.y ** 2);
-              if (currentSpeedFinal > 0) {
-                const scale = desiredSpeed / currentSpeedFinal;
-                Matter.Body.setVelocity(ball, {
-                  x: ball.velocity.x * scale,
-                  y: ball.velocity.y * scale,
-                });
-              }
-            }
-            //---------------------------------------------------------------------------------------------------------------
-
             Matter.World.remove(engine.world, brick);
             delete entities[brickKey];
             dispatch({ type: "increase-score" });
 
             if (brick.label.includes("special")) {
-
-            
-              const newBallId = `ball_extra_${Date.now()}`;
-  
+              const newBallId = `ball_extra_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
+              
               const newBall = Matter.Bodies.circle(
                 ball.position.x,
                 ball.position.y,
@@ -95,33 +68,43 @@ export const Physics = (entities, { time, dispatch }) => {
                   collisionFilter: { group: 0 },
                 }
               );
-
-              Matter.Body.setVelocity(newBall, { x: 3, y: -5 });
+              
+              Matter.Body.setVelocity(newBall, { x: ball.velocity.x, y: ball.velocity.y });
               Matter.World.add(engine.world, newBall);
-
-              entities[`ball_extra_${Date.now()}`] = {
+            
+              const pastelColors = [
+                "#FFB3BA", // vibrant pastel pink
+                "#FFDFBA", // vibrant pastel orange
+                "#FFFFBA", // vibrant pastel yellow
+                "#BAFFC9", // vibrant pastel green
+                "#BAE1FF", // vibrant pastel blue
+                "#E3BAFF", // vibrant pastel purple
+              ];
+              
+              const randomColor = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+            
+              entities[newBallId] = {
                 body: newBall,
-                renderer: entities.ball.renderer, 
+                renderer: Ball, 
+                color: randomColor,
               };
-
             }
           }
         });
-  if (ball.position.y > 600) {
-  Matter.World.remove(engine.world, ball);
-  delete entities[key];
-  
-  const ballsRemaining = Object.keys(entities).filter((k) => k.startsWith("ball_") || k === "ball");
-  if (ballsRemaining.length === 0) {
-    dispatch({ type: "game-over" });
-  }
-}
 
+      if (ball.position.y > 600) {
+        Matter.World.remove(engine.world, ball);
+        delete entities[key];
 
-        if (!bricksLeft) {
-          dispatch({ type: "level-cleared" }); 
+        const ballsRemaining = Object.keys(entities).filter((k) => k.startsWith("ball_") || k === "ball");
+        if (ballsRemaining.length === 0) {
+          dispatch({ type: "game-over" });
         }
-        
+      }
+
+      if (!bricksLeft) {
+        dispatch({ type: "level-cleared" });
+      }
 
       const wallLeft = entities.wallLeft.body;
       const wallRight = entities.wallRight.body;
@@ -137,16 +120,13 @@ export const Physics = (entities, { time, dispatch }) => {
         Matter.Body.setVelocity(ball, { x: ball.velocity.x, y: Math.abs(ball.velocity.y) });
       }
 
-
-
       const minSpeed = 3;
-      if (Math.abs(ball.velocity.x) < minSpeed) {
-        Matter.Body.setVelocity(ball, { x: Math.sign(ball.velocity.x) * minSpeed, y: ball.velocity.y });
-      }
-      if (Math.abs(ball.velocity.y) < minSpeed) {
-        Matter.Body.setVelocity(ball, { x: ball.velocity.x, y: Math.sign(ball.velocity.y) * minSpeed });
+      const currentSpeed = Math.sqrt(ball.velocity.x ** 2 + ball.velocity.y ** 2);
+      if (currentSpeed < minSpeed) {
+        const scale = minSpeed / (currentSpeed || 1);
+        Matter.Body.setVelocity(ball, { x: ball.velocity.x * scale, y: ball.velocity.y * scale });
       }
     });
 
-return entities;
+  return entities;
 };
