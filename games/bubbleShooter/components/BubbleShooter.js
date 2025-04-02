@@ -1,7 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, TouchableWithoutFeedback, Dimensions, StyleSheet, Text } from 'react-native';
 import Matter from 'matter-js';
-import { createPhysics, createShooterBall, createStaticBalls, updatePhysics, getRandomPastelColor, findClusterAndRemove } from '../utils/shooterPhysics';
+import {
+  createPhysics,
+  createShooterBall,
+  createStaticBalls,
+  updatePhysics,
+  getRandomPastelColor,
+  findClusterAndRemove,
+  findFloatingBalls
+} from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
 
 const { width, height } = Dimensions.get('window');
@@ -61,14 +69,23 @@ const BubbleShooter = ({ navigation }) => {
               Matter.Body.setPosition(shooter, { x: newX, y: newY });
             }
 
-            // Poistetaan kaikki yhdistyneet samanväriset pallot!
             const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
+
             if (cluster.length > 0) {
               cluster.forEach(ball => Matter.World.remove(world, ball));
               setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
-              setScore(prevScore => prevScore + cluster.length * 10);
+              setScore(prev => prev + cluster.length * 10);
             } else {
               setStaticBalls(prev => [...prev, shooter]);
+            }
+
+            // Leijuvien pallojen tarkistus ja poisto
+            const updatedBalls = staticBallsRef.current.filter(ball => !cluster.includes(ball));
+            const floatingBalls = findFloatingBalls(updatedBalls);
+            if (floatingBalls.length > 0) {
+              floatingBalls.forEach(ball => Matter.World.remove(world, ball));
+              setStaticBalls(prev => prev.filter(ball => !floatingBalls.includes(ball)));
+              setScore(prev => prev + floatingBalls.length * 5);
             }
 
             shooterBall.current = null;
@@ -128,7 +145,7 @@ const BubbleShooter = ({ navigation }) => {
     const directionY = touchY - shooterBall.current.position.y;
 
     const angle = Math.atan2(directionY, directionX);
-    const speed = 15; // Sama nopeus kuin alkuperäisessä
+    const speed = 15;
     const normalizedX = Math.cos(angle) * speed;
     const normalizedY = Math.sin(angle) * speed;
 
