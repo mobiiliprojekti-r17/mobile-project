@@ -1,5 +1,4 @@
 
-
 import React, { useRef, useState, useMemo, useEffect } from "react";
 import { View, StyleSheet, PanResponder, Text, Button } from "react-native";
 import { GameEngine } from "react-native-game-engine";
@@ -8,7 +7,7 @@ import { Paddle, Ball, Brick } from "./BrickBreakRender";
 import { Physics } from "../utils/BrickPhysics";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
-import { collection, getDocs, query, orderBy, addDoc, FieldPath } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, addDoc } from "firebase/firestore";
 
 Matter.Resolver._restingThresh = 0.001;
 Matter.Resolver._positionDampen = 0.01;
@@ -81,8 +80,6 @@ export default function BrickBreaker() {
   const route = useRoute();
   const [nickname, setNickname] = useState(route.params?.nickname);
 
-
-
   const gameEngine = useRef(null);
   const [gameState, setGameState] = useState(setupWorld());
   const [score, setScore] = useState(0);
@@ -107,7 +104,7 @@ export default function BrickBreaker() {
       }),
     [gameState.paddle]
   );
-//-----------------------------------------------------------------------------------------------------------------------
+
   const storeResult = async () => {
     try {
       await addDoc(collection(db, "BreakerResults"), {
@@ -151,36 +148,33 @@ export default function BrickBreaker() {
     }
   }, [route.params?.nickname]);
 
-//--------------------------------------------------------------------------------------------------------------------------------
+  const nextLevel = () => {
+    const newLevel = gameState.level + 1;
+    const newGameState = setupWorld(newLevel);
+    setGameState(newGameState);
+    setGameOver(false);
+    setGameStarted(false);
+    setLevelCleared(false);
 
-const nextLevel = () => {
-  const newLevel = gameState.level + 1;
-  const newGameState = setupWorld(newLevel);
-  setGameState(newGameState);
-  setGameOver(false);
-  setGameStarted(false);
-  setLevelCleared(false);
-
-  setTimeout(() => {
-    gameEngine.current.swap({
-      physics: { engine: newGameState.engine, world: newGameState.world },
-      ball: { 
-        body: newGameState.ball, 
-        renderer: Ball, 
-        fixedSpeed: 3 + newGameState.level, // Kiinteä nopeus seuraavalle tasolle
-        color: "red"
-      },
-      paddle: { body: newGameState.paddle, renderer: Paddle },
-      wallLeft: { body: newGameState.wallLeft },
-      wallRight: { body: newGameState.wallRight },
-      ceiling: { body: newGameState.ceiling },
-      ...newGameState.bricks.reduce((acc, brick, index) => {
-        acc[`brick_${index}`] = { body: brick, renderer: Brick };
-        return acc;
-      }, {}),
-    });
-  }, 50);
-};
+    setTimeout(() => {
+      gameEngine.current.swap({
+        physics: { engine: newGameState.engine, world: newGameState.world },
+        ball: { 
+          body: newGameState.ball, 
+          renderer: Ball, 
+          themeIndex: gameState.level,
+        },
+        paddle: { body: newGameState.paddle, renderer: Paddle },
+        wallLeft: { body: newGameState.wallLeft },
+        wallRight: { body: newGameState.wallRight },
+        ceiling: { body: newGameState.ceiling },
+        ...newGameState.bricks.reduce((acc, brick, index) => {
+          acc[`brick_${index}`] = { body: brick, renderer: Brick };
+          return acc;
+        }, {}),
+      });
+    }, 50);
+  };
 
   const gameOverHandler = () => {
     setGameOver(true);
@@ -226,9 +220,11 @@ const nextLevel = () => {
             }}
           />
           <Button
-            title="Results"onPress={() => navigation.navigate("BreakerResults", {
-              nickname
-            })
+            title="Results"
+            onPress={() =>
+              navigation.navigate("BreakerResults", {
+                nickname,
+              })
             }
           />
         </View>
@@ -256,46 +252,44 @@ const nextLevel = () => {
         </View>
       )}
 
-<GameEngine
-  ref={gameEngine}
-  style={styles.gameContainer}
-  systems={[Physics]}
-  running={gameStarted}
-  entities={{
-    physics: { engine: gameState.engine, world: gameState.world },
-    // Lisätään fixedSpeed: baseSpeed + tason arvo
-    ball: { 
-      body: gameState.ball, 
-      renderer: Ball, 
-      color: "red",
-      fixedSpeed: 3 + gameState.level // Tämä arvo pysyy samana tasolla
-    },
-    paddle: { body: gameState.paddle, renderer: Paddle },
-    wallLeft: { body: gameState.wallLeft },
-    wallRight: { body: gameState.wallRight },
-    ceiling: { body: gameState.ceiling },
-    ...gameState.bricks.reduce((acc, brick, index) => {
-      acc[`brick_${index}`] = { body: brick, renderer: Brick };
-      return acc;
-    }, {}),
-    ...Object.keys(gameState)
-      .filter((key) => key.startsWith("ball_extra"))
-      .reduce((acc, key) => {
-        acc[key] = { body: gameState[key].body, renderer: Ball, color: gameState[key].color };
-        return acc;
-      }, {}),
-  }}
-  onEvent={(e) => {
-    if (e.type === "increase-score") {
-      setScore((prev) => prev + 1);
-    } else if (e.type === "game-over") {
-      gameOverHandler();
-    } else if (e.type === "level-cleared") {
-      setLevelCleared(true);
-      setGameStarted(false);
-    }
-  }}
-/>
+      <GameEngine
+        ref={gameEngine}
+        style={styles.gameContainer}
+        systems={[Physics]}
+        running={gameStarted}
+        entities={{
+          physics: { engine: gameState.engine, world: gameState.world },
+          ball: { 
+            body: gameState.ball, 
+            renderer: Ball, 
+            themeIndex: gameState.level,
+          },
+          paddle: { body: gameState.paddle, renderer: Paddle },
+          wallLeft: { body: gameState.wallLeft },
+          wallRight: { body: gameState.wallRight },
+          ceiling: { body: gameState.ceiling },
+          ...gameState.bricks.reduce((acc, brick, index) => {
+            acc[`brick_${index}`] = { body: brick, renderer: Brick };
+            return acc;
+          }, {}),
+         /* ...Object.keys(gameState)
+            .filter((key) => key.startsWith("ball_extra"))
+            .reduce((acc, key) => {
+              acc[key] = { body: gameState[key].body, renderer: Ball, color: gameState[key].color };
+              return acc;
+            }, {}),*/
+        }}
+        onEvent={(e) => {
+          if (e.type === "increase-score") {
+            setScore((prev) => prev + 1);
+          } else if (e.type === "game-over") {
+            gameOverHandler();
+          } else if (e.type === "level-cleared") {
+            setLevelCleared(true);
+            setGameStarted(false);
+          }
+        }}
+      />
     </View>
   );
 }
@@ -317,4 +311,3 @@ const styles = StyleSheet.create({
   },
   gameOverText: { color: "white", fontSize: 30, marginBottom: 20 },
 });
-
