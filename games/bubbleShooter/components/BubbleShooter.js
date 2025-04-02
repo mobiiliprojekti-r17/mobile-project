@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, TouchableWithoutFeedback, Dimensions, StyleSheet, Text } from 'react-native';
 import Matter from 'matter-js';
-import { createPhysics, createShooterBall, createStaticBalls, updatePhysics, getRandomPastelColor } from '../utils/shooterPhysics';
+import { createPhysics, createShooterBall, createStaticBalls, updatePhysics, getRandomPastelColor, findClusterAndRemove } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
 
 const { width, height } = Dimensions.get('window');
@@ -18,8 +18,6 @@ const BubbleShooter = ({ navigation }) => {
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
-  const [angle, setAngle] = useState(0); 
-  const [power, setPower] = useState(0); 
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -39,46 +37,38 @@ const BubbleShooter = ({ navigation }) => {
     }
 
     Matter.Events.on(engine, 'collisionStart', (event) => {
-      for (let i = 0; i < event.pairs.length; i++) {
+      for (let { bodyA, bodyB } of event.pairs) {
         if (!shooterBall.current) break;
-        const { bodyA, bodyB } = event.pairs[i];
-        const shooter = shooterBall.current;
-        let other = null;
 
-        if (bodyA === shooter) {
-          other = bodyB;
-        } else if (bodyB === shooter) {
-          other = bodyA;
-        }
+        const shooter = shooterBall.current;
+        let other = bodyA === shooter ? bodyB : bodyB === shooter ? bodyA : null;
 
         if (other) {
           const isStaticBall = staticBallsRef.current.some((b) => b.id === other.id);
           if (isStaticBall) {
             Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
-            Matter.Body.setAngularVelocity(shooter, 0);
             Matter.Body.setStatic(shooter, true);
+
             const dx = shooter.position.x - other.position.x;
             const dy = shooter.position.y - other.position.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
             if (dist !== 0) {
-              const targetDistance = BALL_RADIUS + BALL_RADIUS;
+              const targetDistance = BALL_RADIUS * 2;
               const factor = targetDistance / dist;
               const newX = other.position.x + dx * factor;
               const newY = other.position.y + dy * factor;
-
-              let adjustedX = newX;
-              let adjustedY = newY;
-              Matter.Body.setPosition(shooter, { x: adjustedX, y: adjustedY });
+              Matter.Body.setPosition(shooter, { x: newX, y: newY });
             }
 
-            if (shooter.color === other.color) {
-              Matter.World.remove(world, other);
-              setStaticBalls((prev) => prev.filter((b) => b.id !== other.id));
-              Matter.World.remove(world, shooter);
-              setScore((prevScore) => prevScore + 10);
+            // Poistetaan kaikki yhdistyneet samanväriset pallot!
+            const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
+            if (cluster.length > 0) {
+              cluster.forEach(ball => Matter.World.remove(world, ball));
+              setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
+              setScore(prevScore => prevScore + cluster.length * 10);
             } else {
-              setStaticBalls((prev) => [...prev, shooter]);
+              setStaticBalls(prev => [...prev, shooter]);
             }
 
             shooterBall.current = null;
@@ -138,9 +128,7 @@ const BubbleShooter = ({ navigation }) => {
     const directionY = touchY - shooterBall.current.position.y;
 
     const angle = Math.atan2(directionY, directionX);
-    const magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
-    const speed = Math.min(magnitude / 10, 20); 
-
+    const speed = 15; // Sama nopeus kuin alkuperäisessä
     const normalizedX = Math.cos(angle) * speed;
     const normalizedY = Math.sin(angle) * speed;
 
@@ -155,7 +143,7 @@ const BubbleShooter = ({ navigation }) => {
     <TouchableWithoutFeedback onPress={handleTouch}>
       <View style={styles.container}>
         <Text style={styles.score}>Pisteet: {score} | Aika: {time}s</Text>
-        {staticBalls.map((ball) => (
+        {staticBalls.map(ball => (
           <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
         ))}
         <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
@@ -167,8 +155,8 @@ const BubbleShooter = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5C7FF', // Light pastel pink background
-    alignItems: 'center', // Center content
+    backgroundColor: '#F5C7FF',
+    alignItems: 'center',
     justifyContent: 'center',
   },
   score: {
