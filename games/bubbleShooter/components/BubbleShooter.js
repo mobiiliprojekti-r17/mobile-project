@@ -39,20 +39,20 @@ const BubbleShooter = ({ navigation }) => {
     Matter.Events.on(engine, 'collisionStart', (event) => {
       for (let { bodyA, bodyB } of event.pairs) {
         if (!shooterBall.current) break;
-    
+
         const shooter = shooterBall.current;
         let other = bodyA === shooter ? bodyB : bodyB === shooter ? bodyA : null;
-    
+
         if (other) {
           const isStaticBall = staticBallsRef.current.some((b) => b.id === other.id);
           if (isStaticBall) {
             Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
             Matter.Body.setStatic(shooter, true);
-    
+
             const dx = shooter.position.x - other.position.x;
             const dy = shooter.position.y - other.position.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-    
+
             if (dist !== 0) {
               const targetDistance = BALL_RADIUS * 2;
               const factor = targetDistance / dist;
@@ -60,8 +60,8 @@ const BubbleShooter = ({ navigation }) => {
               const newY = other.position.y + dy * factor;
               Matter.Body.setPosition(shooter, { x: newX, y: newY });
             }
-    
-            // 🔥 Poistetaan KAIKKI yhdistyneet samanväriset pallot!
+
+            // Poistetaan kaikki yhdistyneet samanväriset pallot!
             const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
             if (cluster.length > 0) {
               cluster.forEach(ball => Matter.World.remove(world, ball));
@@ -70,13 +70,13 @@ const BubbleShooter = ({ navigation }) => {
             } else {
               setStaticBalls(prev => [...prev, shooter]);
             }
-    
+
             shooterBall.current = null;
             resetShooterBall();
             break;
           }
         }
-    
+
         if ((bodyA === shooter && bodyB === ceiling) || (bodyB === shooter && bodyA === ceiling)) {
           Matter.World.remove(world, shooter);
           shooterBall.current = null;
@@ -85,7 +85,7 @@ const BubbleShooter = ({ navigation }) => {
         }
       }
     });
-    
+
     const update = () => {
       updatePhysics(engine);
       if (shooterBall.current) {
@@ -128,13 +128,12 @@ const BubbleShooter = ({ navigation }) => {
     const directionY = touchY - shooterBall.current.position.y;
 
     const angle = Math.atan2(directionY, directionX);
-    const magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
-    const speed = Math.min(magnitude / 10, 20); 
-
+    const speed = 15; // Sama nopeus kuin alkuperäisessä
     const normalizedX = Math.cos(angle) * speed;
     const normalizedY = Math.sin(angle) * speed;
 
     Matter.Body.setStatic(shooterBall.current, false);
+    Matter.Body.set(shooterBall.current, { restitution: 1, friction: 0, frictionAir: 0 });
     Matter.Body.setVelocity(shooterBall.current, { x: normalizedX, y: normalizedY });
 
     setIsBallAtCenter(false);

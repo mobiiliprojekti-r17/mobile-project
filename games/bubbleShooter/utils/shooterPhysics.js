@@ -1,5 +1,7 @@
 import Matter from 'matter-js';
 
+const BALL_RADIUS = 20;
+
 export const getRandomPastelColor = () => {
   const pastelColors = ['#F8BBD0', '#e4bdff', '#B2EBF2', '#C8E6C9', '#FFF9C4'];
   return pastelColors[Math.floor(Math.random() * pastelColors.length)];
@@ -9,7 +11,7 @@ export const createPhysics = (screenWidth, screenHeight) => {
   const engine = Matter.Engine.create();
   const world = engine.world;
   engine.world.gravity.x = 0;
-  engine.world.gravity.y = 0.1;
+  engine.world.gravity.y = 0;
 
   const wallOptions = { isStatic: true, restitution: 1 };
   const ground = Matter.Bodies.rectangle(screenWidth / 2, screenHeight - 80, screenWidth, 50, wallOptions);
@@ -85,17 +87,23 @@ export const findClusterAndRemove = (balls, targetBall) => {
     if (visited.has(current.id)) continue;
     visited.add(current.id);
     cluster.push(current);
-    
+
+    // Käydään kaikki pallot läpi, jotka ovat samassa värissä
     for (let ball of balls) {
       if (ball.id !== current.id && ball.color === current.color) {
         const dx = ball.position.x - current.position.x;
         const dy = ball.position.y - current.position.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance <= 2 * 20) {
-          queue.push(ball);
+        
+        // Varmistetaan, että pallot ovat riittävän lähellä toisiaan
+        // Asetetaan etäisyysrajaksi hieman suurempi arvo, jotta pallot voivat olla hieman kauempana toisistaan
+        if (distance <= 2 * BALL_RADIUS + 2) {  // Tässä voidaan nostaa etäisyysrajaa, esim. +2
+          queue.push(ball); // Lisää naapuripallon jonoon, jos se on riittävän lähellä
         }
       }
     }
   }
+
+  // Poistetaan klusteri vain, jos siinä on vähintään 3 palloa
   return cluster.length >= 3 ? cluster : [];
 };
