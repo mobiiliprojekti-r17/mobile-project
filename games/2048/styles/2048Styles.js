@@ -49,18 +49,6 @@ export const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
-  resultContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#faf8ef",
-  },
-  resultText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#333",
-  },
 });
 
 export const getTileStyle = (value) => {
