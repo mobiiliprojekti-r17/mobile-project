@@ -11,6 +11,9 @@ import {
   findFloatingBalls
 } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { db } from "../../../firebase/Config";
+import { collection, getDocs, query, orderBy, addDoc } from "firebase/firestore";
 
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
@@ -27,6 +30,8 @@ const BubbleShooter = ({ navigation }) => {
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
+  const route = useRoute();
+  const [nickname, setNickname] = useState(route.params?.nickname)
 
   useEffect(() => {
     staticBallsRef.current = staticBalls;
@@ -119,7 +124,7 @@ const BubbleShooter = ({ navigation }) => {
     if (ballsInitialized && staticBalls.length === 0 && !gameOver) {
       setGameOver(true);
       clearInterval(timerRef.current);
-      navigation.replace('ShooterGameOver');
+      storeShooterResults();
     }
   }, [staticBalls, ballsInitialized]);
 
@@ -154,6 +159,22 @@ const BubbleShooter = ({ navigation }) => {
     Matter.Body.setVelocity(shooterBall.current, { x: normalizedX, y: normalizedY });
 
     setIsBallAtCenter(false);
+  };
+
+  const storeShooterResults = async () => {
+    try {
+      await addDoc(collection(db, "ShooterResults"), {
+        Nickname: nickname,
+        score: score,
+      });
+      console.log("Result stored in Firestore.");
+    } catch (error) {
+      console.error("Error storing result: ", error);
+    }
+    navigation.navigate("ShooterGameOver", {
+      nickname,
+      finalScore: score,
+    });
   };
 
   return (

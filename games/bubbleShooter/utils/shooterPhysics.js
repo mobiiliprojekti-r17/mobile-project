@@ -3,7 +3,13 @@ import Matter from 'matter-js';
 const BALL_RADIUS = 20;
 
 export const getRandomPastelColor = () => {
-  const pastelColors = ['#F8BBD0', '#e4bdff', '#B2EBF2', '#C8E6C9', '#FFF9C4'];
+const pastelColors = [
+  '#F8BBD0', // vaaleanpunainen (pastelli pinkki)
+  '#e4bdff', // vaalea violetti / laventeli
+  '#B2EBF2', // vaaleansininen / syaaninen
+  '#C8E6C9', // vaaleanvihreä / mintunvihreä
+  '#FFF9C4'  // vaaleankeltainen / kerma
+];
   return pastelColors[Math.floor(Math.random() * pastelColors.length)];
 };
 
