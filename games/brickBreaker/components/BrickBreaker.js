@@ -7,7 +7,7 @@ import { Paddle, Ball, Brick } from "./BrickBreakRender";
 import { Physics } from "../utils/BrickPhysics";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
-import { collection, getDocs, query, orderBy, addDoc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 
 Matter.Resolver._restingThresh = 0.001;
 Matter.Resolver._positionDampen = 0.01;
@@ -123,29 +123,7 @@ export default function BrickBreaker() {
     });
   };
 
-  useEffect(() => {
-    if (!route.params?.nickname) {
-      const fetchNickname = async () => {
-        try {
-          const q = query(
-            collection(db, "NicknameList"),
-            orderBy("__name__", "asc")
-          );
-          const querySnapshot = await getDocs(q);
-          if (querySnapshot.docs.length > 0) {
-            const fetched = querySnapshot.docs[querySnapshot.docs.length - 1].data().nickname;
-            setNickname(fetched || "Guest");
-          } else {
-            setNickname("Guest");
-          }
-        } catch (error) {
-          console.error("Error fetching nickname:", error);
-          setNickname("Guest");
-        }
-      };
-      fetchNickname();
-    }
-  }, [route.params?.nickname]);
+
 
   const nextLevel = () => {
     const newLevel = gameState.level + 1;
@@ -180,7 +158,7 @@ export default function BrickBreaker() {
     setGameStarted(false);
     setLevelCleared(false);
     gameEngine.current.stop();
-    storeResult();
+    //storeResult();
   };
 
   return (
@@ -221,9 +199,9 @@ export default function BrickBreaker() {
           <Button
             title="Results"
             onPress={() =>
-              navigation.navigate("BreakerResults", {
-                nickname,
-              })
+              storeResult() 
+                
+            
             }
           />
         </View>
@@ -245,7 +223,7 @@ export default function BrickBreaker() {
               setGameStarted(true);
               const baseSpeed = 3;
               const fixedSpeed = baseSpeed + gameState.level;
-              Matter.Body.setVelocity(gameState.ball, { x: fixedSpeed, y: -fixedSpeed });
+              Matter.Body.setVelocity(gameState.ball, { x: 0, y: -fixedSpeed });
             }}
           />
         </View>
