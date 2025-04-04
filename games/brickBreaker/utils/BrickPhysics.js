@@ -73,12 +73,12 @@ export const Physics = (entities, { time, dispatch }) => {
               Matter.World.add(engine.world, newBall);
             
               const pastelColors = [
-                "#FFB3BA", // vibrant pastel pink
-                "#FFDFBA", // vibrant pastel orange
-                "#FFFFBA", // vibrant pastel yellow
-                "#BAFFC9", // vibrant pastel green
-                "#BAE1FF", // vibrant pastel blue
-                "#E3BAFF", // vibrant pastel purple
+                "#FFB3BA",
+                "#FFDFBA",
+                "#FFFFBA",
+                "#BAFFC9",
+                "#BAE1FF",
+                "#E3BAFF",
               ];
               
               const randomColor = pastelColors[Math.floor(Math.random() * pastelColors.length)];
