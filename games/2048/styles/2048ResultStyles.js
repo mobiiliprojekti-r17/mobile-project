@@ -8,8 +8,9 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         padding: 20,
       },
-  title: {
-    fontSize: 35,
+  ryeText: {
+    fontFamily: 'Rye_400Regular',
+    fontSize: 70,
     fontWeight: "bold",
     color: "#BB86FC", // Game Over -otsikko
     marginBottom: 20,

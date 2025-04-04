@@ -2,11 +2,17 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Button, ScrollView, TouchableOpacity } from "react-native";
 import { db } from "../../../firebase/Config"; 
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import styles from "../styles/2048ResultStyles"; // ✅ Lisätty tyylitiedoston import
+import styles from "../styles/2048ResultStyles"; 
+import { useFonts } from 'expo-font';
+import { Rye_400Regular } from '@expo-google-fonts/rye';
 
 export default function Game2048ResultScreen({ route, navigation }) {
   const { Nickname, score, time } = route.params;
   const [scores, setScores] = useState([]);
+
+  let[fontsLoaded] = useFonts({
+    Rye_400Regular,
+  });
 
   // ✅ Muutetaan `time` takaisin sekunneiksi, jos se on merkkijono
   const convertTimeToSeconds = (timeString) => {
@@ -49,7 +55,7 @@ export default function Game2048ResultScreen({ route, navigation }) {
           return a.timeInSeconds - b.timeInSeconds; // Lyhin aika ensin
         });
   
-        setScores(scoresList);
+        setScores(scoresList.slice(0, 5))
       } catch (error) {
         console.error("Virhe tulosten hakemisessa: ", error);
       }
@@ -65,9 +71,13 @@ export default function Game2048ResultScreen({ route, navigation }) {
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
+  if (!fontsLoaded) {
+    return <Text>Loading...</Text>; // Ladataan fonttia
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Game Over</Text>
+      <Text style={[styles.ryeText, {fontFamily: 'Rye_400Regular'}]}>Game Over</Text>
       
       <View style={styles.resultBox}>
         <Text style={styles.infoText}>Player: {Nickname}</Text>
@@ -75,7 +85,7 @@ export default function Game2048ResultScreen({ route, navigation }) {
         <Text style={styles.infoText}>Time: {formattedTime(timeInSeconds)}</Text>
       </View>
   
-      <Text style={styles.subtitle}>Top Scores:</Text>
+      <Text style={styles.subtitle}>Top 5:</Text>
       
       <ScrollView style={styles.scrollView}>
   {scores.length > 0 ? (
@@ -98,7 +108,6 @@ export default function Game2048ResultScreen({ route, navigation }) {
     <Text style={styles.noScores}>No scores yet!</Text>
   )}
 </ScrollView>
-  );
 
       <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate("Home")}>
         <Text style={styles.homeButtonText}>Home</Text>
