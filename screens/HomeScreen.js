@@ -106,12 +106,6 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.buttonText}>Clear</Text>
       </TouchableOpacity>
 
-      {recentNickname ? (
-        <Text style={styles.nicknameText}>Nickname: {recentNickname}</Text>
-      ) : (
-        <Text style={styles.nicknameText}>No nickname saved yet.</Text>
-      )}
-
       <Text>Singleplayer games!</Text>
       <TouchableOpacity style={styles.gameButton} onPress={new2048Game}>
         <Text style={styles.gameButtonText}>2048</Text>
