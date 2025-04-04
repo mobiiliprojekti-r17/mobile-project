@@ -1,8 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, TouchableWithoutFeedback, Dimensions, StyleSheet, Text } from 'react-native';
 import Matter from 'matter-js';
-import { createPhysics, createShooterBall, createStaticBalls, updatePhysics, getRandomPastelColor } from '../utils/shooterPhysics';
+import {
+  createPhysics,
+  createShooterBall,
+  createStaticBalls,
+  updatePhysics,
+  getRandomPastelColor,
+  findClusterAndRemove,
+  findFloatingBalls
+} from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { db } from "../../../firebase/Config";
+import { collection, getDocs, query, orderBy, addDoc } from "firebase/firestore";
+import shooterStyles from '../styles/shooterStyles';
 
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
@@ -18,9 +30,9 @@ const BubbleShooter = ({ navigation }) => {
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
-  const [angle, setAngle] = useState(0); 
-  const [power, setPower] = useState(0); 
   const timerRef = useRef(null);
+  const route = useRoute();
+  const [nickname, setNickname] = useState(route.params?.nickname)
 
   useEffect(() => {
     staticBallsRef.current = staticBalls;
@@ -39,46 +51,47 @@ const BubbleShooter = ({ navigation }) => {
     }
 
     Matter.Events.on(engine, 'collisionStart', (event) => {
-      for (let i = 0; i < event.pairs.length; i++) {
+      for (let { bodyA, bodyB } of event.pairs) {
         if (!shooterBall.current) break;
-        const { bodyA, bodyB } = event.pairs[i];
-        const shooter = shooterBall.current;
-        let other = null;
 
-        if (bodyA === shooter) {
-          other = bodyB;
-        } else if (bodyB === shooter) {
-          other = bodyA;
-        }
+        const shooter = shooterBall.current;
+        let other = bodyA === shooter ? bodyB : bodyB === shooter ? bodyA : null;
 
         if (other) {
           const isStaticBall = staticBallsRef.current.some((b) => b.id === other.id);
           if (isStaticBall) {
             Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
-            Matter.Body.setAngularVelocity(shooter, 0);
             Matter.Body.setStatic(shooter, true);
+
             const dx = shooter.position.x - other.position.x;
             const dy = shooter.position.y - other.position.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
             if (dist !== 0) {
-              const targetDistance = BALL_RADIUS + BALL_RADIUS;
+              const targetDistance = BALL_RADIUS * 2;
               const factor = targetDistance / dist;
               const newX = other.position.x + dx * factor;
               const newY = other.position.y + dy * factor;
-
-              let adjustedX = newX;
-              let adjustedY = newY;
-              Matter.Body.setPosition(shooter, { x: adjustedX, y: adjustedY });
+              Matter.Body.setPosition(shooter, { x: newX, y: newY });
             }
 
-            if (shooter.color === other.color) {
-              Matter.World.remove(world, other);
-              setStaticBalls((prev) => prev.filter((b) => b.id !== other.id));
-              Matter.World.remove(world, shooter);
-              setScore((prevScore) => prevScore + 10);
+            const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
+
+            if (cluster.length > 0) {
+              cluster.forEach(ball => Matter.World.remove(world, ball));
+              setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
+              setScore(prev => prev + cluster.length * 10);
             } else {
-              setStaticBalls((prev) => [...prev, shooter]);
+              setStaticBalls(prev => [...prev, shooter]);
+            }
+
+            // Leijuvien pallojen tarkistus ja poisto
+            const updatedBalls = staticBallsRef.current.filter(ball => !cluster.includes(ball));
+            const floatingBalls = findFloatingBalls(updatedBalls);
+            if (floatingBalls.length > 0) {
+              floatingBalls.forEach(ball => Matter.World.remove(world, ball));
+              setStaticBalls(prev => prev.filter(ball => !floatingBalls.includes(ball)));
+              setScore(prev => prev + floatingBalls.length * 5);
             }
 
             shooterBall.current = null;
@@ -112,7 +125,7 @@ const BubbleShooter = ({ navigation }) => {
     if (ballsInitialized && staticBalls.length === 0 && !gameOver) {
       setGameOver(true);
       clearInterval(timerRef.current);
-      navigation.replace('ShooterGameOver');
+      storeShooterResults();
     }
   }, [staticBalls, ballsInitialized]);
 
@@ -138,9 +151,7 @@ const BubbleShooter = ({ navigation }) => {
     const directionY = touchY - shooterBall.current.position.y;
 
     const angle = Math.atan2(directionY, directionX);
-    const magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
-    const speed = Math.min(magnitude / 10, 20); 
-
+    const speed = 15;
     const normalizedX = Math.cos(angle) * speed;
     const normalizedY = Math.sin(angle) * speed;
 
@@ -151,36 +162,33 @@ const BubbleShooter = ({ navigation }) => {
     setIsBallAtCenter(false);
   };
 
+  const storeShooterResults = async () => {
+    try {
+      await addDoc(collection(db, "ShooterResults"), {
+        Nickname: nickname,
+        score: score,
+      });
+      console.log("Result stored in Firestore.");
+    } catch (error) {
+      console.error("Error storing result: ", error);
+    }
+    navigation.navigate("ShooterGameOver", {
+      nickname,
+      finalScore: score,
+    });
+  };
+
   return (
     <TouchableWithoutFeedback onPress={handleTouch}>
-      <View style={styles.container}>
-        <Text style={styles.score}>Pisteet: {score} | Aika: {time}s</Text>
-        {staticBalls.map((ball) => (
+      <View style={shooterStyles.gameContainer}>
+        <Text style={shooterStyles.scoreText}>Pisteet: {score} | Aika: {time}s</Text>
+        {staticBalls.map(ball => (
           <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
         ))}
         <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
       </View>
     </TouchableWithoutFeedback>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5C7FF', // Light pastel pink background
-    alignItems: 'center', // Center content
-    justifyContent: 'center',
-  },
-  score: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    fontSize: 24,
-    color: 'deeppink',
-    textShadowColor: '#FF69B4', 
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 10,
-  },
-});
+}
 
 export default BubbleShooter;

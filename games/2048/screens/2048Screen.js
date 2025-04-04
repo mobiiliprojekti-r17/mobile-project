@@ -6,26 +6,26 @@ import { styles, getTileStyle } from "../styles/2048Styles";
 import Icon from "react-native-vector-icons/Feather";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { db, collection, addDoc, getDocs } from "../../../firebase/Config"
+import { db, collection, addDoc } from "../../../firebase/Config"
 
-const Game2048Screen = ({route}) => {
+const Game2048Screen = ({ route }) => {
   const navigation = useNavigation();
   const [Nickname, setNickname] = useState('');
   const [grid, setGrid] = useState(initializeGrid());
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
   const [isGameActive, setIsGameActive] = useState(true);
+  const [gameOverHandled, setGameOverHandled] = useState(false); // Estää kaksoistallennukset
   const [swipeCooldown, setSwipeCooldown] = useState(false);
 
-  // Tallennetaan edellinen tila peruutusta varten
   const [previousGrid, setPreviousGrid] = useState(null);
   const [previousScore, setPreviousScore] = useState(0);
 
   useEffect(() => {
-      if (route.params?.nickname) {
-        setNickname(route.params.nickname);
-      }
-    }, [route.params?.nickname]);
+    if (route.params?.nickname) {
+      setNickname(route.params.nickname);
+    }
+  }, [route.params?.nickname]);
 
   useEffect(() => {
     let timer;
@@ -39,6 +39,34 @@ const Game2048Screen = ({route}) => {
     return () => clearInterval(timer);
   }, [isGameActive]);
 
+  useEffect(() => {
+    if (isGameActive || gameOverHandled) return; // Estetään ylimääräiset kutsut
+
+    const handleGameOver = async () => {
+      setGameOverHandled(true); // Estetään uudelleenkutsuminen
+
+      try {
+        const gameResultsRef = collection(db, "2048Results");
+        await addDoc(gameResultsRef, {
+          Nickname: Nickname,
+          score: score,
+          time: formatTime(time),
+        });
+        console.log("✅ Pelitulos tallennettu Firebaseen");
+      } catch (error) {
+        console.error("❌ Virhe tallennettaessa tulosta: ", error);
+      }
+
+      navigation.replace("Game2048ResultScreen", {
+        Nickname,
+        score,
+        time: formatTime(time),
+      });
+    };
+
+    handleGameOver();
+  }, [isGameActive]); // Käynnistyy vain kun peli loppuu
+
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -46,7 +74,7 @@ const Game2048Screen = ({route}) => {
   };
 
   const handleSwipe = (event) => {
-    if (swipeCooldown || !isGameActive) return;
+    if (swipeCooldown || !isGameActive || gameOverHandled) return; // Estää ylimääräiset siirrot
     setSwipeCooldown(true);
 
     const { translationX, translationY } = event.nativeEvent;
@@ -59,7 +87,6 @@ const Game2048Screen = ({route}) => {
         ? "down"
         : "up";
 
-    // Tallennetaan edellinen ruudukko ja pisteet ennen siirtoa
     setPreviousGrid([...grid]);
     setPreviousScore(score);
 
@@ -67,29 +94,11 @@ const Game2048Screen = ({route}) => {
     setGrid([...newGrid]);
     setScore(score + totalPoints);
 
-    const handleGameOver = () => {
-      setIsGameActive(false);
-      navigation.replace("Game2048ResultScreen", {
-        Nickname, 
-        score,
-        time: formatTime(time),
-      });
-    };
-
     if (checkGameOver(newGrid)) {
-      handleGameOver();
+      setIsGameActive(false); // Tämä aktivoi useEffectin tallentamaan tuloksen
     }
 
     setTimeout(() => setSwipeCooldown(false), 150);
-  };
-
-  // Peru siirto -toiminto palauttaa edellisen ruudukon ja pisteet
-  const undoMove = () => {
-    if (previousGrid) {
-      setGrid(previousGrid);
-      setScore(previousScore);
-      setPreviousGrid(null); // Nollataan edellinen tila, jotta ei voi perua toistuvasti
-    }
   };
 
   const handleUndo = () => {
@@ -106,13 +115,12 @@ const Game2048Screen = ({route}) => {
     setScore(0);
     setTime(0);
     setIsGameActive(true);
-    setPreviousGrid(null); // Nollataan myös edellinen tila pelin resetoinnin yhteydessä
+    setGameOverHandled(false); // Nollataan tila uuden pelin alkaessa
   };
 
   return (
     <PanGestureHandler onGestureEvent={handleSwipe}>
       <View style={styles.container}>
-        {/* Undo-nappi */}
         <TouchableOpacity style={styles.undoButtonContainer} onPress={handleUndo}>
           <Icon name="corner-up-left" size={24} color="#fff" />
         </TouchableOpacity>
