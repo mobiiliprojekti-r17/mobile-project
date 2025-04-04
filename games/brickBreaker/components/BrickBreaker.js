@@ -110,7 +110,6 @@ export default function BrickBreaker() {
         Nickname: nickname,
         level: gameState.level,
         score: score,
-        timestamp: Date.now(),
       });
       console.log("Result stored in Firestore.");
     } catch (error) {
@@ -156,7 +155,7 @@ export default function BrickBreaker() {
     setGameStarted(false);
     setLevelCleared(false);
     gameEngine.current.stop();
-    storeResult();
+    //storeResult();
   };
 
   return (
@@ -197,9 +196,9 @@ export default function BrickBreaker() {
           <Button
             title="Results"
             onPress={() =>
-              navigation.navigate("BreakerResults", {
-                nickname,
-              })
+              storeResult() 
+                
+            
             }
           />
         </View>
@@ -221,7 +220,7 @@ export default function BrickBreaker() {
               setGameStarted(true);
               const baseSpeed = 3;
               const fixedSpeed = baseSpeed + gameState.level;
-              Matter.Body.setVelocity(gameState.ball, { x: fixedSpeed, y: -fixedSpeed });
+              Matter.Body.setVelocity(gameState.ball, { x: 0, y: -fixedSpeed });
             }}
           />
         </View>
@@ -262,7 +261,6 @@ export default function BrickBreaker() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#483471" },
   gameContainer: { flex: 1 },
