@@ -3,7 +3,13 @@ import Matter from 'matter-js';
 const BALL_RADIUS = 20;
 
 export const getRandomPastelColor = () => {
-  const pastelColors = ['#F8BBD0', '#e4bdff', '#B2EBF2', '#C8E6C9', '#FFF9C4'];
+const pastelColors = [
+  '#FF9EE2', // vaaleanpunainen (pastelli pinkki)
+  '#d3b5ff', // vaalea violetti / laventeli
+  '#a0dcff', // vaaleansininen / syaaninen
+  '#c2ff9a', // vaaleanvihreä / mintunvihreä
+  '#fff68f'  // vaaleankeltainen / kerma
+];
   return pastelColors[Math.floor(Math.random() * pastelColors.length)];
 };
 
@@ -37,7 +43,7 @@ export const createShooterBall = (world, x, y, radius, color) => {
     },
   });
   ball.color = color;
-  ball.id = ball.id || Matter.Common.nextId();
+  ball.id = Matter.Common.nextId();
   Matter.World.add(world, ball);
   return ball;
 };
@@ -65,7 +71,7 @@ export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
         },
       });
       staticBall.color = getRandomPastelColor();
-      staticBall.id = `static-${row}-${col}`;
+      staticBall.id = Matter.Common.nextId(); // 🛠 uniikki ID
       Matter.World.add(world, staticBall);
       staticBallsArray.push(staticBall);
     }
@@ -88,22 +94,45 @@ export const findClusterAndRemove = (balls, targetBall) => {
     visited.add(current.id);
     cluster.push(current);
 
-    // Käydään kaikki pallot läpi, jotka ovat samassa värissä
     for (let ball of balls) {
       if (ball.id !== current.id && ball.color === current.color) {
         const dx = ball.position.x - current.position.x;
         const dy = ball.position.y - current.position.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        // Varmistetaan, että pallot ovat riittävän lähellä toisiaan
-        // Asetetaan etäisyysrajaksi hieman suurempi arvo, jotta pallot voivat olla hieman kauempana toisistaan
-        if (distance <= 2 * BALL_RADIUS + 2) {  // Tässä voidaan nostaa etäisyysrajaa, esim. +2
-          queue.push(ball); // Lisää naapuripallon jonoon, jos se on riittävän lähellä
+        if (distance <= 2 * BALL_RADIUS + 2) {
+          queue.push(ball);
         }
       }
     }
   }
 
-  // Poistetaan klusteri vain, jos siinä on vähintään 3 palloa
   return cluster.length >= 3 ? cluster : [];
+};
+
+export const findFloatingBalls = (balls) => {
+  const connectedToTop = new Set();
+  const queue = [];
+
+  for (let ball of balls) {
+    if (ball.position.y <= 100) {
+      queue.push(ball);
+      connectedToTop.add(ball.id);
+    }
+  }
+
+  while (queue.length > 0) {
+    const current = queue.pop();
+    for (let ball of balls) {
+      if (connectedToTop.has(ball.id)) continue;
+      const dx = ball.position.x - current.position.x;
+      const dy = ball.position.y - current.position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance <= 2 * BALL_RADIUS + 2) {
+        connectedToTop.add(ball.id);
+        queue.push(ball);
+      }
+    }
+  }
+
+  return balls.filter(ball => !connectedToTop.has(ball.id));
 };

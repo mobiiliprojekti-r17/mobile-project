@@ -1,8 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, TouchableWithoutFeedback, Dimensions, StyleSheet, Text } from 'react-native';
 import Matter from 'matter-js';
-import { createPhysics, createShooterBall, createStaticBalls, updatePhysics, getRandomPastelColor, findClusterAndRemove } from '../utils/shooterPhysics';
+import {
+  createPhysics,
+  createShooterBall,
+  createStaticBalls,
+  updatePhysics,
+  getRandomPastelColor,
+  findClusterAndRemove,
+  findFloatingBalls
+} from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { db } from "../../../firebase/Config";
+import { collection, getDocs, query, orderBy, addDoc } from "firebase/firestore";
+import shooterStyles from '../styles/shooterStyles';
 
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
@@ -19,6 +31,8 @@ const BubbleShooter = ({ navigation }) => {
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
+  const route = useRoute();
+  const [nickname, setNickname] = useState(route.params?.nickname)
 
   useEffect(() => {
     staticBallsRef.current = staticBalls;
@@ -61,14 +75,23 @@ const BubbleShooter = ({ navigation }) => {
               Matter.Body.setPosition(shooter, { x: newX, y: newY });
             }
 
-            // Poistetaan kaikki yhdistyneet samanväriset pallot!
             const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
+
             if (cluster.length > 0) {
               cluster.forEach(ball => Matter.World.remove(world, ball));
               setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
-              setScore(prevScore => prevScore + cluster.length * 10);
+              setScore(prev => prev + cluster.length * 10);
             } else {
               setStaticBalls(prev => [...prev, shooter]);
+            }
+
+            // Leijuvien pallojen tarkistus ja poisto
+            const updatedBalls = staticBallsRef.current.filter(ball => !cluster.includes(ball));
+            const floatingBalls = findFloatingBalls(updatedBalls);
+            if (floatingBalls.length > 0) {
+              floatingBalls.forEach(ball => Matter.World.remove(world, ball));
+              setStaticBalls(prev => prev.filter(ball => !floatingBalls.includes(ball)));
+              setScore(prev => prev + floatingBalls.length * 5);
             }
 
             shooterBall.current = null;
@@ -102,7 +125,7 @@ const BubbleShooter = ({ navigation }) => {
     if (ballsInitialized && staticBalls.length === 0 && !gameOver) {
       setGameOver(true);
       clearInterval(timerRef.current);
-      navigation.replace('ShooterGameOver');
+      storeShooterResults();
     }
   }, [staticBalls, ballsInitialized]);
 
@@ -128,7 +151,7 @@ const BubbleShooter = ({ navigation }) => {
     const directionY = touchY - shooterBall.current.position.y;
 
     const angle = Math.atan2(directionY, directionX);
-    const speed = 15; // Sama nopeus kuin alkuperäisessä
+    const speed = 15;
     const normalizedX = Math.cos(angle) * speed;
     const normalizedY = Math.sin(angle) * speed;
 
@@ -139,10 +162,26 @@ const BubbleShooter = ({ navigation }) => {
     setIsBallAtCenter(false);
   };
 
+  const storeShooterResults = async () => {
+    try {
+      await addDoc(collection(db, "ShooterResults"), {
+        Nickname: nickname,
+        score: score,
+      });
+      console.log("Result stored in Firestore.");
+    } catch (error) {
+      console.error("Error storing result: ", error);
+    }
+    navigation.navigate("ShooterGameOver", {
+      nickname,
+      finalScore: score,
+    });
+  };
+
   return (
     <TouchableWithoutFeedback onPress={handleTouch}>
-      <View style={styles.container}>
-        <Text style={styles.score}>Pisteet: {score} | Aika: {time}s</Text>
+      <View style={shooterStyles.gameContainer}>
+        <Text style={shooterStyles.scoreText}>Pisteet: {score} | Aika: {time}s</Text>
         {staticBalls.map(ball => (
           <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
         ))}
@@ -150,25 +189,6 @@ const BubbleShooter = ({ navigation }) => {
       </View>
     </TouchableWithoutFeedback>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5C7FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  score: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    fontSize: 24,
-    color: 'deeppink',
-    textShadowColor: '#FF69B4', 
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 10,
-  },
-});
+}
 
 export default BubbleShooter;
