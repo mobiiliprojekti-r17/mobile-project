@@ -3,11 +3,13 @@ import { View, Text, Button, ScrollView, TouchableOpacity } from "react-native";
 import { db } from "../../../firebase/Config";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import styles from "../styles/SudokuResultStyles";
+import { useNickname } from "../../../context/context";
 
 export default function SudokuResult({ route, navigation }) {
-  const { time, difficulty, Nickname } = route.params;
+  const { nickname } = useNickname(); // ← käytetään tästä
+  const { time, difficulty } = route.params;
   const [scores, setScores] = useState([]);
-  const [selectedDifficulty, setSelectedDifficulty] = useState(""); // Uusi tila valitulle vaikeustasolle
+  const [selectedDifficulty, setSelectedDifficulty] = useState("");
 
   useEffect(() => {
     const fetchScores = async () => {
@@ -39,19 +41,18 @@ export default function SudokuResult({ route, navigation }) {
 
   useEffect(() => {
     navigation.setOptions({
-      headerLeft: () => null, // Poistaa takaisin-napin
-      gestureEnabled: false,  // Estää pyyhkäisypalautuksen
+      headerLeft: () => null,
+      gestureEnabled: false,
     });
   }, [navigation]);
 
   const formattedTime = (timeInSeconds) => {
-    if (timeInSeconds == null) return "N/A"; // Varmistetaan, ettei null tai undefined mene läpi
+    if (timeInSeconds == null) return "N/A";
     const minutes = Math.floor(timeInSeconds / 60);
     const secs = timeInSeconds % 60;
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // Ryhmän jako vaikeustason mukaan
   const groupedScores = scores.reduce((acc, score) => {
     if (!acc[score.difficulty]) acc[score.difficulty] = [];
     acc[score.difficulty].push(score);
@@ -63,66 +64,61 @@ export default function SudokuResult({ route, navigation }) {
       <Text style={styles.title}>GAME OVER!</Text>
       <Text style={styles.title}>Your result:</Text>
       <View style={styles.resultBox}>
-        <Text style={styles.infoText}>Nickname: {Nickname}</Text>
+        <Text style={styles.infoText}>Nickname: {nickname}</Text>
         <Text style={styles.infoText}>Difficulty: {difficulty}</Text>
         <Text style={styles.infoText}>Time: {time ? formattedTime(time) : "N/A"}</Text>
       </View>
 
       <Text style={styles.subtitle}>Top list:</Text>
 
- {/* Vaikeustason valinta napilla */}
-<View style={styles.buttonContainer}>
-  {["", "easy", "medium", "hard"].map((level) => (
-    <TouchableOpacity
-      key={level}
-      style={[
-        styles.filterButton,
-        selectedDifficulty === level && styles.selectedButton,
-      ]}
-      onPress={() => {
-        setSelectedDifficulty(level);
-        console.log("Selected Difficulty:", level);  // Lisää debuggausta
-      }}
-    >
-      <Text style={styles.buttonText}>
-        {level === "" ? "Show all" : level.toUpperCase()}
-      </Text>
-    </TouchableOpacity>
-  ))}
-</View>
+      <View style={styles.buttonContainer}>
+        {["", "easy", "medium", "hard"].map((level) => (
+          <TouchableOpacity
+            key={level}
+            style={[
+              styles.filterButton,
+              selectedDifficulty === level && styles.selectedButton,
+            ]}
+            onPress={() => setSelectedDifficulty(level)}
+          >
+            <Text style={styles.buttonText}>
+              {level === "" ? "Show all" : level.toUpperCase()}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-{/* Vaikeustason mukaan ryhmiteltyjen tulosten renderöinti */}
-<ScrollView style={styles.scrollView}>
-  {Object.keys(groupedScores).length > 0 ? (
-    Object.keys(groupedScores)
-      .filter((diffLevel) => !selectedDifficulty || diffLevel === selectedDifficulty)
-      .map((diffLevel) => (
-        <View key={diffLevel} style={styles.difficultySection}>
-          <Text style={styles.difficultyTitle}>
-            {diffLevel ? diffLevel.toUpperCase() : "ALL"}
-          </Text>
-          {groupedScores[diffLevel]
-            .sort((a, b) => a.timeInSeconds - b.timeInSeconds) // Järjestetään ajan mukaan
-            .map((score, index) => (
-              <View key={index} style={styles.scoreItem}>
-                <Text style={styles.rank}>#{index + 1}</Text> {/* Sijoitus numero erilleen */}
-                <Text style={styles.scoreText}>
-                  Nickname: {score.Nickname ? score.Nickname : "Unknown"}
+      <ScrollView style={styles.scrollView}>
+        {Object.keys(groupedScores).length > 0 ? (
+          Object.keys(groupedScores)
+            .filter((diffLevel) => !selectedDifficulty || diffLevel === selectedDifficulty)
+            .map((diffLevel) => (
+              <View key={diffLevel} style={styles.difficultySection}>
+                <Text style={styles.difficultyTitle}>
+                  {diffLevel ? diffLevel.toUpperCase() : "ALL"}
                 </Text>
-                <Text style={styles.scoreText}>
-                  Difficulty: {score.difficulty ? score.difficulty : "Unknown"}
-                </Text>
-                <Text style={styles.scoreText}>
-                  Time: {score.timeInSeconds != null ? formattedTime(score.timeInSeconds) : "N/A"}
-                </Text>
+                {groupedScores[diffLevel]
+                  .sort((a, b) => a.timeInSeconds - b.timeInSeconds)
+                  .map((score, index) => (
+                    <View key={index} style={styles.scoreItem}>
+                      <Text style={styles.rank}>#{index + 1}</Text>
+                      <Text style={styles.scoreText}>
+                        Nickname: {score.Nickname ?? "Unknown"}
+                      </Text>
+                      <Text style={styles.scoreText}>
+                        Difficulty: {score.difficulty ?? "Unknown"}
+                      </Text>
+                      <Text style={styles.scoreText}>
+                        Time: {score.timeInSeconds != null ? formattedTime(score.timeInSeconds) : "N/A"}
+                      </Text>
+                    </View>
+                  ))}
               </View>
-            ))}
-        </View>
-      ))
-  ) : (
-    <Text style={styles.noScores}>No scores yet!</Text>
-  )}
-</ScrollView>
+            ))
+        ) : (
+          <Text style={styles.noScores}>No scores yet!</Text>
+        )}
+      </ScrollView>
 
       <Button title="Home" onPress={() => navigation.navigate("Home")} color="#6200EE" />
     </View>

@@ -1,13 +1,13 @@
-
-import React, { useRef, useState, useMemo, useEffect } from "react";
+import React, { useRef, useState, useMemo } from "react";
 import { View, StyleSheet, PanResponder, Text, Button } from "react-native";
 import { GameEngine } from "react-native-game-engine";
 import Matter from "matter-js";
 import { Paddle, Ball, Brick } from "./BrickBreakRender";
 import { Physics } from "../utils/BrickPhysics";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
-import { collection, getDocs, query, orderBy, addDoc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
+import { useNickname } from "../../../context/context";
 
 Matter.Resolver._restingThresh = 0.001;
 Matter.Resolver._positionDampen = 0.01;
@@ -77,8 +77,7 @@ const setupWorld = (level = 1) => {
 
 export default function BrickBreaker() {
   const navigation = useNavigation();
-  const route = useRoute();
-  const [nickname, setNickname] = useState(route.params?.nickname);
+  const { nickname } = useNickname();
 
   const gameEngine = useRef(null);
   const [gameState, setGameState] = useState(setupWorld());
@@ -124,30 +123,6 @@ export default function BrickBreaker() {
     });
   };
 
-  useEffect(() => {
-    if (!route.params?.nickname) {
-      const fetchNickname = async () => {
-        try {
-          const q = query(
-            collection(db, "NicknameList"),
-            orderBy("__name__", "asc")
-          );
-          const querySnapshot = await getDocs(q);
-          if (querySnapshot.docs.length > 0) {
-            const fetched = querySnapshot.docs[querySnapshot.docs.length - 1].data().nickname;
-            setNickname(fetched || "Guest");
-          } else {
-            setNickname("Guest");
-          }
-        } catch (error) {
-          console.error("Error fetching nickname:", error);
-          setNickname("Guest");
-        }
-      };
-      fetchNickname();
-    }
-  }, [route.params?.nickname]);
-
   const nextLevel = () => {
     const newLevel = gameState.level + 1;
     const newGameState = setupWorld(newLevel);
@@ -159,9 +134,9 @@ export default function BrickBreaker() {
     setTimeout(() => {
       gameEngine.current.swap({
         physics: { engine: newGameState.engine, world: newGameState.world },
-        ball: { 
-          body: newGameState.ball, 
-          renderer: Ball, 
+        ball: {
+          body: newGameState.ball,
+          renderer: Ball,
           themeIndex: gameState.level,
         },
         paddle: { body: newGameState.paddle, renderer: Paddle },
@@ -259,9 +234,9 @@ export default function BrickBreaker() {
         running={gameStarted}
         entities={{
           physics: { engine: gameState.engine, world: gameState.world },
-          ball: { 
-            body: gameState.ball, 
-            renderer: Ball, 
+          ball: {
+            body: gameState.ball,
+            renderer: Ball,
             themeIndex: gameState.level,
           },
           paddle: { body: gameState.paddle, renderer: Paddle },
@@ -272,12 +247,6 @@ export default function BrickBreaker() {
             acc[`brick_${index}`] = { body: brick, renderer: Brick };
             return acc;
           }, {}),
-         /* ...Object.keys(gameState)
-            .filter((key) => key.startsWith("ball_extra"))
-            .reduce((acc, key) => {
-              acc[key] = { body: gameState[key].body, renderer: Ball, color: gameState[key].color };
-              return acc;
-            }, {}),*/
         }}
         onEvent={(e) => {
           if (e.type === "increase-score") {

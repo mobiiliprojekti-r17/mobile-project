@@ -6,22 +6,17 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import sudoku from "sudoku";
 import styles from "../styles/SudokuStyles";
 import { db, collection, addDoc } from "../../../firebase/Config"
+import { useNickname } from "../../../context/context";
 
 export default function Sudoku({ route, navigation }) {
   const [board, setBoard] = useState([]);
   const [solution, setSolution] = useState(null);
   const [selectedCell, setSelectedCell] = useState(null);
-  const [Nickname, setNickname] = useState('');
+  const { nickname: Nickname } = useNickname();
   const [difficulty, setDifficulty] = useState(route.params?.difficulty);
   const [timer, setTimer] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
 
-
-  useEffect(() => {
-    if (route.params?.nickname) {
-      setNickname(route.params.nickname);
-    }
-  }, [route.params?.nickname]);
 
   useEffect(() => {
     let interval;
