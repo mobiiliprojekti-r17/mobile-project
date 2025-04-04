@@ -15,6 +15,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
 import { collection, getDocs, query, orderBy, addDoc } from "firebase/firestore";
 import shooterStyles from '../styles/shooterStyles';
+import { useNickname } from '../../../context/context';
 
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
@@ -32,7 +33,7 @@ const BubbleShooter = ({ navigation }) => {
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
   const route = useRoute();
-  const [nickname, setNickname] = useState(route.params?.nickname)
+  const { nickname } = useNickname(); 
 
   useEffect(() => {
     staticBallsRef.current = staticBalls;
