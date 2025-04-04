@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { db, collection, addDoc, getDocs } from '../firebase/Config'; 
-
+import styles from "../styles/styles"
 const HomeScreen = ({ navigation }) => {
   const [nickname, setNickname] = useState(''); 
   const [nicknames, setNicknames] = useState([]); 
@@ -49,21 +49,23 @@ const HomeScreen = ({ navigation }) => {
       Alert.alert("Warning", "Please enter a nickname first!");
       return;
     }
+    
+    // Alert for difficulty selection
     Alert.alert(
       "Choose difficulty",
       "",
       [
-        { text: "Easy", onPress: () => startSudokuGame("easy") },
-        { text: "Medium", onPress: () => startSudokuGame("medium") },
-        { text: "Hard", onPress: () => startSudokuGame("hard") },
+        { text: "Easy", onPress: () => startGame("Sudoku", "easy") },
+        { text: "Medium", onPress: () => startGame("Sudoku", "medium") },
+        { text: "Hard", onPress: () => startGame("Sudoku", "hard") },
         { text: "Cancel", style: "cancel" },
       ],
       { cancelable: false }
     );
   };
 
-  const startSudokuGame = (difficulty) => {
-    navigation.navigate("Sudoku", { nickname, difficulty, autoStart: true });
+  const startGame = (game, difficulty) => {
+    navigation.navigate(game, { nickname, difficulty, autoStart: true });
   };
 
   const new2048Game = () => {
@@ -74,24 +76,43 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate("2048", { nickname });
   };
 
-const startBubbleShooter = () => {
-  if (!nickname.trim()) {
-    Alert.alert("Warning", "Please enter a nickname first!");
-    return;
-  }
-  navigation.navigate("BubbleShooter", { nickname });
-}
+  const startBubbleShooter = () => {
+    if (!nickname.trim()) {
+      Alert.alert("Warning", "Please enter a nickname first!");
+      return;
+    }
+    navigation.navigate("BubbleShooter", { nickname });
+  };
 
-const startBrickBreaker = () => {
-  if (!nickname.trim()) {
-    Alert.alert("Warning", "Please enter a nickname first!");
-    return;
-  }
-  navigation.navigate("BrickBreaker", { nickname});
-}
+  const startBrickBreaker = () => {
+    if (!nickname.trim()) {
+      Alert.alert("Warning", "Please enter a nickname first!");
+      return;
+    }
+    navigation.navigate("BrickBreaker", { nickname });
+  };
 
- const recentNickname = nicknames.length > 0 ? nicknames[nicknames.length - 1].name : '';
+  const startMinesweeper = () => {
+    if (!nickname.trim()) {
+      Alert.alert("Warning", "Please enter a nickname first!");
+      return;
+    }
+    
+    // Alert for difficulty selection
+    Alert.alert(
+      "Choose difficulty",
+      "",
+      [
+        { text: "Easy", onPress: () => startGame("Minesweeper", "easy") },
+        { text: "Medium", onPress: () => startGame("Minesweeper", "medium") },
+        { text: "Hard", onPress: () => startGame("Minesweeper", "hard") },
+        { text: "Cancel", style: "cancel" },
+      ],
+      { cancelable: false }
+    );
+  };
 
+  const recentNickname = nicknames.length > 0 ? nicknames[nicknames.length - 1].name : '';
 
   return (
     <View style={styles.container}>
@@ -117,76 +138,31 @@ const startBrickBreaker = () => {
       <TouchableOpacity style={styles.gameButton} onPress={new2048Game}>
         <Text style={styles.gameButtonText}>2048</Text>
       </TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.gameButton} onPress={startBubbleShooter}>
+      <TouchableOpacity style={styles.gameButton} onPress={startBubbleShooter}>
         <Text style={styles.gameButtonText}>BubbleShooter</Text>
       </TouchableOpacity>
-      <TouchableOpacity 
-  style={styles.gameButton} onPress={startBrickBreaker}>
-  <Text style={styles.gameButtonText}>BrickBreaker</Text>
-</TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.gameButton} 
-        onPress={() => navigation.navigate('TictactoeSingleplayer')}>
+      <TouchableOpacity style={styles.gameButton} onPress={startBrickBreaker}>
+        <Text style={styles.gameButtonText}>BrickBreaker</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.gameButton} onPress={() => navigation.navigate('TictactoeSingleplayer')}>
         <Text style={styles.gameButtonText}>Tictactoe</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.gameButton} onPress={newSudokuGame}>
         <Text style={styles.gameButtonText}>Sudoku</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.gameButton} onPress={startMinesweeper}>
+        <Text style={styles.gameButtonText}>Minesweeper</Text>
+      </TouchableOpacity>
 
      <Text>Multiplayer games!</Text>
-     <TouchableOpacity 
-        style={styles.gameButton} 
-        onPress={() => navigation.navigate('TictactoeMultiplayer')}>
+     <TouchableOpacity style={styles.gameButton} onPress={() => navigation.navigate('TictactoeMultiplayer')}>
         <Text style={styles.gameButtonText}>Tictactoe</Text>
       </TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.gameButton} 
-        onPress={() => navigation.navigate('Connect4')}>
+      <TouchableOpacity style={styles.gameButton} onPress={() => navigation.navigate('Connect4')}>
         <Text style={styles.gameButtonText}>Connect4</Text>
       </TouchableOpacity>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'lightblue',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    width: 200,
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    backgroundColor: 'white',
-  },
-  gameButton: {
-    backgroundColor: 'blue',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
-  },
-  gameButtonText: {
-    color: 'white',
-    fontSize: 18,
-  },
-  nicknameText: {
-    fontSize: 18,
-    marginBottom: 20,
-    fontWeight: 'bold',
-    color: 'darkblue',
-  },
-});
 
 export default HomeScreen;

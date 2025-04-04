@@ -114,7 +114,6 @@ export default function BrickBreaker() {
         Nickname: nickname,
         level: gameState.level,
         score: score,
-        timestamp: Date.now(),
       });
       console.log("Result stored in Firestore.");
     } catch (error) {
@@ -126,30 +125,6 @@ export default function BrickBreaker() {
       score,
     });
   };
-
-  useEffect(() => {
-    if (!route.params?.nickname) {
-      const fetchNickname = async () => {
-        try {
-          const q = query(
-            collection(db, "NicknameList"),
-            orderBy("__name__", "asc")
-          );
-          const querySnapshot = await getDocs(q);
-          if (querySnapshot.docs.length > 0) {
-            const fetched = querySnapshot.docs[querySnapshot.docs.length - 1].data().nickname;
-            setNickname(fetched || "Guest");
-          } else {
-            setNickname("Guest");
-          }
-        } catch (error) {
-          console.error("Error fetching nickname:", error);
-          setNickname("Guest");
-        }
-      };
-      fetchNickname();
-    }
-  }, [route.params?.nickname]);
 
 //--------------------------------------------------------------------------------------------------------------------------------
 
