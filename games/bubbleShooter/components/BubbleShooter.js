@@ -11,6 +11,10 @@ import {
   findFloatingBalls
 } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { db } from "../../../firebase/Config";
+import { collection, getDocs, query, orderBy, addDoc } from "firebase/firestore";
+import shooterStyles from '../styles/shooterStyles';
 
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
@@ -27,6 +31,8 @@ const BubbleShooter = ({ navigation }) => {
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
+  const route = useRoute();
+  const [nickname, setNickname] = useState(route.params?.nickname)
 
   useEffect(() => {
     staticBallsRef.current = staticBalls;
@@ -119,7 +125,7 @@ const BubbleShooter = ({ navigation }) => {
     if (ballsInitialized && staticBalls.length === 0 && !gameOver) {
       setGameOver(true);
       clearInterval(timerRef.current);
-      navigation.replace('ShooterGameOver');
+      storeShooterResults();
     }
   }, [staticBalls, ballsInitialized]);
 
@@ -156,10 +162,26 @@ const BubbleShooter = ({ navigation }) => {
     setIsBallAtCenter(false);
   };
 
+  const storeShooterResults = async () => {
+    try {
+      await addDoc(collection(db, "ShooterResults"), {
+        Nickname: nickname,
+        score: score,
+      });
+      console.log("Result stored in Firestore.");
+    } catch (error) {
+      console.error("Error storing result: ", error);
+    }
+    navigation.navigate("ShooterGameOver", {
+      nickname,
+      finalScore: score,
+    });
+  };
+
   return (
     <TouchableWithoutFeedback onPress={handleTouch}>
-      <View style={styles.container}>
-        <Text style={styles.score}>Pisteet: {score} | Aika: {time}s</Text>
+      <View style={shooterStyles.gameContainer}>
+        <Text style={shooterStyles.scoreText}>Pisteet: {score} | Aika: {time}s</Text>
         {staticBalls.map(ball => (
           <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
         ))}
@@ -167,25 +189,6 @@ const BubbleShooter = ({ navigation }) => {
       </View>
     </TouchableWithoutFeedback>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5C7FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  score: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    fontSize: 24,
-    color: 'deeppink',
-    textShadowColor: '#FF69B4', 
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 10,
-  },
-});
+}
 
 export default BubbleShooter;
