@@ -1,13 +1,13 @@
-
-import React, { useRef, useState, useMemo, useEffect } from "react";
+import React, { useRef, useState, useMemo } from "react";
 import { View, StyleSheet, PanResponder, Text, Button } from "react-native";
 import { GameEngine } from "react-native-game-engine";
 import Matter from "matter-js";
 import { Paddle, Ball, Brick } from "./BrickBreakRender";
 import { Physics } from "../utils/BrickPhysics";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
 import { collection, addDoc } from "firebase/firestore";
+import { useNickname } from "../../../context/context";
 
 Matter.Resolver._restingThresh = 0.001;
 Matter.Resolver._positionDampen = 0.01;
@@ -77,8 +77,7 @@ const setupWorld = (level = 1) => {
 
 export default function BrickBreaker() {
   const navigation = useNavigation();
-  const route = useRoute();
-  const [nickname, setNickname] = useState(route.params?.nickname);
+  const { nickname } = useNickname();
 
   const gameEngine = useRef(null);
   const [gameState, setGameState] = useState(setupWorld());
@@ -123,8 +122,6 @@ export default function BrickBreaker() {
     });
   };
 
-
-
   const nextLevel = () => {
     const newLevel = gameState.level + 1;
     const newGameState = setupWorld(newLevel);
@@ -136,9 +133,9 @@ export default function BrickBreaker() {
     setTimeout(() => {
       gameEngine.current.swap({
         physics: { engine: newGameState.engine, world: newGameState.world },
-        ball: { 
-          body: newGameState.ball, 
-          renderer: Ball, 
+        ball: {
+          body: newGameState.ball,
+          renderer: Ball,
           themeIndex: gameState.level,
         },
         paddle: { body: newGameState.paddle, renderer: Paddle },
@@ -236,9 +233,9 @@ export default function BrickBreaker() {
         running={gameStarted}
         entities={{
           physics: { engine: gameState.engine, world: gameState.world },
-          ball: { 
-            body: gameState.ball, 
-            renderer: Ball, 
+          ball: {
+            body: gameState.ball,
+            renderer: Ball,
             themeIndex: gameState.level,
           },
           paddle: { body: gameState.paddle, renderer: Paddle },
