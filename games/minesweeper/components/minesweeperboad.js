@@ -9,8 +9,8 @@ const Board = ({ board, revealTile, flagTile }) => {
           {row.map((cell, colIndex) => (
             <TouchableOpacity
               key={colIndex}
-              onPress={() => revealTile(rowIndex, colIndex)}  // Klikkaus paljastaa
-              onLongPress={() => flagTile(rowIndex, colIndex)} // Pitkä painallus asettaa lipun
+              onPress={() => revealTile(rowIndex, colIndex)}
+              onLongPress={() => flagTile(rowIndex, colIndex)}
               style={{
                 width: 30,
                 height: 30,
@@ -22,8 +22,12 @@ const Board = ({ board, revealTile, flagTile }) => {
                 borderColor: "#999",
               }}
             >
-              {cell.revealed && <Text>{cell.value}</Text>}  // Näyttää arvon, jos ruutu on paljastettu
-              {cell.flagged && <Text>🚩</Text>}  // Näyttää lipun, jos se on asetettu
+              {cell.revealed && (
+                <Text>
+                  {cell.mine ? "💣" : cell.number > 0 ? cell.number : ""}
+                </Text>
+              )}
+              {cell.flagged && !cell.revealed && <Text>🚩</Text>}
             </TouchableOpacity>
           ))}
         </View>

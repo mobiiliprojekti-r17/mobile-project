@@ -98,7 +98,6 @@ const HomeScreen = ({ navigation }) => {
       return;
     }
     
-    // Alert for difficulty selection
     Alert.alert(
       "Choose difficulty",
       "",
