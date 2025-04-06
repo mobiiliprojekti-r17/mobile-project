@@ -36,12 +36,12 @@ export const Ball = (props) => {
   const { position } = body;
 
   const pastelColors = [
-    "#FFB3BA", // vibrant pastel pink
-    "#FFDFBA", // vibrant pastel orange
-    "#FFFFBA", // vibrant pastel yellow
-    "#BAFFC9", // vibrant pastel green
-    "#BAE1FF", // vibrant pastel blue
-    "#E3BAFF", // vibrant pastel purple
+    "#FFB3BA",
+    "#FFDFBA",
+    "#FFFFBA",
+    "#BAFFC9",
+    "#BAE1FF",
+    "#E3BAFF",
   ];
 
   const ballColor = color || pastelColors[(themeIndex || 0) % pastelColors.length];
@@ -69,7 +69,6 @@ export const Ball = (props) => {
   );
 };
 
-
 export const Brick = (props) => {
   const { body } = props;
   const width = body.bounds.max.x - body.bounds.min.x;
@@ -82,12 +81,12 @@ export const Brick = (props) => {
   const row = rowMatch ? parseInt(rowMatch[1], 10) : 0;
 
   const pastelColors = [
-    "#FFB3BA", 
-    "#FFDFBA",
+    "#FFB3BA",
+    "#FFDFBA", 
     "#FFFFBA", 
     "#BAFFC9",
     "#BAE1FF",
-    "#E3BAFF", 
+    "#E3BAFF",
   ];
 
   const brickColor = label.includes("special")
@@ -102,14 +101,42 @@ export const Brick = (props) => {
         top: y,
         width: width,
         height: height,
-        backgroundColor: brickColor,
-        shadowColor: brickColor,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.4,
-        shadowRadius: 3,
-        elevation: 2.5
-        ,
+        backgroundColor: "#d3d3d3", 
+        justifyContent: "center",
+        alignItems: "center",
       }}
-    />
+    >
+      <View
+        style={{
+          width: width - 4, 
+          height: height - 4,
+          backgroundColor: brickColor,
+          borderWidth: 1,
+          borderColor: "#aaa",
+        }}
+      >
+        <View
+          style={{
+            position: "absolute",
+            top: 2,
+            left: 2,
+            right: 2,
+            height: 1,
+            backgroundColor: "rgba(0,0,0,0.1)",
+          }}
+        />
+        <View
+          style={{
+            position: "absolute",
+            bottom: 2,
+            left: 2,
+            right: 2,
+            height: 1,
+            backgroundColor: "rgba(255,255,255,0.3)",
+          }}
+        />
+      </View>
+    </View>
   );
 };
+

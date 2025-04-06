@@ -55,7 +55,7 @@ export const getTileStyle = (value) => {
   const tileColors = {
     0: { backgroundColor: "#e6f5ff", color: "#f9f6f2" },
     2: { backgroundColor: "rgb(211, 181, 255)", color: "#776e65" },
-    4: { backgroundColor: "rgb(255, 182, 193)", color: "#776e65" },
+    4: { backgroundColor: "rgb(255, 158, 226)", color: "#776e65" },
     8: { backgroundColor: "rgb(251, 151, 137)", color: "#776e65" },
     16: { backgroundColor: "rgb(255, 199, 144)", color: "#776e65" },
     32: { backgroundColor: "rgb(255, 216, 130)", color: "#776e65" },

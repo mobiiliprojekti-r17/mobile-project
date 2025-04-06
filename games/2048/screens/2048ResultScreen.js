@@ -2,24 +2,30 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Button, ScrollView, TouchableOpacity } from "react-native";
 import { db } from "../../../firebase/Config"; 
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import styles from "../styles/2048ResultStyles"; // ✅ Lisätty tyylitiedoston import
+import styles from "../styles/2048ResultStyles"; 
+import { useFonts } from 'expo-font';
+import { Rye_400Regular } from '@expo-google-fonts/rye';
+import { useNickname } from "../../../context/context";
 
 export default function Game2048ResultScreen({ route, navigation }) {
-  const { Nickname, score, time } = route.params;
+  const { nickname } = useNickname();
+  const { score, time } = route.params;
   const [scores, setScores] = useState([]);
 
-  // ✅ Muutetaan `time` takaisin sekunneiksi, jos se on merkkijono
+  let[fontsLoaded] = useFonts({
+    Rye_400Regular,
+  });
+
   const convertTimeToSeconds = (timeString) => {
     if (typeof timeString === "string") {
-      const timeParts = timeString.split(":").map(Number);
+      const timeParts = timeString.split(":" ).map(Number);
       if (timeParts.length === 2) {
-        return timeParts[0] * 60 + timeParts[1]; // Muutetaan sekunneiksi
+        return timeParts[0] * 60 + timeParts[1];
       }
     }
     return 0;
   };
 
-  // ✅ Muutetaan route-parametrin aika oikeaan muotoon
   const timeInSeconds = convertTimeToSeconds(time);
 
   useEffect(() => {
@@ -27,37 +33,33 @@ export default function Game2048ResultScreen({ route, navigation }) {
       try {
         const scoresQuery = query(collection(db, "2048Results"));
         const querySnapshot = await getDocs(scoresQuery);
-        
+
         const scoresList = querySnapshot.docs.map((doc) => {
           const data = doc.data();
-  
           if (data.time) {
-            const timeParts = data.time.split(":").map(Number);
+            const timeParts = data.time.split(":" ).map(Number);
             data.timeInSeconds = (timeParts[0] || 0) * 60 + (timeParts[1] || 0);
           } else {
             data.timeInSeconds = 0;
           }
-  
           return data;
         });
-  
-        // ✅ Järjestetään ensin score (suurin ensin) ja jos samat pisteet, lyhin aika voittaa
+
         scoresList.sort((a, b) => {
           if (b.score !== a.score) {
-            return b.score - a.score; // Suurin score ensin
+            return b.score - a.score;
           }
-          return a.timeInSeconds - b.timeInSeconds; // Lyhin aika ensin
+          return a.timeInSeconds - b.timeInSeconds;
         });
-  
+
         setScores(scoresList);
       } catch (error) {
         console.error("Virhe tulosten hakemisessa: ", error);
       }
     };
-  
+
     fetchScores();
   }, [navigation]);
-  
 
   const formattedTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
@@ -65,17 +67,21 @@ export default function Game2048ResultScreen({ route, navigation }) {
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
+  if (!fontsLoaded) {
+    return <Text>Loading...</Text>; // Ladataan fonttia
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Game Over</Text>
+      <Text style={[styles.ryeText, {fontFamily: 'Rye_400Regular'}]}>Game Over</Text>
       
       <View style={styles.resultBox}>
-        <Text style={styles.infoText}>Player: {Nickname}</Text>
+        <Text style={styles.infoText}>Player: {nickname}</Text>
         <Text style={styles.infoText}>Score: {score}</Text>
         <Text style={styles.infoText}>Time: {formattedTime(timeInSeconds)}</Text>
       </View>
   
-      <Text style={styles.subtitle}>Top Scores:</Text>
+      <Text style={styles.subtitle}>Top 5:</Text>
       
       <ScrollView style={styles.scrollView}>
   {scores.length > 0 ? (
@@ -98,7 +104,6 @@ export default function Game2048ResultScreen({ route, navigation }) {
     <Text style={styles.noScores}>No scores yet!</Text>
   )}
 </ScrollView>
-  );
 
       <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate("Home")}>
         <Text style={styles.homeButtonText}>Home</Text>
