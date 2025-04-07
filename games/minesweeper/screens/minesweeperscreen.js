@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { View, Button, Text, TouchableOpacity } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native"; 
+import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Board from "../components/minesweeperboad";
 import { generateBoard } from "../components/generateboard";
 import { styles } from "../styles/minesweeperStyles";
@@ -21,7 +21,7 @@ const MinesweeperScreen = () => {
   const [board, setBoard] = useState([]);
   const [gameOver, setGameOver] = useState(false);
   const [win, setWin] = useState(false);
-  const [time, setTime] = useState(0);
+  const [timer, setTimer] = useState(0);
   const [Nickname, setNickname] = useState('');
 
   useEffect(() => {
@@ -38,26 +38,27 @@ const MinesweeperScreen = () => {
     let timer;
     if (!gameOver && !win) {
       timer = setInterval(() => {
-        setTime((prevTime) => prevTime + 1);
+        setTimer((prevTime) => prevTime + 1);
       }, 1000);
     }
     return () => clearInterval(timer);
   }, [gameOver, win]);
 
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+  };
   const resetGame = () => {
     const { size, mines } = DIFFICULTY_LEVELS[difficulty];
     setBoard(generateBoard(size, mines));
     setGameOver(false);
     setWin(false);
-    setTime(0);
+    setTimer(0);
   };
+  const formattedTime = formatTime(timer); // Aika muotoillaan "mm:ss"
 
   const saveGameResult = async () => {
-    // Muotoillaan aika minuuteiksi ja sekunneiksi
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
     try {
       const gameResultsRef = collection(db, "MinesweeperResults");
       await addDoc(gameResultsRef, {
@@ -70,7 +71,7 @@ const MinesweeperScreen = () => {
       console.error("Virhe tallennettaessa tulosta: ", error);
     }
 
-    return formattedTime;  // Palauta formattedTime
+    return formattedTime;
   };
 
   const revealTile = (row, col) => {
@@ -87,7 +88,29 @@ const MinesweeperScreen = () => {
     
     if (checkWin(newBoard)) {
       setWin(true);
-      saveGameResult();  // Tallennetaan vain voitto
+
+      Alert.alert(
+        "Voitto! 🎉",
+        "Haluatko nähdä tulokset?",
+        [
+          {
+            text: "Peruuta",
+            style: "cancel",
+          },
+          {
+            text: "Result",
+            onPress: async () => {
+            saveGameResult();
+              navigation.navigate("MinesweeperResults", {
+                Nickname: Nickname,
+                time: timer,
+                difficulty: difficulty,
+              });
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     }
   };
 
@@ -129,19 +152,12 @@ const MinesweeperScreen = () => {
     setBoard(newBoard);
   };
 
-  const handleToplistNavigation = async () => {
-    const formattedTime = await saveGameResult();
-    navigation.navigate("MinesweeperResults", {
-        nickname: Nickname,
-        time: formattedTime,
-        difficulty: difficulty,
-    });
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Vaikeustaso: {difficulty.toUpperCase()}</Text>
-      <Text style={styles.timer}>Aika: {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, "0")}</Text>
+      <Text style={styles.timer}>
+        <Text style={styles.timerText}>Time: {formatTime(timer)}</Text>
+      </Text>
 
       {gameOver && !win && <Text style={styles.gameOverText}>Hävisit! 💥</Text>}
       {win && <Text style={styles.gameOverText}>Voitit! 🎉</Text>}
@@ -152,11 +168,8 @@ const MinesweeperScreen = () => {
         <TouchableOpacity style={styles.button} onPress={resetGame}>
           <Text style={styles.buttonText}>Restart</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("Home")}>
-          <Text style= {styles.buttonText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleToplistNavigation}>
-          <Text style={styles.buttonText}>Toplist</Text>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
+          <Text style={styles.buttonText}>Home</Text>
         </TouchableOpacity>
       </View>
     </View>

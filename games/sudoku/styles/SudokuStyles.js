@@ -5,8 +5,14 @@ const styles = StyleSheet.create({
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: 'lightblue',
+      backgroundColor: "rgb(160, 220, 255)",
       padding: 10,
+    },
+    title: {
+      fontSize: 30,
+      fontWeight: "bold",
+      marginBottom: 20,
+      color: "#2162aa",
     },
       header: {
         flexDirection: "row",
@@ -18,10 +24,12 @@ const styles = StyleSheet.create({
       difficultyText: {
         fontSize: 18,
         fontWeight: "bold",
+         color: "#2162aa",
       },
       timerText: {
         fontSize: 18,
         fontWeight: "bold",
+        color: "#2162aa",
       },
     row: {
       flexDirection: "row",
@@ -47,10 +55,10 @@ const styles = StyleSheet.create({
       boldLeft: { borderLeftWidth: 3 },
       boldRight: { borderRightWidth: 3 },
       boldBottom: { borderBottomWidth: 3 },
-      grayCell: { backgroundColor: "#d3d3d3" }, // Harmaa tausta
+      blueCell: { backgroundColor: "rgb(188, 231, 255)" }, 
 
       selectedCell: {
-        backgroundColor: "lightblue",
+        backgroundColor: "rgb(127, 203, 244)",
       },
       
     cellText: {
@@ -79,7 +87,7 @@ const styles = StyleSheet.create({
         height: 40,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: "#C8A2C8",
+      backgroundColor: "rgb(188, 231, 255)" ,
       margin: 5,
       borderRadius: 5,
       marginLeft: 20,
@@ -98,7 +106,7 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#C8A2C8",
+        backgroundColor: "rgb(188, 231, 255)" ,
         margin: 5,
         borderRadius: 5,
         marginLeft: 20,
@@ -110,7 +118,7 @@ const styles = StyleSheet.create({
         height: 40,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: "#C8A2C8",
+      backgroundColor: "rgb(188, 231, 255)" ,
       margin: 5,
       borderRadius: 5,
       marginLeft: 20,
@@ -118,7 +126,26 @@ const styles = StyleSheet.create({
       },
 
     cellError: {
-        backgroundColor: 'red',
+        backgroundColor: "rgb(33, 131, 184)",
       },
+      Homebutton: {
+        backgroundColor: "rgb(188, 231, 255)", 
+        width: 100,
+        height: 40,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgb(188, 231, 255)" ,
+      margin: 5,
+      borderRadius: 5,
+      marginLeft: 20,
+      marginRight: 10,
+      },
+      
+      HomebuttonText: {
+        color: '#fff', // White text on buttons for contrast
+        fontSize: 18,
+        textAlign: 'center',
+        fontWeight: 'bold',
+      }
   });
   export default styles;

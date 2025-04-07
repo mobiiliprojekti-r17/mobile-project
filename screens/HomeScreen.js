@@ -1,30 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { db, collection, addDoc, getDocs } from '../firebase/Config'; 
-import styles from "../styles/styles"
+import { db, collection, addDoc} from '../firebase/Config'; 
+import styles from "../styles/HomeScreenStyles"
 import { useNickname } from '../context/context';
 
 const HomeScreen = ({ navigation }) => {
   const { nickname, setNickname } = useNickname(); // 👈 korvaa useState
   const [nicknames, setNicknames] = useState([]);
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => null,
-      gestureEnabled: false,
-    });
-    fetchNicknames();
-  }, [navigation]);
-
-  const fetchNicknames = async () => {
-    const querySnapshot = await getDocs(collection(db, "NicknameList"));
-    let nicknameList = [];
-    querySnapshot.forEach((doc) => {
-      nicknameList.push({ id: doc.id, ...doc.data() });
-    });
-    setNicknames(nicknameList);
-  };
 
   const addNickname = async () => {
     if (!nickname.trim()) {
@@ -94,7 +78,7 @@ const HomeScreen = ({ navigation }) => {
       Alert.alert("Warning", "Please enter a nickname first!");
       return;
     }
-    
+  
     Alert.alert(
       "Choose difficulty",
       "",
@@ -118,39 +102,41 @@ const HomeScreen = ({ navigation }) => {
         value={nickname}
         onChangeText={setNickname}
       />
-      <TouchableOpacity style={styles.button} onPress={addNickname}>
-        <Text style={styles.buttonText}>Save</Text>
-      </TouchableOpacity>
+  <View style={styles.buttonContainer}>
+  <TouchableOpacity style={styles.button} onPress={addNickname}>
+    <Text style={styles.buttonText}>Save</Text>
+  </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => setNickname('')}>
-        <Text style={styles.buttonText}>Clear</Text>
-      </TouchableOpacity>
-
+  <TouchableOpacity style={styles.button} onPress={() => setNickname('')}>
+    <Text style={styles.buttonText}>Clear</Text>
+  </TouchableOpacity>
+</View>
 
       <Text>Singleplayer games!</Text>
-      <TouchableOpacity style={styles.gameButton} onPress={new2048Game}>
+      <TouchableOpacity style={styles.g2048Button} onPress={new2048Game}>
         <Text style={styles.gameButtonText}>2048</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.gameButton} onPress={startBubbleShooter}>
+      <TouchableOpacity style={styles.ShooterButton} onPress={startBubbleShooter}>
         <Text style={styles.gameButtonText}>BubbleShooter</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.gameButton} onPress={startBrickBreaker}>
+      <TouchableOpacity style={styles.BreakerButton} onPress={startBrickBreaker}>
         <Text style={styles.gameButtonText}>BrickBreaker</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.gameButton} onPress={() => navigation.navigate('TictactoeSingleplayer')}>
+      <TouchableOpacity style={styles.TTTSButton} onPress={() => navigation.navigate('TictactoeSingleplayer')}>
         <Text style={styles.gameButtonText}>Tictactoe</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.gameButton} onPress={newSudokuGame}>
+      <TouchableOpacity style={styles.SudokuButton} onPress={newSudokuGame}>
         <Text style={styles.gameButtonText}>Sudoku</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.gameButton} onPress={startMinesweeper}>
+      <TouchableOpacity style={styles.MinesweeperButton} onPress={startMinesweeper}>
         <Text style={styles.gameButtonText}>Minesweeper</Text>
       </TouchableOpacity>
+
       <Text>Multiplayer games!</Text>
-      <TouchableOpacity style={styles.gameButton} onPress={() => navigation.navigate('TictactoeMultiplayer')}>
+      <TouchableOpacity style={styles.TTTMButton} onPress={() => navigation.navigate('TictactoeMultiplayer')}>
         <Text style={styles.gameButtonText}>Tictactoe</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.gameButton} onPress={() => navigation.navigate('Connect4')}>
+      <TouchableOpacity style={styles.Connect4Button} onPress={() => navigation.navigate('Connect4')}>
         <Text style={styles.gameButtonText}>Connect4</Text>
       </TouchableOpacity>
     </View>

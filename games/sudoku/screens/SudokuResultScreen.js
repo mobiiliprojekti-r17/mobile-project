@@ -6,7 +6,7 @@ import styles from "../styles/SudokuResultStyles";
 import { useNickname } from "../../../context/context";
 
 export default function SudokuResult({ route, navigation }) {
-  const { nickname } = useNickname(); // ← käytetään tästä
+  const { nickname } = useNickname()
   const { time, difficulty } = route.params;
   const [scores, setScores] = useState([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
@@ -39,12 +39,6 @@ export default function SudokuResult({ route, navigation }) {
     fetchScores();
   }, [navigation]);
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => null,
-      gestureEnabled: false,
-    });
-  }, [navigation]);
 
   const formattedTime = (timeInSeconds) => {
     if (timeInSeconds == null) return "N/A";
@@ -62,7 +56,7 @@ export default function SudokuResult({ route, navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>GAME OVER!</Text>
-      <Text style={styles.title}>Your result:</Text>
+      <Text style={styles.title2}>Your result:</Text>
       <View style={styles.resultBox}>
         <Text style={styles.infoText}>Nickname: {nickname}</Text>
         <Text style={styles.infoText}>Difficulty: {difficulty}</Text>
@@ -119,8 +113,9 @@ export default function SudokuResult({ route, navigation }) {
           <Text style={styles.noScores}>No scores yet!</Text>
         )}
       </ScrollView>
-
-      <Button title="Home" onPress={() => navigation.navigate("Home")} color="#6200EE" />
+      <TouchableOpacity style={styles.Homebutton} onPress={() => navigation.navigate("Home")}>
+        <Text style={styles.buttonText}>Home</Text>
+      </TouchableOpacity>
     </View>
   );
 }

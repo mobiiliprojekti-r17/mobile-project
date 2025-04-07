@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#faf8ef",
+    backgroundColor: "rgb(211, 181, 255)",
   },
   topBar: {
     flexDirection: "row",
@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
     position: "absolute",
     top: 140,
     right: 40, 
-    backgroundColor: "rgb(106, 106, 106)",
+    backgroundColor: "rgb(177, 152, 216)",
     padding: 5, 
     borderRadius: 5,
     justifyContent: "center",
@@ -49,6 +49,22 @@ export const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
+  button: {
+    backgroundColor: "rgb(177, 152, 216)", 
+    width: 120,
+    height: 45,
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 20,
+    elevation: 3, 
+  },
+  
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  }
 });
 
 export const getTileStyle = (value) => {
