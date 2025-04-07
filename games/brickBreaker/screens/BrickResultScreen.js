@@ -5,7 +5,7 @@ import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { useNickname } from "../../../context/context";
 
 export default function BreakerResult({ route, navigation }) {
-  const { nickname } = useNickname(); // ← käytetään tästä
+  const { nickname } = useNickname();
   const { level, score } = route.params;
   const [results, setResults] = useState([]);
 
