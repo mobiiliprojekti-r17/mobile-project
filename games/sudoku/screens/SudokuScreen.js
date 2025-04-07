@@ -6,17 +6,22 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import sudoku from "sudoku";
 import styles from "../styles/SudokuStyles";
 import { db, collection, addDoc } from "../../../firebase/Config"
-import { useNickname } from "../../../context/context";
 
 export default function Sudoku({ route, navigation }) {
   const [board, setBoard] = useState([]);
   const [solution, setSolution] = useState(null);
   const [selectedCell, setSelectedCell] = useState(null);
-  const { nickname: Nickname } = useNickname();
+  const [Nickname, setNickname] = useState('');
   const [difficulty, setDifficulty] = useState(route.params?.difficulty);
   const [timer, setTimer] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
 
+
+  useEffect(() => {
+    if (route.params?.nickname) {
+      setNickname(route.params.nickname);
+    }
+  }, [route.params?.nickname]);
 
   useEffect(() => {
     let interval;
@@ -99,7 +104,7 @@ export default function Sudoku({ route, navigation }) {
       } else {
         Toast.show({
           type: "error",
-          text1: "Et voi muokata täytettyä kenttää!",
+          text1: "You cannot edit a filled field!",
         });
       }
 
@@ -125,7 +130,7 @@ export default function Sudoku({ route, navigation }) {
 
   const checkSudoku = async () => {
     if (!solution) {
-      Toast.show({ type: "error", text1: "Ratkaisua ei löydy!" });
+      Toast.show({ type: "error", text1: "No solution found!" });
       return;
     }
   
@@ -168,13 +173,14 @@ export default function Sudoku({ route, navigation }) {
       }
       navigation.replace("SudokuResult", { time: timer, Nickname, difficulty });
     } else {
-      Alert.alert("Virheitä löytyi!", "Korjaa punaiset ruudut ja yritä uudelleen.", [{ text: "OK" }]);
+      Alert.alert("Errors found!", "Fix the blue boxes and try again.", [{ text: "OK" }]);
     }
   };
   
   
   return (
     <View style={styles.container}>
+      <Text style ={styles.title}>Sudoku</Text>
       <View style={styles.header}>
         <Text style={styles.difficultyText}>Difficulty: {difficulty}</Text>
         <Text style={styles.timerText}>Time: {formatTime(timer)}</Text>
@@ -189,7 +195,7 @@ export default function Sudoku({ route, navigation }) {
                 key={colIndex}
                 style={[
                   styles.cell,
-                  (Math.floor(rowIndex / 3) + Math.floor(colIndex / 3)) % 2 === 1 && styles.grayCell,
+                  (Math.floor(rowIndex / 3) + Math.floor(colIndex / 3)) % 2 === 1 && styles.blueCell,
                   rowIndex % 3 === 0 && rowIndex !== 0 && styles.boldTop,
                   colIndex % 3 === 0 && colIndex !== 0 && styles.boldLeft,
                   colIndex === 8 && styles.boldRight,
@@ -232,8 +238,10 @@ export default function Sudoku({ route, navigation }) {
 </Button>
 <Button style={styles.CheckButton} textColor='black' mode="contained" onPress={checkSudoku}>Check Sudoku</Button>
   </View>
-
 </View>
+<TouchableOpacity style={styles.Homebutton} onPress={() => navigation.navigate("Home")}>
+        <Text style={styles.buttonText}>Home</Text>
+      </TouchableOpacity>
     </View>
   );
 }
