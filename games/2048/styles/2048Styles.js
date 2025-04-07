@@ -15,6 +15,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+
     backgroundColor: "rgb(211, 181, 255)", //"#faf8ef"
   },
   ChangaOneText: {
@@ -43,6 +44,7 @@ export const styles = StyleSheet.create({
   },
   topButtonsContainer: {
     position: "absolute",
+
     top: scaleSize(260),
     right: scaleSize(25),
     flexDirection: "row",
@@ -52,6 +54,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgb(106, 106, 106)",
     padding: scaleSize(5),
     borderRadius: scaleSize(5),
+
     justifyContent: "center",
     alignItems: "center",
     marginLeft: scaleSize(8),
@@ -81,6 +84,22 @@ gridContainer: {
     fontSize: tileSize * 0.3,
     fontWeight: "bold",
   },
+  button: {
+    backgroundColor: "rgb(177, 152, 216)", 
+    width: 120,
+    height: 45,
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 20,
+    elevation: 3, 
+  },
+  
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  }
 });
 
 export const getTileStyle = (value) => {

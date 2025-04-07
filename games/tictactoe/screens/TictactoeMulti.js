@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, Button } from 'react-native';
-import styles from '../styles/TictactoeStyles';
+import styles from '../styles/TictactoeMultiStyles';
 
 const checkWinner = (board) => {
   const lines = [
@@ -33,13 +33,19 @@ export default function TictactoeMultiplayer({navigation}) {
     const winner = checkWinner(newBoard);
     if (winner) {
       setGameOver(true);
-      Alert.alert(`${winner} voitti!`, 'Peli on päättynyt.', [{ text: 'OK', onPress: resetGame }]);
+      Alert.alert(`${winner} wins!`, 'Game over!', [
+        { text: 'Play again', onPress: resetGame },
+        { text: 'Home', onPress: () => navigation.navigate("Home") },
+      ]);
       return;
     }
 
     if (!newBoard.includes(null)) {
       setGameOver(true);
-      Alert.alert('Tasapeli', 'Peli päättyi tasapeliin.', [{ text: 'OK', onPress: resetGame }]);
+      Alert.alert('It is a tie!', 'The game ended in a draw.', [
+              { text: 'Play again', onPress: resetGame },
+              { text: 'Home', onPress: () => navigation.navigate("Home") },
+            ]);
       return;
     }
 
@@ -66,6 +72,8 @@ export default function TictactoeMultiplayer({navigation}) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tic-Tac-Toe</Text>
+      <Text style={styles.title2}>Multiplayer</Text>
+      <Text style={styles.turnText}>Whose turn: {isXNext ? "X" : "O"}</Text>
       <View style={styles.board}>
         {[0, 1, 2].map((row) => (
           <View style={styles.row} key={row}>
@@ -73,8 +81,15 @@ export default function TictactoeMultiplayer({navigation}) {
           </View>
         ))}
       </View>
-      <Text style={styles.turnText}>Vuoro: {isXNext ? "X" : "O"}</Text>
-      <Button title="Restart" onPress={resetGame} />
+      {/* Custom Restart Button */}
+      <TouchableOpacity style={styles.button} onPress={resetGame}>
+        <Text style={styles.buttonText}>Restart</Text>
+      </TouchableOpacity>
+
+      {/* Custom Home Button */}
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
+        <Text style={styles.buttonText}>Home</Text>
+      </TouchableOpacity>
     </View>
   );
 }

@@ -197,8 +197,6 @@ export default function BrickBreaker() {
             title="Results"
             onPress={() =>
               storeResult() 
-                
-            
             }
           />
         </View>
@@ -262,19 +260,17 @@ export default function BrickBreaker() {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#483471" },
-  gameContainer: { flex: 1 },
-  score: { color: "white", fontSize: 20, textAlign: "center", margin: 10 },
+  container: { flex: 1, backgroundColor:"rgb(255, 199, 144)", },
+  gameContainer: { flex: 1},
+  score: { color: "white", fontSize: 20, textAlign: "center", marginTop: 60 },
   overlay: {
     position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.7)",
     zIndex: 10,
+    height: "120%",
+    width: "100%",
   },
   gameOverText: { color: "white", fontSize: 30, marginBottom: 20 },
 });
