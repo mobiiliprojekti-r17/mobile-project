@@ -7,6 +7,8 @@ import Icon from "react-native-vector-icons/Feather";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { db, collection, addDoc } from "../../../firebase/Config"
+import { useFonts } from 'expo-font';
+import { ChangaOne_400Regular } from '@expo-google-fonts/changa-one';
 
 const Game2048Screen = ({ route }) => {
   const navigation = useNavigation();
@@ -17,9 +19,12 @@ const Game2048Screen = ({ route }) => {
   const [isGameActive, setIsGameActive] = useState(true);
   const [gameOverHandled, setGameOverHandled] = useState(false); // Estää kaksoistallennukset
   const [swipeCooldown, setSwipeCooldown] = useState(false);
-
   const [previousGrid, setPreviousGrid] = useState(null);
   const [previousScore, setPreviousScore] = useState(0);
+
+   let[fontsLoaded] = useFonts({
+      ChangaOne_400Regular,
+    });
 
   useEffect(() => {
     if (route.params?.nickname) {
@@ -118,34 +123,47 @@ const Game2048Screen = ({ route }) => {
     setGameOverHandled(false); // Nollataan tila uuden pelin alkaessa
   };
 
+  if (!fontsLoaded) {
+    return <Text>Loading...</Text>;
+  }
+
   return (
     <PanGestureHandler onGestureEvent={handleSwipe}>
       <View style={styles.container}>
-        <TouchableOpacity style={styles.undoButtonContainer} onPress={handleUndo}>
+      <Text style={[styles.ChangaOneText, {fontFamily: 'ChangaOne_400Regular'}]}>2048</Text>
+      <View style={styles.topButtonsContainer}>
+      <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate("Home")}>
+          <Icon name="home" size={24} color="#fff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.iconButton} onPress={handleUndo}>
           <Icon name="corner-up-left" size={24} color="#fff" />
         </TouchableOpacity>
+      </View>
+
 
         <View style={styles.topBar}>
           <Text style={styles.scoreText}>Score: {score}</Text>
           <Text style={styles.timerText}>Time: {formatTime(time)}</Text>
         </View>
-
+        <View style={styles.gridContainer}>
         {grid.map((row, rowIndex) => (
           <View key={rowIndex} style={styles.row}>
             {row.map((cell, cellIndex) => {
               const tileStyle = getTileStyle(cell);
               return (
-                <View
-                  key={cellIndex}
+                <View key={cellIndex}
                   style={[styles.tile, { backgroundColor: tileStyle.backgroundColor }]} >
                   <Text style={[styles.tileText, { color: tileStyle.color }]}>
                     {cell !== 0 ? cell : ""}
                   </Text>
                 </View>
+                
               );
             })}
           </View>
         ))}
+      </View>
       </View>
     </PanGestureHandler>
   );
