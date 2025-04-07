@@ -5,12 +5,13 @@ export const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "rgb(153, 255, 204)",
   },
   header: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 10,
+
+    marginTop: 40,
   },
   timer: {
     fontSize: 18,
@@ -20,23 +21,32 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     color: "red",
-    position: "absolute",
-    top: 50,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
     padding: 10,
     borderRadius: 5,
+    top: 50,  // Adjust to where you want the text to appear
+    zIndex: 10,  // Ensure the game over text is on top
   },
   buttonContainer: {
     flexDirection: "row",
     marginTop: 20,
   },
   button: {
-    backgroundColor: "#007bff",
+    backgroundColor: "rgb(63, 210, 136)",
     padding: 10,
     marginHorizontal: 10,
     borderRadius: 5,
   },
   buttonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  resultButton: {
+    backgroundColor: "rgb(63, 210, 136)",
+    padding: 10,
+    marginHorizontal: 10,
+    borderRadius: 5,
+  },
+  resultButtonText: {
     color: "#fff",
     fontSize: 16,
   },

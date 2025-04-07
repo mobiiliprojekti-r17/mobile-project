@@ -16,12 +16,14 @@ const DIFFICULTY_LEVELS = {
 const MinesweeperScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { difficulty } = route.params || { difficulty: "easy" };
-  
+  const { difficulty: initialDifficulty } = route.params || { difficulty: "easy" };
+
+  const [difficulty, setDifficulty] = useState(initialDifficulty); // Add state for difficulty
   const [board, setBoard] = useState([]);
   const [gameOver, setGameOver] = useState(false);
   const [win, setWin] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [showResultButton, setShowResultButton] = useState(false);
   const [Nickname, setNickname] = useState('');
 
   useEffect(() => {
@@ -49,14 +51,15 @@ const MinesweeperScreen = () => {
     const secs = seconds % 60;
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
+
   const resetGame = () => {
     const { size, mines } = DIFFICULTY_LEVELS[difficulty];
     setBoard(generateBoard(size, mines));
     setGameOver(false);
     setWin(false);
     setTimer(0);
+    setShowResultButton(false);
   };
-  const formattedTime = formatTime(timer); // Aika muotoillaan "mm:ss"
 
   const saveGameResult = async () => {
     try {
@@ -64,16 +67,23 @@ const MinesweeperScreen = () => {
       await addDoc(gameResultsRef, {
         Nickname: Nickname,
         difficulty: difficulty,
-        time: formattedTime,
+        time: formatTime(timer),
       });
       console.log("Pelitulos tallennettu Firebaseen");
     } catch (error) {
       console.error("Virhe tallennettaessa tulosta: ", error);
     }
-
-    return formattedTime;
   };
-
+  const revealAllTiles = () => {
+    setBoard(prevBoard =>
+      prevBoard.map(row =>
+        row.map(cell => ({
+          ...cell,
+          revealed: true
+        }))
+      )
+    );
+  };
   const revealTile = (row, col) => {
     if (gameOver || win) return;
     if (board[row][col].mine) {
@@ -81,39 +91,19 @@ const MinesweeperScreen = () => {
       setGameOver(true);
       return;
     }
-
+  
     const newBoard = board.map(row => row.map(cell => ({ ...cell })));
     revealCells(newBoard, row, col);
     setBoard(newBoard);
-    
+  
     if (checkWin(newBoard)) {
       setWin(true);
-
-      Alert.alert(
-        "Voitto! 🎉",
-        "Haluatko nähdä tulokset?",
-        [
-          {
-            text: "Peruuta",
-            style: "cancel",
-          },
-          {
-            text: "Result",
-            onPress: async () => {
-            saveGameResult();
-              navigation.navigate("MinesweeperResults", {
-                Nickname: Nickname,
-                time: timer,
-                difficulty: difficulty,
-              });
-            },
-          },
-        ],
-        { cancelable: false }
-      );
+      saveGameResult();
+      setShowResultButton(true);
+      revealAllTiles(); // 👈 lisätään tämä
     }
   };
-
+  
   const revealCells = (board, row, col) => {
     if (board[row][col].revealed || board[row][col].flagged) return;
     board[row][col].revealed = true;
@@ -129,7 +119,7 @@ const MinesweeperScreen = () => {
       }
     }
   };
-
+  
   const revealAllMines = () => {
     setBoard(prevBoard =>
       prevBoard.map(row =>
@@ -152,25 +142,79 @@ const MinesweeperScreen = () => {
     setBoard(newBoard);
   };
 
+  const showDifficultyAlert = () => {
+    Alert.alert(
+      "Choose difficulty",
+      "",
+      [
+        {
+          text: "easy",
+          onPress: () => handleDifficultyChange("easy"),
+        },
+        {
+          text: "medium",
+          onPress: () => handleDifficultyChange("medium"),
+        },
+        {
+          text: "hard",
+          onPress: () => handleDifficultyChange("hard"),
+        },
+        { text: "cancel", style: "cancel" },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const handleDifficultyChange = (newDifficulty) => {
+    setShowResultButton(false); // Hide the results button when changing difficulty
+    setGameOver(false); // Reset game over state
+    setWin(false); // Reset win state
+    setTimer(0); // Reset timer
+    setDifficulty(newDifficulty); // Update difficulty
+    if (newDifficulty === difficulty) {
+        // Jos sama vaikeustaso valitaan uudelleen, resetoi peli manuaalisesti
+        resetGame();
+      } else {
+        setDifficulty(newDifficulty); // Tämä triggeröi useEffectin kautta resetin
+      }
+    };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Vaikeustaso: {difficulty.toUpperCase()}</Text>
+      <View style={styles.GameOver}>
+        {gameOver && !win && <Text style={styles.gameOverText}>YOU LOSE! 💥</Text>}
+        {win && <Text style={styles.gameOverText}>YOU WIN! 🎉</Text>}</View>
+      <Text style={styles.header}>Difficulty: {difficulty.toUpperCase()}</Text>
       <Text style={styles.timer}>
         <Text style={styles.timerText}>Time: {formatTime(timer)}</Text>
       </Text>
-
-      {gameOver && !win && <Text style={styles.gameOverText}>Hävisit! 💥</Text>}
-      {win && <Text style={styles.gameOverText}>Voitit! 🎉</Text>}
-
+ 
       <Board board={board} revealTile={revealTile} flagTile={flagTile} />
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={resetGame}>
+        {/* Restart button that shows difficulty selection */}
+        <TouchableOpacity style={styles.button} onPress={showDifficultyAlert}>
           <Text style={styles.buttonText}>Restart</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
           <Text style={styles.buttonText}>Home</Text>
         </TouchableOpacity>
+
+        {showResultButton && (
+          <TouchableOpacity
+            style={styles.resultButton}
+            onPress={() =>
+              navigation.navigate("MinesweeperResults", {
+                Nickname: Nickname,
+                time: timer,
+                difficulty: difficulty,
+              })
+            }
+          >
+            <Text style={styles.resultButtonText}>Results</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
