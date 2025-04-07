@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, Button } from 'react-native';
-import styles from "../styles/TictactoeStyles"
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import styles from "../styles/TictactoeSingleStyles";
 
 const checkWinner = (board) => {
   const lines = [
@@ -18,28 +18,24 @@ const checkWinner = (board) => {
   return null;
 };
 
-// Uusi fiksumpi tekoäly siirron tekemiseen
 const makeAIMove = (newBoard) => {
-  // 1. Tarkista, voiko AI voittaa seuraavalla siirrolla
   for (let i = 0; i < 9; i++) {
     if (!newBoard[i]) {
       newBoard[i] = 'O';
       if (checkWinner(newBoard) === 'O') return i;
-      newBoard[i] = null; // Peru siirto
+      newBoard[i] = null;
     }
   }
 
-  // 2. Tarkista, voiko pelaaja voittaa seuraavalla siirrolla ja estä se
   for (let i = 0; i < 9; i++) {
     if (!newBoard[i]) {
       newBoard[i] = 'X';
       if (checkWinner(newBoard) === 'X') return i;
-      newBoard[i] = null; // Peru siirto
+      newBoard[i] = null;
     }
   }
 
-  // 3. Jos ei kiireellistä voittoa tai estoa, valitse paras strateginen paikka
-  const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7]; // Keskusta ensin, sitten kulmat
+  const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
   for (let i of bestMoves) {
     if (!newBoard[i]) return i;
   }
@@ -47,10 +43,14 @@ const makeAIMove = (newBoard) => {
   return null;
 };
 
-export default function TictactoeSingleplayer({navigation}) {
+export default function TictactoeSingleplayer({ navigation }) {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [gameOver, setGameOver] = useState(false);
+
+  // Pelaajien nimet
+  const [playerName, setPlayerName] = useState("You");
+  const [AIName, setAIName] = useState("AI");
 
   const handlePress = (index) => {
     if (board[index] || gameOver || !isPlayerTurn) return;
@@ -63,18 +63,24 @@ export default function TictactoeSingleplayer({navigation}) {
     const winner = checkWinner(newBoard);
     if (winner) {
       setGameOver(true);
-      Alert.alert(`${winner} voitti!`, 'Peli on päättynyt.', [{ text: 'OK', onPress: resetGame }]);
+      Alert.alert(`${winner === 'X' ? playerName : AIName} wins!`, 'Game over!', [
+        { text: 'Play again', onPress: resetGame },
+        { text: 'Home', onPress: () => navigation.navigate("Home") },
+      ]);
       return;
     }
 
     if (!newBoard.includes(null)) {
       setGameOver(true);
-      Alert.alert('Tasapeli', 'Peli päättyi tasapeliin.', [{ text: 'OK', onPress: resetGame }]);
+      Alert.alert('It is a tie!', 'The game ended in a draw.', [
+        { text: 'Play again', onPress: resetGame },
+        { text: 'Home', onPress: () => navigation.navigate("Home") },
+      ]);
       return;
     }
 
     setTimeout(() => {
-      const computerMove = makeAIMove(newBoard); // Käytä uutta makeAIMove-funktiota
+      const computerMove = makeAIMove(newBoard);
       if (computerMove !== null) {
         newBoard[computerMove] = 'O';
         setBoard([...newBoard]);
@@ -82,12 +88,15 @@ export default function TictactoeSingleplayer({navigation}) {
         const winner = checkWinner(newBoard);
         if (winner) {
           setGameOver(true);
-          Alert.alert(`${winner} voitti!`, 'Peli on päättynyt.', [{ text: 'OK', onPress: resetGame }]);
+          Alert.alert(`${winner === 'O' ? AIName : playerName} wins!`, 'Game over!', [
+            { text: 'Play again', onPress: resetGame },
+            { text: 'Home', onPress: () => navigation.navigate("Home") },
+          ]);
           return;
         }
       }
       setIsPlayerTurn(true);
-    }, 500);
+    }, 1000); // AI odottaa 1 sekunnin ennen siirron tekemistä
   };
 
   const resetGame = () => {
@@ -106,11 +115,12 @@ export default function TictactoeSingleplayer({navigation}) {
       <Text style={styles.squareText}>{board[index]}</Text>
     </TouchableOpacity>
   );
-  
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tic-Tac-Toe</Text>
+      <Text style={styles.title2}>Singleplayer</Text>
+      <Text style={styles.turnText}>Whose turn: {isPlayerTurn ? playerName : AIName}</Text>
       <View style={styles.board}>
         {[0, 1, 2].map((row) => (
           <View style={styles.row} key={row}>
@@ -118,7 +128,16 @@ export default function TictactoeSingleplayer({navigation}) {
           </View>
         ))}
       </View>
-      <Button title="Restart" onPress={resetGame} />
+      
+      {/* Custom Restart Button */}
+      <TouchableOpacity style={styles.button} onPress={resetGame}>
+        <Text style={styles.buttonText}>Restart</Text>
+      </TouchableOpacity>
+
+      {/* Custom Home Button */}
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
+        <Text style={styles.buttonText}>Home</Text>
+      </TouchableOpacity>
     </View>
   );
 }

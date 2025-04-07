@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#faf8ef",
+    backgroundColor: "rgb(211, 181, 255)",
   },
   topBar: {
     flexDirection: "row",
@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
     position: "absolute",
     top: 140,
     right: 40, 
-    backgroundColor: "rgb(106, 106, 106)",
+    backgroundColor: "rgb(177, 152, 216)",
     padding: 5, 
     borderRadius: 5,
     justifyContent: "center",
@@ -49,13 +49,29 @@ export const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
+  button: {
+    backgroundColor: "rgb(177, 152, 216)", 
+    width: 120,
+    height: 45,
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 20,
+    elevation: 3, 
+  },
+  
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  }
 });
 
 export const getTileStyle = (value) => {
   const tileColors = {
     0: { backgroundColor: "#e6f5ff", color: "#f9f6f2" },
     2: { backgroundColor: "rgb(211, 181, 255)", color: "#776e65" },
-    4: { backgroundColor: "rgb(255, 182, 193)", color: "#776e65" },
+    4: { backgroundColor: "rgb(255, 158, 226)", color: "#776e65" },
     8: { backgroundColor: "rgb(251, 151, 137)", color: "#776e65" },
     16: { backgroundColor: "rgb(255, 199, 144)", color: "#776e65" },
     32: { backgroundColor: "rgb(255, 216, 130)", color: "#776e65" },
