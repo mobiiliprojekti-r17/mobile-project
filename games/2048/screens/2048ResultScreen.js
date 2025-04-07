@@ -4,7 +4,7 @@ import { db } from "../../../firebase/Config";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import styles from "../styles/2048ResultStyles"; 
 import { useFonts } from 'expo-font';
-import { Rye_400Regular } from '@expo-google-fonts/rye';
+import { ChangaOne_400Regular } from '@expo-google-fonts/changa-one';
 import { useNickname } from "../../../context/context";
 
 export default function Game2048ResultScreen({ route, navigation }) {
@@ -13,7 +13,7 @@ export default function Game2048ResultScreen({ route, navigation }) {
   const [scores, setScores] = useState([]);
 
   let[fontsLoaded] = useFonts({
-    Rye_400Regular,
+    ChangaOne_400Regular,
   });
 
   const convertTimeToSeconds = (timeString) => {
@@ -52,7 +52,7 @@ export default function Game2048ResultScreen({ route, navigation }) {
           return a.timeInSeconds - b.timeInSeconds;
         });
 
-        setScores(scoresList);
+        setScores(scoresList.slice(0, 5));
       } catch (error) {
         console.error("Virhe tulosten hakemisessa: ", error);
       }
@@ -73,7 +73,7 @@ export default function Game2048ResultScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.ryeText, {fontFamily: 'Rye_400Regular'}]}>Game Over</Text>
+      <Text style={[styles.ChangaOneText, {fontFamily: 'ChangaOne_400Regular'}]}>Game Over</Text>
       
       <View style={styles.resultBox}>
         <Text style={styles.infoText}>Player: {nickname}</Text>
@@ -105,9 +105,16 @@ export default function Game2048ResultScreen({ route, navigation }) {
   )}
 </ScrollView>
 
-      <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate("Home")}>
-        <Text style={styles.homeButtonText}>Home</Text>
-      </TouchableOpacity>
-    </View>
-  );
+<View style={styles.buttonRow}>
+
+<TouchableOpacity style={styles.playAgainButton} onPress={() => navigation.navigate("2048")}>
+    <Text style={styles.homeButtonText}>Play Again</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate("Home")}>
+    <Text style={styles.homeButtonText}>Home</Text>
+  </TouchableOpacity>
+</View>
+</View>
+);
 }
