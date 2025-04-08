@@ -52,7 +52,7 @@ button: {
     borderRadius: 5,
   },
   BreakerButton: {
-    backgroundColor: "rgb(255, 199, 144)",
+    backgroundColor: "rgb(192, 253, 111)",
     padding: 10,
     marginVertical: 10,
     borderRadius: 5,

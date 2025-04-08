@@ -5,7 +5,7 @@ const BreakerStyles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-    backgroundColor: "rgb(255, 199, 144)",
+    backgroundColor: "rgb(192, 253, 111)",
   },
   gameContainer: {
     flex: 1,
@@ -15,7 +15,7 @@ const BreakerStyles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    backgroundColor: "rgb(253, 163, 73)", 
+    backgroundColor: "rgb(146, 212, 60)", 
     width: 100,
     height: 45,
     borderRadius: 8,
