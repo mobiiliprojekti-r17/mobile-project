@@ -206,6 +206,7 @@ const Game2048Screen = ({ route }) => {
             </View>
           ))}
         </View>
+
       </View>
     </PanGestureHandler>
   );
