@@ -1,14 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { db, collection, addDoc} from '../firebase/Config'; 
-import styles from "../styles/HomeScreenStyles"
+import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
+import { db, collection, addDoc } from '../firebase/Config';
+import styles from "../styles/HomeScreenStyles";
 import { useNickname } from '../context/context';
 
 const HomeScreen = ({ navigation }) => {
-  const { nickname, setNickname } = useNickname(); // 👈 korvaa useState
+  const { nickname, setNickname } = useNickname();
   const [nicknames, setNicknames] = useState([]);
-
 
   const addNickname = async () => {
     if (!nickname.trim()) {
@@ -31,8 +29,7 @@ const HomeScreen = ({ navigation }) => {
       Alert.alert("Warning", "Please enter a nickname first!");
       return;
     }
-    
-    // Alert for difficulty selection
+
     Alert.alert(
       "Choose difficulty",
       "",
@@ -65,6 +62,7 @@ const HomeScreen = ({ navigation }) => {
     }
     navigation.navigate("BubbleShooter");
   };
+
   const startBrickBreaker = () => {
     if (!nickname.trim()) {
       Alert.alert("Warning", "Please enter a nickname first!");
@@ -78,7 +76,7 @@ const HomeScreen = ({ navigation }) => {
       Alert.alert("Warning", "Please enter a nickname first!");
       return;
     }
-  
+
     Alert.alert(
       "Choose difficulty",
       "",
@@ -93,53 +91,58 @@ const HomeScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to the Game!</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your nickname"
-        value={nickname}
-        onChangeText={setNickname}
-      />
-  <View style={styles.buttonContainer}>
-  <TouchableOpacity style={styles.button} onPress={addNickname}>
-    <Text style={styles.buttonText}>Save</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity style={styles.button} onPress={() => setNickname('')}>
-    <Text style={styles.buttonText}>Clear</Text>
-  </TouchableOpacity>
-</View>
-
-      <Text>Singleplayer games!</Text>
-      <TouchableOpacity style={styles.g2048Button} onPress={new2048Game}>
-        <Text style={styles.gameButtonText}>2048</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.ShooterButton} onPress={startBubbleShooter}>
-        <Text style={styles.gameButtonText}>BubbleShooter</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.BreakerButton} onPress={startBrickBreaker}>
-        <Text style={styles.gameButtonText}>BrickBreaker</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.TTTSButton} onPress={() => navigation.navigate('TictactoeSingleplayer')}>
-        <Text style={styles.gameButtonText}>Tictactoe</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.SudokuButton} onPress={newSudokuGame}>
-        <Text style={styles.gameButtonText}>Sudoku</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.MinesweeperButton} onPress={startMinesweeper}>
-        <Text style={styles.gameButtonText}>Minesweeper</Text>
-      </TouchableOpacity>
-
-      <Text>Multiplayer games!</Text>
-      <TouchableOpacity style={styles.TTTMButton} onPress={() => navigation.navigate('TictactoeMultiplayer')}>
-        <Text style={styles.gameButtonText}>Tictactoe</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.Connect4Button} onPress={() => navigation.navigate('Connect4')}>
-        <Text style={styles.gameButtonText}>Connect4</Text>
-      </TouchableOpacity>
-    </View>
+    <ScrollView 
+    style={styles.scrollView} 
+    contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Welcome to the Game!</Text>
+  
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your nickname"
+          value={nickname}
+          onChangeText={setNickname}
+        />
+  
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={addNickname}>
+            <Text style={styles.buttonText}>Save</Text>
+          </TouchableOpacity>
+  
+          <TouchableOpacity style={styles.button} onPress={() => setNickname('')}>
+            <Text style={styles.buttonText}>Clear</Text>
+          </TouchableOpacity>
+        </View>
+  
+        <Text>Singleplayer games!</Text>
+        <TouchableOpacity style={styles.gameButton} onPress={new2048Game}>
+          <Text style={styles.g2048Text}>2048</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.gameButton} onPress={startBubbleShooter}>
+          <Text style={styles.shooterText}>BubbleShooter</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.gameButton} onPress={startBrickBreaker}>
+          <Text style={styles.breakerText}>BrickBreaker</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.gameButton} onPress={() => navigation.navigate('TictactoeSingleplayer')}>
+          <Text style={styles.tttsText}>Tictactoe</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.gameButton} onPress={newSudokuGame}>
+          <Text style={styles.sudokuText}>Sudoku</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.gameButton} onPress={startMinesweeper}>
+          <Text style={styles.minesweeperText}>Minesweeper</Text>
+        </TouchableOpacity>
+  
+        <Text>Multiplayer games!</Text>
+        <TouchableOpacity style={styles.gameButton} onPress={() => navigation.navigate('TictactoeMultiplayer')}>
+          <Text style={styles.tttmText}>Tictactoe</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.gameButton} onPress={() => navigation.navigate('Connect4')}>
+          <Text style={styles.connect4Text}>Connect4</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 

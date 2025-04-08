@@ -56,14 +56,14 @@ export default function SudokuResult({ route, navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>GAME OVER!</Text>
-      <Text style={styles.title}>Your result:</Text>
+      <Text style={styles.title2}>Your result:</Text>
       <View style={styles.resultBox}>
         <Text style={styles.infoText}>Nickname: {nickname}</Text>
         <Text style={styles.infoText}>Difficulty: {difficulty}</Text>
         <Text style={styles.infoText}>Time: {time ? formattedTime(time) : "N/A"}</Text>
       </View>
 
-      <Text style={styles.subtitle}>Top list:</Text>
+      <Text style={styles.title2}>Top list:</Text>
 
       <View style={styles.buttonContainer}>
         {["", "easy", "medium", "hard"].map((level) => (
@@ -113,8 +113,9 @@ export default function SudokuResult({ route, navigation }) {
           <Text style={styles.noScores}>No scores yet!</Text>
         )}
       </ScrollView>
-
-      <Button title="Home" onPress={() => navigation.navigate("Home")} color="#6200EE" />
+      <TouchableOpacity style={styles.Homebutton} onPress={() => navigation.navigate("Home")}>
+        <Text style={styles.buttonText}>Home</Text>
+      </TouchableOpacity>
     </View>
   );
 }
