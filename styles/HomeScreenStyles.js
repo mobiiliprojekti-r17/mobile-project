@@ -25,8 +25,8 @@ export default StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between', // Lisää tilaa nappien väliin
-    alignItems: 'center', // Varmistaa, että napit ovat samalla linjalla
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
  
 button: {
@@ -38,7 +38,6 @@ button: {
     marginBottom: 20,
 },
 
-  //gamebuttons
   g2048Button: {
     backgroundColor: "rgb(211, 181, 255)",
     padding: 10,
