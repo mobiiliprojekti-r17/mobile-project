@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, Button } from 'react-native';
+import { View, Text, TouchableOpacity, Modal } from 'react-native';
 import styles from '../styles/TictactoeMultiStyles';
 
 const checkWinner = (board) => {
@@ -18,10 +18,12 @@ const checkWinner = (board) => {
   return null;
 };
 
-export default function TictactoeMultiplayer({navigation}) {
+export default function TictactoeMultiplayer({ navigation }) {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isXNext, setIsXNext] = useState(true);
   const [gameOver, setGameOver] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false); // Modaalin näkyvyys
+  const [winner, setWinner] = useState(null); // Voittaja
 
   const handlePress = (index) => {
     if (board[index] || gameOver) return;
@@ -32,20 +34,16 @@ export default function TictactoeMultiplayer({navigation}) {
 
     const winner = checkWinner(newBoard);
     if (winner) {
+      setWinner(winner);
       setGameOver(true);
-      Alert.alert(`${winner} wins!`, 'Game over!', [
-        { text: 'Play again', onPress: resetGame },
-        { text: 'Home', onPress: () => navigation.navigate("Home") },
-      ]);
+      setModalVisible(true); // Avaa modaalin
       return;
     }
 
     if (!newBoard.includes(null)) {
+      setWinner('Tie');
       setGameOver(true);
-      Alert.alert('It is a tie!', 'The game ended in a draw.', [
-              { text: 'Play again', onPress: resetGame },
-              { text: 'Home', onPress: () => navigation.navigate("Home") },
-            ]);
+      setModalVisible(true); // Avaa modaalin, jos tasapeli
       return;
     }
 
@@ -56,6 +54,8 @@ export default function TictactoeMultiplayer({navigation}) {
     setBoard(Array(9).fill(null));
     setIsXNext(true);
     setGameOver(false);
+    setWinner(null);
+    setModalVisible(false); // Sulje modaalin
   };
 
   const renderSquare = (index) => (
@@ -68,7 +68,7 @@ export default function TictactoeMultiplayer({navigation}) {
       <Text style={styles.squareText}>{board[index]}</Text>
     </TouchableOpacity>
   );
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tic-Tac-Toe</Text>
@@ -81,6 +81,29 @@ export default function TictactoeMultiplayer({navigation}) {
           </View>
         ))}
       </View>
+
+      {/* Modaalin näyttäminen */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>
+              {winner === 'Tie' ? 'It\'s a tie!' : `${winner} wins!`}
+            </Text>
+            <TouchableOpacity
+              style={styles.modalButton} // Käytetään samaa tyyliä
+              onPress={resetGame} // Sulkee modaalin ja aloittaa uuden pelin
+            >
+              <Text style={styles.modalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       {/* Custom Restart Button */}
       <TouchableOpacity style={styles.button} onPress={resetGame}>
         <Text style={styles.buttonText}>Restart</Text>

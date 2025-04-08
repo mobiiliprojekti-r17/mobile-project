@@ -5,7 +5,7 @@ export default StyleSheet.create({
     flex: 1,
     alignItems: "center",
     backgroundColor: "lightblue",
-    paddingBottom: 40, // lisää tilaa ettei content jää footerin alle
+    paddingBottom: 40,
   },
 
   title: {
@@ -33,7 +33,7 @@ export default StyleSheet.create({
 
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     width: "90%",
     marginBottom: 20,
   },
@@ -45,6 +45,8 @@ export default StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 5,
     elevation: 3,
+    marginRight: 20,
+    marginLeft: 20,
   },
 
   buttonText: {
@@ -86,59 +88,169 @@ export default StyleSheet.create({
   
 
   
+  gameButtonsContainer: {
+    flexDirection: 'row',     
+    flexWrap: 'wrap',          
+    justifyContent: 'center', 
+    alignItems: 'center',     
+  },
+  
   // Game buttons
   g2048Button: {
     backgroundColor: "rgb(211, 181, 255)",
     padding: 12,
     borderRadius: 10,
-    marginVertical: 6,
+    margin: 6, 
+    width: '40%',
+    justifyContent: 'center', 
+    alignItems: 'center', 
+  },
+  gameButtonText: {
+    color: "white",
+    fontSize: 15,  
+    fontWeight: "600",
+    textAlign: "center", 
   },
   ShooterButton: {
     backgroundColor: "rgb(255, 158, 226)",
     padding: 12,
     borderRadius: 10,
-    marginVertical: 6,
+    margin: 6,
+    width: '40%', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
   BreakerButton: {
     backgroundColor: "rgb(255, 199, 144)",
     padding: 12,
     borderRadius: 10,
-    marginVertical: 6,
+    margin: 6,
+    width: '40%',  
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
   TTTSButton: {
     backgroundColor: "rgb(255, 216, 130)",
     padding: 12,
     borderRadius: 10,
-    marginVertical: 6,
+    margin: 6,
+    width: '40%',  
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
   SudokuButton: {
     backgroundColor: "rgb(160, 220, 255)",
     padding: 12,
     borderRadius: 10,
-    marginVertical: 6,
+    margin: 6,
+    width: '40%',  
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
   MinesweeperButton: {
     backgroundColor: "rgb(153, 255, 204)",
     padding: 12,
     borderRadius: 10,
-    marginVertical: 6,
+    margin: 6,
+    width: '40%',  
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
   TTTMButton: {
     backgroundColor: "rgb(251, 151, 137)",
     padding: 12,
     borderRadius: 10,
-    marginVertical: 6,
+    margin: 6,
+    width: '40%', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
   Connect4Button: {
-    backgroundColor: "rgb(194, 255, 154)",
+    backgroundColor: "rgb(255, 199, 144)",
     padding: 12,
     borderRadius: 10,
-    marginVertical: 6,
+    margin: 6,
+    width: '40%',  
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
-  gameButtonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
+  
+    // Difficulty modal
+  modalOverlay: {
+    position: "absolute", 
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flex: 1,
+    justifyContent: "center", 
+    alignItems: "center", 
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    zIndex: 100, 
+  },
+
+  modalContent: {
+    backgroundColor: 'lightblue',
+    padding: 20,
+    borderRadius: 12,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+
+  modalText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 15,
     textAlign: "center",
+    color: "white",
+  },
+
+  ModalButton: {
+    backgroundColor: "rgb(58, 226, 255)",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+
+  ModalButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: 'center'
+  },
+
+  // Difficulty modal
+  difficultyModalContent: {
+    backgroundColor: 'lightblue',
+    padding: 20,
+    borderRadius: 12,
+    alignItems: "stretch", 
+    width: "80%", 
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: "space-between",
+  },
+  
+  difficultyModalButton: {
+    backgroundColor: "rgb(58, 226, 255)",
+    paddingVertical: 10,
+    borderRadius: 8,
+    width: "100%", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    marginVertical: 5, 
+  },
+
+  difficultyModalButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

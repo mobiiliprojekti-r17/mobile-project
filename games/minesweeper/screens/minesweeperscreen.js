@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Alert, Modal } from "react-native";
+import { View, Text, TouchableOpacity, Modal } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Board from "../components/minesweeperboad";
 import { generateBoard } from "../components/generateboard";
@@ -24,8 +24,10 @@ const MinesweeperScreen = () => {
   const [win, setWin] = useState(false);
   const [timer, setTimer] = useState(0);
   const [showResultButton, setShowResultButton] = useState(false);
-  const [Nickname, setNickname] = useState('');
-  const [showModal, setShowModal] = useState(false);
+  const [Nickname, setNickname] = useState("");
+  const [resultModalVisible, setResultModalVisible] = useState(false);
+  const [restartModalVisible, setRestartModalVisible] = useState(false);
+  const [resultMessage, setResultMessage] = useState("");
 
   useEffect(() => {
     if (route.params?.nickname) {
@@ -38,13 +40,11 @@ const MinesweeperScreen = () => {
   }, [difficulty]);
 
   useEffect(() => {
-    let timerInterval;
+    let timer;
     if (!gameOver && !win) {
-      timerInterval = setInterval(() => {
-        setTimer((prevTime) => prevTime + 1);
-      }, 1000);
+      timer = setInterval(() => setTimer(prev => prev + 1), 1000);
     }
-    return () => clearInterval(timerInterval);
+    return () => clearInterval(timer);
   }, [gameOver, win]);
 
   const formatTime = (seconds) => {
@@ -60,49 +60,36 @@ const MinesweeperScreen = () => {
     setWin(false);
     setTimer(0);
     setShowResultButton(false);
-    setShowModal(false);
+    setResultModalVisible(false);
+    setRestartModalVisible(false);
   };
 
   const saveGameResult = async () => {
     try {
-      const gameResultsRef = collection(db, "MinesweeperResults");
-      await addDoc(gameResultsRef, {
-        Nickname: Nickname,
-        difficulty: difficulty,
+      await addDoc(collection(db, "MinesweeperResults"), {
+        Nickname,
+        difficulty,
         time: formatTime(timer),
       });
-      console.log("Pelitulos tallennettu Firebaseen");
     } catch (error) {
-      console.error("Virhe tallennettaessa tulosta: ", error);
+      console.error("Error saving result:", error);
     }
   };
 
   const revealAllTiles = () => {
-    setBoard(prevBoard =>
-      prevBoard.map(row =>
-        row.map(cell => ({
-          ...cell,
-          revealed: true
-        }))
-      )
-    );
-  };
-
-  const revealAllMines = () => {
-    setBoard(prevBoard =>
-      prevBoard.map(row =>
-        row.map(cell => (cell.mine ? { ...cell, revealed: true } : cell))
-      )
+    setBoard(prev =>
+      prev.map(row =>
+        row.map(cell => ({ ...cell, revealed: true })))
     );
   };
 
   const revealTile = (row, col) => {
     if (gameOver || win) return;
-
     if (board[row][col].mine) {
       revealAllMines();
       setGameOver(true);
-      setTimeout(() => setShowModal(true), 1000);
+      setResultMessage("You hit a mine! 💥");
+      setTimeout(() => setResultModalVisible(true), 500);
       return;
     }
 
@@ -115,14 +102,14 @@ const MinesweeperScreen = () => {
       saveGameResult();
       setShowResultButton(true);
       revealAllTiles();
-      setTimeout(() => setShowModal(true), 50);
+      setResultMessage("You win! 🎉");
+      setTimeout(() => setResultModalVisible(true), 500);
     }
   };
 
   const revealCells = (board, row, col) => {
     if (board[row][col].revealed || board[row][col].flagged) return;
     board[row][col].revealed = true;
-
     if (board[row][col].number === 0) {
       for (let dr = -1; dr <= 1; dr++) {
         for (let dc = -1; dc <= 1; dc++) {
@@ -135,54 +122,34 @@ const MinesweeperScreen = () => {
     }
   };
 
+  const revealAllMines = () => {
+    setBoard(prev =>
+      prev.map(row =>
+        row.map(cell => (cell.mine ? { ...cell, revealed: true } : cell))
+      )
+    );
+  };
+
   const checkWin = (board) => {
     return board.every(row =>
-      row.every(cell => (cell.mine || cell.revealed))
+      row.every(cell => cell.mine || cell.revealed)
     );
   };
 
   const flagTile = (row, col) => {
     if (gameOver || win) return;
-    let newBoard = board.map((r, ri) => r.map((cell, ci) =>
-      ri === row && ci === col ? { ...cell, flagged: !cell.flagged } : cell
-    ));
-    setBoard(newBoard);
-  };
-
-  const showDifficultyAlert = () => {
-    Alert.alert(
-      "Choose difficulty",
-      "",
-      [
-        {
-          text: "Easy",
-          onPress: () => handleDifficultyChange("easy"),
-        },
-        {
-          text: "Medium",
-          onPress: () => handleDifficultyChange("medium"),
-        },
-        {
-          text: "Hard",
-          onPress: () => handleDifficultyChange("hard"),
-        },
-        { text: "Cancel", style: "cancel" },
-      ],
-      { cancelable: true }
+    setBoard(prevBoard =>
+      prevBoard.map((r, ri) =>
+        r.map((cell, ci) =>
+          ri === row && ci === col ? { ...cell, flagged: !cell.flagged } : cell
+        )
+      )
     );
   };
 
   const handleDifficultyChange = (newDifficulty) => {
-    setShowResultButton(false);
-    setGameOver(false);
-    setWin(false);
-    setTimer(0);
-    setShowModal(false);
-    if (newDifficulty === difficulty) {
-      resetGame();
-    } else {
-      setDifficulty(newDifficulty);
-    }
+    setDifficulty(newDifficulty);
+    resetGame();
   };
 
   return (
@@ -196,27 +163,8 @@ const MinesweeperScreen = () => {
 
       <Board board={board} revealTile={revealTile} flagTile={flagTile} difficulty={difficulty} />
 
-      {/* Result Modal */}
-      <Modal
-        visible={showModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => {}}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>
-              {win ? "🎉 You Win!" : "You hit the mine!💥"}
-            </Text>
-            <TouchableOpacity style={styles.modalButton} onPress={() => setShowModal(false)}>
-              <Text style={styles.modalButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={showDifficultyAlert}>
+        <TouchableOpacity style={styles.button} onPress={() => setRestartModalVisible(true)}>
           <Text style={styles.buttonText}>Restart</Text>
         </TouchableOpacity>
 
@@ -229,9 +177,9 @@ const MinesweeperScreen = () => {
             style={styles.resultButton}
             onPress={() =>
               navigation.navigate("MinesweeperResults", {
-                Nickname: Nickname,
+                Nickname,
                 time: timer,
-                difficulty: difficulty,
+                difficulty,
               })
             }
           >
@@ -239,6 +187,42 @@ const MinesweeperScreen = () => {
           </TouchableOpacity>
         )}
       </View>
+
+      {/* Modal for Game Result */}
+      <Modal transparent animationType="fade" visible={resultModalVisible}>
+        <View style={styles.modalOverlay}> {/* Changed from modalContainer to modalOverlay */}
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>{resultMessage}</Text>
+            <TouchableOpacity onPress={() => setResultModalVisible(false)} style={styles.modalButton}>
+              <Text style={styles.modalButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal for Restart Difficulty Selection */}
+      <Modal transparent animationType="fade" visible={restartModalVisible}>
+  <View style={styles.modalOverlay}>
+    <View style={styles.difficultyModalContent}>
+      <Text style={styles.modalText}>Choose difficulty</Text>
+      {["easy", "medium", "hard"].map(level => (
+        <TouchableOpacity 
+          key={level} 
+          onPress={() => handleDifficultyChange(level)} 
+          style={styles.difficultyModalButton}>
+          <Text style={styles.modalButtonText}>{level}</Text>
+        </TouchableOpacity>
+      ))}
+      <TouchableOpacity 
+        onPress={() => setRestartModalVisible(false)} 
+        style={styles.difficultyModalButton}>
+        <Text style={styles.modalButtonText}>Cancel</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
+
     </View>
   );
 };
