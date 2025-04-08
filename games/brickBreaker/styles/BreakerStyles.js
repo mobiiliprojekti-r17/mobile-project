@@ -1,4 +1,3 @@
-// styles/BrickBreakerScreenStyles.js
 import { StyleSheet } from 'react-native';
 
 const BreakerStyles = StyleSheet.create({

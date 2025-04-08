@@ -74,32 +74,7 @@ export const Ball = (props) => {
     />
   );
 };
-/*
-  const ballColor = color || pastelColors[(themeIndex || 0) % pastelColors.length];
 
-  return (
-    <View
-      style={{
-        position: "absolute",
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        backgroundColor: ballColor,
-        left: position.x - 12,
-        top: position.y - 12,
-        justifyContent: "center",
-        alignItems: "center",
-        shadowColor: ballColor,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.4,
-        shadowRadius: 3,
-        elevation: 2.5,
-      }}
-    >
-    </View>
-  );
-};
-*/
 export const Brick = (props) => {
   const { body, brickType, damaged, hits } = props;
   const width = body.bounds.max.x - body.bounds.min.x;

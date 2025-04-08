@@ -6,7 +6,7 @@ const Ball = ({ x, y, size, color }) => {
   return (
     <View
       style={[
-        shooterStyles.ball,
+        shooterStyles.shooterBall,
         {
           left: x - size / 2,
           top: y - size / 2,
