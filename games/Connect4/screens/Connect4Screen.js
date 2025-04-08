@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import styles from '../styles/Connect4Styles';
 
 const Connect4 = ({ navigation }) => {
   const [board, setBoard] = useState(Array(6).fill(null).map(() => Array(7).fill(null)));
-  const [currentPlayer, setCurrentPlayer] = useState('DarkGreen');
+  const [currentPlayer, setCurrentPlayer] = useState('Orange');
   const [winner, setWinner] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false); // Modaalin näkyvyys
 
   const dropDisc = (col) => {
-    if (winner) return; // Prevent playing if there is already a winner
+    if (winner) return;
 
     for (let row = 5; row >= 0; row--) {
       if (!board[row][col]) {
@@ -19,8 +20,9 @@ const Connect4 = ({ navigation }) => {
         const winner = checkWinner(newBoard);
         if (winner) {
           setWinner(winner);
+          setModalVisible(true); // Asetetaan modaalin näkyvyys päälle, kun voittaja löytyy
         } else {
-          setCurrentPlayer(currentPlayer === 'DarkGreen' ? 'LightGreen' : 'DarkGreen');
+          setCurrentPlayer(currentPlayer === 'Orange' ? 'Yellow' : 'Orange');
         }
         return;
       }
@@ -28,6 +30,12 @@ const Connect4 = ({ navigation }) => {
   };
 
   const renderCell = (row, col) => {
+    const cellColor = board[row][col] === 'Orange'
+      ? 'rgb(255, 94, 0)'
+      : board[row][col] === 'Yellow'
+      ? 'rgb(255, 234, 0)'
+      : 'transparent';
+
     return (
       <TouchableOpacity
         key={`${row}-${col}`}
@@ -36,13 +44,9 @@ const Connect4 = ({ navigation }) => {
       >
         {board[row][col] && (
           <View
-            style={[
-              styles.disc,
-              {
-                backgroundColor:
-                  board[row][col] === 'DarkGreen' ? '#006400' : '#32CD32',
-              },
-            ]}
+            style={[styles.disc, {
+              backgroundColor: cellColor,
+            }]}
           />
         )}
       </TouchableOpacity>
@@ -58,7 +62,6 @@ const Connect4 = ({ navigation }) => {
   };
 
   const checkWinner = (board) => {
-    // Horizontal
     for (let row = 0; row < 6; row++) {
       for (let col = 0; col < 4; col++) {
         if (
@@ -72,7 +75,6 @@ const Connect4 = ({ navigation }) => {
       }
     }
 
-    // Vertical
     for (let col = 0; col < 7; col++) {
       for (let row = 0; row < 3; row++) {
         if (
@@ -86,7 +88,6 @@ const Connect4 = ({ navigation }) => {
       }
     }
 
-    // Diagonal (top-left to bottom-right)
     for (let row = 0; row < 3; row++) {
       for (let col = 0; col < 4; col++) {
         if (
@@ -100,7 +101,6 @@ const Connect4 = ({ navigation }) => {
       }
     }
 
-    // Diagonal (top-right to bottom-left)
     for (let row = 0; row < 3; row++) {
       for (let col = 6; col > 2; col--) {
         if (
@@ -120,23 +120,47 @@ const Connect4 = ({ navigation }) => {
   const startNewGame = () => {
     setBoard(Array(6).fill(null).map(() => Array(7).fill(null)));
     setWinner(null);
-    setCurrentPlayer('DarkGreen');
+    setCurrentPlayer('Orange');
+    setModalVisible(false); // Suljetaan modaalin
   };
+
+  // Määritellään modaalin taustaväri voittajan mukaan
+  const modalBackgroundColor = winner === 'Orange' ? 'rgb(255, 94, 0)' : 'rgb(255, 234, 0)';
+  // Määritellään nappiväri niin, että se erottuu taustasta
+  const modalButtonBackgroundColor = winner === 'Orange' ? 'rgb(200, 75, 0)' : 'rgb(255, 204, 0)';
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Connect4</Text>
-      <Text style= {styles.player}>
+      <Text style={styles.player}>
         Current Player:{' '}
-        <Text style={{ color: currentPlayer === 'DarkGreen' ? '#006400' : '#32CD32' }}>
-          {currentPlayer === 'DarkGreen' ? 'DarkGreen' : 'LightGreen'}
+        <Text style={{ color: currentPlayer === 'Orange' ? 'rgb(255, 94, 0)' : 'rgb(255, 234, 0)' }}>
+          {currentPlayer === 'Orange' ? 'Orange' : 'Yellow'}
         </Text>
       </Text>
-      {winner && (
-        <Text style={styles.winnerText}>
-          {winner === 'DarkGreen' ? 'DarkGreen' : 'LightGreen'} Wins!
-        </Text>
-      )}
+
+      {/* Modaalin näkyvyys */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={[styles.modalOverlay, { backgroundColor: "rgba(0, 0, 0, 0.4)" }]}>
+          <View style={[styles.modalContent, { backgroundColor: modalBackgroundColor }]}>
+            <Text style={styles.modalText}>
+              {winner === 'Orange' ? 'Orange' : 'Yellow'} Wins!
+            </Text>
+            <TouchableOpacity
+              style={[styles.modalButton, { backgroundColor: modalButtonBackgroundColor }]} // Erilainen väri napille
+              onPress={() => setModalVisible(false)} // "OK"-nappi sulkee modaalin
+            >
+              <Text style={styles.modalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <View style={styles.board}>{renderBoard()}</View>
 
       <TouchableOpacity style={styles.button} onPress={startNewGame}>

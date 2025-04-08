@@ -5,7 +5,7 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: "rgb(194, 255, 154)", // Pehmeä vaalea vihreä tausta
+    backgroundColor: "rgb(255, 199, 144)", // Pehmeä vaalea vihreä tausta
   },
   title: {
     fontSize: 40,
@@ -28,7 +28,7 @@ marginBottom: 10,
     marginTop: 10,
   },
   board: {
-    backgroundColor: "rgb(106, 255, 7)", // Vaalea vihreä lauta, joka täydentää taustaväriä
+    backgroundColor: "rgb(252, 128, 4)", // Vaalea vihreä lauta, joka täydentää taustaväriä
     padding: 10,
     borderRadius: 15,
     shadowColor: "#000",
@@ -43,7 +43,7 @@ marginBottom: 10,
   cell: {
     width: 40,
     height: 40,
-    backgroundColor: "rgb(194, 255, 154)",
+    backgroundColor: "rgb(255, 199, 144)",
     borderRadius: 25,
     margin: 5,
     alignItems: 'center',
@@ -57,11 +57,56 @@ marginBottom: 10,
   button: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: "rgb(49, 118, 4)", // Vihreä nappi, joka sulautuu teemaan
+    backgroundColor:"rgb(252, 128, 4)", // Vihreä nappi, joka sulautuu teemaan
     borderRadius: 5,
   },
   buttonText: {
     color: 'white', // Valkoinen teksti vihreällä napilla, jotta se erottuu
     fontSize: 18,
   },
+// Modal styles
+modalOverlay: {
+  position: "absolute", 
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  flex: 1,
+  justifyContent: "center", 
+  alignItems: "center", 
+  backgroundColor: "rgba(0, 0, 0, 0.4)",
+  zIndex: 100, 
+},
+
+modalContent: {
+  backgroundColor: "rgb(63, 210, 136)",
+  padding: 20,
+  borderRadius: 12,
+  alignItems: "center",
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 4,
+  elevation: 5,
+},
+
+modalText: {
+  fontSize: 20,
+  fontWeight: "bold",
+  marginBottom: 15,
+  textAlign: "center",
+  color: "white",
+},
+
+modalButton: {
+  paddingHorizontal: 20,
+  paddingVertical: 10,
+  borderRadius: 8,
+},
+
+modalButtonText: {
+  color: "white",
+  fontSize: 16,
+  fontWeight: "bold",
+},
 });

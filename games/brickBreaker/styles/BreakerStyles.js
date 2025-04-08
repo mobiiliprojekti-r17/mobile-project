@@ -14,7 +14,7 @@ const BreakerStyles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    backgroundColor: "rgb(146, 212, 60)", 
+    backgroundColor: "rgb(159, 228, 70)", 
     width: 100,
     height: 45,
     borderRadius: 8,
