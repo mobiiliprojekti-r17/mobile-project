@@ -68,9 +68,8 @@ const styles = StyleSheet.create({
   difficultyTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color:"rgb(0, 0, 0)", // Sama sävy kuin subtitle
+    color:"rgb(4, 201, 103)", // Sama sävy kuin subtitle
     marginBottom: 5,
-    textDecorationLine: 'underline'
   },
   picker: {
     width: "80%",
@@ -101,8 +100,8 @@ const styles = StyleSheet.create({
   rank: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "rgb(4, 201, 103)", // Yhtenäinen sävy muiden otsikoiden kanssa
-    marginBottom: 5,
+    color: "rgb(4, 201, 103)", // Yhtenäinen sävy muiden otsikoiden kanssa                                      §   
+marginBottom: 5,
   },
   Homebutton: {
   backgroundColor: "rgb(71, 224, 148)", 

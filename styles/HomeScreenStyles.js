@@ -5,14 +5,14 @@ export default StyleSheet.create({
     flex: 1,
     alignItems: "center",
     backgroundColor: "lightblue",
-    padding: 20,
+    paddingBottom: 40, // lisää tilaa ettei content jää footerin alle
   },
 
   title: {
     fontSize: 28,
     fontFamily: 'PressStart2P_400Regular',
     fontWeight: "bold",
-    marginTop: 40,
+    marginTop: 80,
     marginBottom: 20,
     color: "#222",
     textShadowColor: "rgba(0, 0, 0, 0.2)",
@@ -75,15 +75,18 @@ export default StyleSheet.create({
     textAlign: "center",
     textDecorationLine: "underline",
   },
-
-  gameButtonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
-    textAlign: "center",
+  fullScreen: {
+    flex: 1,
+    backgroundColor: 'lightblue',
   },
+  
+  scrollContainer: {
+    flex: 1, 
+  },
+  
 
-  // Game buttons, keep original colors
+  
+  // Game buttons
   g2048Button: {
     backgroundColor: "rgb(211, 181, 255)",
     padding: 12,
@@ -131,5 +134,11 @@ export default StyleSheet.create({
     padding: 12,
     borderRadius: 10,
     marginVertical: 6,
+  },
+  gameButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center",
   },
 });

@@ -16,15 +16,14 @@ const Board = ({ board, revealTile, flagTile, difficulty }) => {
   };
 
   const size = getBoardSize(difficulty); // Lasketaan koko vaikeustason mukaan
-  const tileSize = 27; // Solun koko (voit säätää tätä tarvittaessa)
+  const tileSize = 32; // Solun koko (voit säätää tätä tarvittaessa)
 
   return (
     <View
       style={{
-        backgroundColor: "white", // Valkoinen tausta
-        padding: 5, // Lisää tilaa valkoisen laatikon ympärille
+        backgroundColor: "black", // Valkoinen tausta
+        padding: 2, // Lisää tilaa valkoisen laatikon ympärille
         opacity: 0.8, // Läpimäkyvyys (0 on täysin läpinäkyvä, 1 täysin peittävä)
-        borderRadius: 10, // Kulmien pyöristys
         shadowColor: "#000", // Varjo efektin lisääminen
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.8,
@@ -43,12 +42,11 @@ const Board = ({ board, revealTile, flagTile, difficulty }) => {
               style={{
                 width: tileSize,
                 height: tileSize,
-                margin: 2,
-                backgroundColor: cell.revealed ? "rgb(63, 210, 136)" : "rgb(170, 254, 212)",
+                backgroundColor: cell.revealed ? "rgb(63, 210, 136)" : "white",
                 justifyContent: "center",
                 alignItems: "center",
                 borderWidth: 1,
-                borderColor: "#999",
+                borderColor: "black",
               }}
             >
               {cell.revealed && (
