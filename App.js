@@ -17,10 +17,26 @@ import Connect4 from './games/Connect4/screens/Connect4Screen';
 import BreakerResult from './games/brickBreaker/screens/BrickResultScreen';
 import MinesweeperScreen from './games/minesweeper/screens/minesweeperscreen';
 import MinesweeperResults from './games/minesweeper/screens/minesweeperResults';
+import { useFonts, CuteFont_400Regular } from '@expo-google-fonts/cute-font';
+import { ChangaOne_400Regular } from '@expo-google-fonts/changa-one';
+import { PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
+import { FredokaOne_400Regular } from '@expo-google-fonts/fredoka-one';
 
 const Stack = createStackNavigator();
 
 const App = () => {
+
+  const [fontsLoaded] = useFonts({
+    ChangaOne_400Regular,
+    CuteFont_400Regular,
+    PressStart2P_400Regular,
+    FredokaOne_400Regular,
+  });
+
+  if (!fontsLoaded) {
+    return null; // tai <AppLoading />
+  }
+
   return (
     <NicknameProvider> {/* ⬅️ Tämä käärii NavigationContainerin */}
       <NavigationContainer>

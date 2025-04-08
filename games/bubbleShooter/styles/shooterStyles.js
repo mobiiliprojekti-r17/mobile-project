@@ -1,8 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 const shooterStyles = StyleSheet.create({
-  // 🎈 Pallo (ShooterBall) - Ei muutettu!
-  ball: {
+  shooterBall: {
     position: 'absolute',
     borderRadius: 50,
     shadowColor: '#000',
@@ -12,7 +11,7 @@ const shooterStyles = StyleSheet.create({
     elevation: 10,
     justifyContent: 'center',
     alignItems: 'center',
-     marginTop:30
+     marginTop:40
   },
   face: {
     fontSize: 15,
@@ -21,33 +20,32 @@ const shooterStyles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // 🟣 BubbleShooter
-  gameContainer: {
+  shooterGameContainer: {
     flex: 1,
-    backgroundColor:  "rgb(255, 158, 226)", // Sama taustaväri kuin alkuperäisessä
+    backgroundColor:  "rgb(255, 158, 226)", 
     alignItems: 'center',
     justifyContent: 'center',
     height: "120%",
   },
-  scoreText: {
+  shooterScoreText: {
+    textAlign: "center" ,
     position: 'absolute',
     top: 10,
-    left: 10,
     fontSize: 24,
-    color: '#6C5DD3', // Pastellinsininen teksti
-    textShadowColor: '#8EA7E9', // Vaaleampi sininen varjo
+    color: '#6C5DD3', 
+    textShadowColor: '#8EA7E9', 
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 10,
     marginTop: 40,
+    fontFamily: 'CuteFont_400Regular',
   },
 
-  // 🧩 ShooterScreen
-  paddedContainer: {
+  ShooterScreenContainer: {
     flex: 1,
-    paddingBottom: 40,
-    backgroundColor: '#ff8afa', // Sama yhtenäinen taustaväri
+    paddingBottom: 80, 
   },
-  button: {
+  
+  shooterButton: {
     backgroundColor: "rgb(253, 122, 214)", 
     width: 100,
     height: 45,
@@ -57,12 +55,23 @@ const shooterStyles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
-  buttonText: {
+  shooterButtonText: {
     color: '#fff',
     fontSize: 18,
     textAlign: 'center',
     fontWeight: 'bold',
-  }
+  },
+  shooterFooter: {
+    backgroundColor: '#ffc7fd',   
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: -5,
+    left: 0,
+    right: 0,
+  },
 });
+
 
 export default shooterStyles;

@@ -92,7 +92,7 @@ const BubbleShooter = ({ navigation }) => {
             if (floatingBalls.length > 0) {
               floatingBalls.forEach(ball => Matter.World.remove(world, ball));
               setStaticBalls(prev => prev.filter(ball => !floatingBalls.includes(ball)));
-              setScore(prev => prev + floatingBalls.length * 5);
+              setScore(prev => prev + floatingBalls.length * 15);
             }
 
             shooterBall.current = null;
@@ -181,8 +181,8 @@ const BubbleShooter = ({ navigation }) => {
 
   return (
     <TouchableWithoutFeedback onPress={handleTouch}>
-      <View style={shooterStyles.gameContainer}>
-        <Text style={shooterStyles.scoreText}>Pisteet: {score} | Aika: {time}s</Text>
+      <View style={shooterStyles.shooterGameContainer}>
+        <Text style={shooterStyles.shooterScoreText}>Score: {score} | Time: {time}s</Text>
         {staticBalls.map(ball => (
           <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
         ))}
