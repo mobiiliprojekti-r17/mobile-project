@@ -1,24 +1,24 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 import BubbleShooter from '../components/BubbleShooter';
 import shooterStyles from '../styles/shooterStyles';
 
 const BubbleShooterScreen = ({ navigation }) => {
+
   return (
-    <View style={styles.container}>
+    <View style={shooterStyles.ShooterScreenContainer}>
       <BubbleShooter navigation={navigation} />
-            <TouchableOpacity style={shooterStyles.button} onPress={() => navigation.navigate("Home")}>
-                <Text style={shooterStyles.buttonText}>Home</Text>
-              </TouchableOpacity> 
+
+      <View style={shooterStyles.shooterFooter}>
+        <TouchableOpacity
+          style={shooterStyles.shooterButton}
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Text style={shooterStyles.shooterButtonText}>Home</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingBottom: 40,
-  },
-});
 
 export default BubbleShooterScreen;

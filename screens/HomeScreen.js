@@ -49,6 +49,9 @@ const HomeScreen = ({ navigation }) => {
       navigation.navigate('Sudoku', { nickname, difficulty, autoStart: true });
     } else if (selectedGame === 'Minesweeper') {
       navigation.navigate('Minesweeper', { nickname, difficulty });
+    } else {
+      // Muiden pelien osalta ei kysytä vaikeustasoa, vaan ne käynnistyvät suoraan
+      navigation.navigate(selectedGame, { nickname });
     }
     // Lisää tarvittaessa muita pelejä tänne
   };
@@ -58,9 +61,13 @@ const HomeScreen = ({ navigation }) => {
       showModal('Warning', 'Please enter a nickname first!', 'error');
     } else {
       setSelectedGame(game);
-      setRestartModalVisible(true);
-      setModalMessage('Choose difficulty');
-      setModalType('difficulty');
+      if (game === 'Sudoku' || game === 'Minesweeper') {
+        setRestartModalVisible(true);
+        setModalMessage('Choose difficulty');
+        setModalType('difficulty');
+      } else {
+        startGame('easy'); // Käynnistetään peli oletusvaikeudella (esim. 'easy')
+      }
     }
   };
 
@@ -175,7 +182,7 @@ const HomeScreen = ({ navigation }) => {
               </>
             )}
 
-            {modalType === 'error'  && (
+            {modalType === 'error' && (
               <TouchableOpacity onPress={() => setRestartModalVisible(false)} style={styles.ModalButton}>
                 <Text style={styles.ModalButtonText}>OK</Text>
               </TouchableOpacity>
