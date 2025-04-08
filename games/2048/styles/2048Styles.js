@@ -1,61 +1,112 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions} from "react-native";
+
+const screenWidth = Dimensions.get("window").width;
+const gridPadding = 60; // marginaalia sivuilta
+const tileMargin = 5;
+const tilesPerRow = 4;
+const baseWidth = 390;
+const scale = screenWidth / baseWidth;
+
+const tileSize = (screenWidth - gridPadding - tileMargin * 2 * tilesPerRow) / tilesPerRow;
+const scaleSize = (size) => Math.round(size * scale);
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#faf8ef",
+
+    backgroundColor: "rgb(211, 181, 255)", //"#faf8ef"
+  },
+  ChangaOneText: {
+    fontFamily: 'ChangaOne_400Regular',
+    fontSize: scaleSize(80),
+    fontWeight: "bold",
+    color: "rgb(255, 255, 255)",
+    marginBottom: scaleSize(50),
   },
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "81%",
-    marginBottom: 10,
+    width: "89%",
+    marginTop: scaleSize(25),
+    marginBottom: scaleSize(5),
   },
   scoreText: {
-    fontSize: 18,
+    fontSize: scaleSize(18),
     fontWeight: "bold",
     color: "#333",
   },
   timerText: {
-    fontSize: 18,
+    fontSize: scaleSize(18),
     fontWeight: "bold",
     color: "#333",
   },
-  undoButtonContainer: {
+  topButtonsContainer: {
     position: "absolute",
-    top: 140,
-    right: 40, 
+
+    top: scaleSize(260),
+    right: scaleSize(25),
+    flexDirection: "row",
+  },
+  
+  iconButton: {
     backgroundColor: "rgb(106, 106, 106)",
-    padding: 5, 
-    borderRadius: 5,
+    padding: scaleSize(5),
+    borderRadius: scaleSize(5),
+
     justifyContent: "center",
     alignItems: "center",
+    marginLeft: scaleSize(8),
+  },
+  
+gridContainer: {
+  backgroundColor: "#faf8ef",
+  padding: 8,
+  borderRadius: 10,
+  borderWidth: 3,
+  borderColor: "#fff", // vaalea reunaväri
+  marginTop: 10,
 },
 
   row: {
     flexDirection: "row",
   },
   tile: {
-    width: 80,
-    height: 80,
-    margin: 5,
+    width: tileSize,
+    height: tileSize,
+    margin: tileMargin,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 5,
   },
   tileText: {
-    fontSize: 24,
+    fontSize: tileSize * 0.3,
     fontWeight: "bold",
   },
+  button: {
+    backgroundColor: "rgb(177, 152, 216)", 
+    width: 120,
+    height: 45,
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 20,
+    elevation: 3, 
+  },
+  
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  }
 });
 
 export const getTileStyle = (value) => {
   const tileColors = {
     0: { backgroundColor: "#e6f5ff", color: "#f9f6f2" },
     2: { backgroundColor: "rgb(211, 181, 255)", color: "#776e65" },
-    4: { backgroundColor: "rgb(255, 182, 193)", color: "#776e65" },
+    4: { backgroundColor: "rgb(255, 158, 226)", color: "#776e65" },
     8: { backgroundColor: "rgb(251, 151, 137)", color: "#776e65" },
     16: { backgroundColor: "rgb(255, 199, 144)", color: "#776e65" },
     32: { backgroundColor: "rgb(255, 216, 130)", color: "#776e65" },

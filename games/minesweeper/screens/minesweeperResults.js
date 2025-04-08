@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Button, ScrollView, TouchableOpacity } from "react-native";
 import { db } from "../../../firebase/Config";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import styles from "../styles/SudokuResultStyles";
+import styles from "../styles/minesweeperResultsStyles";
 import { useNickname } from "../../../context/context";
 
 export default function SudokuResult({ route, navigation }) {
@@ -15,7 +15,7 @@ export default function SudokuResult({ route, navigation }) {
     const fetchScores = async () => {
       try {
         const scoresQuery = query(
-          collection(db, "SudokuGameResults"),
+          collection(db, "MinesweeperResults"),
           orderBy("time")
         );
 
@@ -56,7 +56,7 @@ export default function SudokuResult({ route, navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>GAME OVER!</Text>
-      <Text style={styles.title2}>Your result:</Text>
+      <Text style={styles.title}>Your result:</Text>
       <View style={styles.resultBox}>
         <Text style={styles.infoText}>Nickname: {nickname}</Text>
         <Text style={styles.infoText}>Difficulty: {difficulty}</Text>
@@ -113,9 +113,8 @@ export default function SudokuResult({ route, navigation }) {
           <Text style={styles.noScores}>No scores yet!</Text>
         )}
       </ScrollView>
-      <TouchableOpacity style={styles.Homebutton} onPress={() => navigation.navigate("Home")}>
-        <Text style={styles.buttonText}>Home</Text>
-      </TouchableOpacity>
+
+      <Button title="Home" onPress={() => navigation.navigate("Home")} color="#6200EE" />
     </View>
   );
 }

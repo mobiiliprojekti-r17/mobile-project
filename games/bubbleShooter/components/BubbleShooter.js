@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, TouchableWithoutFeedback, Dimensions, StyleSheet, Text } from 'react-native';
+import { View, TouchableWithoutFeedback, Dimensions, Text, TouchableOpacity} from 'react-native';
 import Matter from 'matter-js';
 import {
   createPhysics,
@@ -13,7 +13,7 @@ import {
 import Ball from './ShooterBall';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
-import { collection, getDocs, query, orderBy, addDoc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import shooterStyles from '../styles/shooterStyles';
 import { useNickname } from '../../../context/context';
 
@@ -188,6 +188,7 @@ const BubbleShooter = ({ navigation }) => {
         ))}
         <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
       </View>
+
     </TouchableWithoutFeedback>
   );
 }

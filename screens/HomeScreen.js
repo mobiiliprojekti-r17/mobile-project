@@ -1,28 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert, StyleSheet } from 'react-native';
-import { db, collection, addDoc, getDocs } from '../firebase/Config';
+
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { db, collection, addDoc} from '../firebase/Config'; 
+import styles from "../styles/HomeScreenStyles"
 import { useNickname } from '../context/context';
 
 const HomeScreen = ({ navigation }) => {
   const { nickname, setNickname } = useNickname(); // 👈 korvaa useState
   const [nicknames, setNicknames] = useState([]);
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => null,
-      gestureEnabled: false,
-    });
-    fetchNicknames();
-  }, [navigation]);
-
-  const fetchNicknames = async () => {
-    const querySnapshot = await getDocs(collection(db, "NicknameList"));
-    let nicknameList = [];
-    querySnapshot.forEach((doc) => {
-      nicknameList.push({ id: doc.id, ...doc.data() });
-    });
-    setNicknames(nicknameList);
-  };
 
   const addNickname = async () => {
     if (!nickname.trim()) {
@@ -45,21 +31,23 @@ const HomeScreen = ({ navigation }) => {
       Alert.alert("Warning", "Please enter a nickname first!");
       return;
     }
+    
+    // Alert for difficulty selection
     Alert.alert(
       "Choose difficulty",
       "",
       [
-        { text: "Easy", onPress: () => startSudokuGame("easy") },
-        { text: "Medium", onPress: () => startSudokuGame("medium") },
-        { text: "Hard", onPress: () => startSudokuGame("hard") },
+        { text: "Easy", onPress: () => startGame("Sudoku", "easy") },
+        { text: "Medium", onPress: () => startGame("Sudoku", "medium") },
+        { text: "Hard", onPress: () => startGame("Sudoku", "hard") },
         { text: "Cancel", style: "cancel" },
       ],
       { cancelable: false }
     );
   };
 
-  const startSudokuGame = (difficulty) => {
-    navigation.navigate("Sudoku", { nickname, difficulty, autoStart: true });
+  const startGame = (game, difficulty) => {
+    navigation.navigate(game, { nickname, difficulty, autoStart: true });
   };
 
   const new2048Game = () => {
@@ -77,7 +65,6 @@ const HomeScreen = ({ navigation }) => {
     }
     navigation.navigate("BubbleShooter");
   };
-
   const startBrickBreaker = () => {
     if (!nickname.trim()) {
       Alert.alert("Warning", "Please enter a nickname first!");
@@ -86,7 +73,24 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate("BrickBreaker");
   };
 
-  const recentNickname = nicknames.length > 0 ? nicknames[nicknames.length - 1].name : '';
+  const startMinesweeper = () => {
+    if (!nickname.trim()) {
+      Alert.alert("Warning", "Please enter a nickname first!");
+      return;
+    }
+  
+    Alert.alert(
+      "Choose difficulty",
+      "",
+      [
+        { text: "Easy", onPress: () => startGame("Minesweeper", "easy") },
+        { text: "Medium", onPress: () => startGame("Minesweeper", "medium") },
+        { text: "Hard", onPress: () => startGame("Minesweeper", "hard") },
+        { text: "Cancel", style: "cancel" },
+      ],
+      { cancelable: false }
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -98,90 +102,45 @@ const HomeScreen = ({ navigation }) => {
         value={nickname}
         onChangeText={setNickname}
       />
-      <TouchableOpacity style={styles.button} onPress={addNickname}>
-        <Text style={styles.buttonText}>Save</Text>
-      </TouchableOpacity>
+  <View style={styles.buttonContainer}>
+  <TouchableOpacity style={styles.button} onPress={addNickname}>
+    <Text style={styles.buttonText}>Save</Text>
+  </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => setNickname('')}>
-        <Text style={styles.buttonText}>Clear</Text>
-      </TouchableOpacity>
+  <TouchableOpacity style={styles.button} onPress={() => setNickname('')}>
+    <Text style={styles.buttonText}>Clear</Text>
+  </TouchableOpacity>
+</View>
 
       <Text>Singleplayer games!</Text>
-      <TouchableOpacity style={styles.gameButton} onPress={new2048Game}>
+      <TouchableOpacity style={styles.g2048Button} onPress={new2048Game}>
         <Text style={styles.gameButtonText}>2048</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.gameButton} onPress={startBubbleShooter}>
+      <TouchableOpacity style={styles.ShooterButton} onPress={startBubbleShooter}>
         <Text style={styles.gameButtonText}>BubbleShooter</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.gameButton} onPress={startBrickBreaker}>
+      <TouchableOpacity style={styles.BreakerButton} onPress={startBrickBreaker}>
         <Text style={styles.gameButtonText}>BrickBreaker</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.gameButton} onPress={() => navigation.navigate('TictactoeSingleplayer')}>
+      <TouchableOpacity style={styles.TTTSButton} onPress={() => navigation.navigate('TictactoeSingleplayer')}>
         <Text style={styles.gameButtonText}>Tictactoe</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.gameButton} onPress={newSudokuGame}>
+      <TouchableOpacity style={styles.SudokuButton} onPress={newSudokuGame}>
         <Text style={styles.gameButtonText}>Sudoku</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.MinesweeperButton} onPress={startMinesweeper}>
+        <Text style={styles.gameButtonText}>Minesweeper</Text>
       </TouchableOpacity>
 
       <Text>Multiplayer games!</Text>
-      <TouchableOpacity style={styles.gameButton} onPress={() => navigation.navigate('TictactoeMultiplayer')}>
+      <TouchableOpacity style={styles.TTTMButton} onPress={() => navigation.navigate('TictactoeMultiplayer')}>
         <Text style={styles.gameButtonText}>Tictactoe</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.gameButton} onPress={() => navigation.navigate('Connect4')}>
+      <TouchableOpacity style={styles.Connect4Button} onPress={() => navigation.navigate('Connect4')}>
         <Text style={styles.gameButtonText}>Connect4</Text>
       </TouchableOpacity>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'lightblue',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    width: 200,
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    backgroundColor: 'white',
-  },
-  gameButton: {
-    backgroundColor: 'blue',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
-  },
-  button: {
-    backgroundColor: 'green',
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  gameButtonText: {
-    color: 'white',
-    fontSize: 18,
-  },
-  nicknameText: {
-    fontSize: 18,
-    marginBottom: 20,
-    fontWeight: 'bold',
-    color: 'darkblue',
-  },
-});
 
 export default HomeScreen;
