@@ -163,9 +163,6 @@ const Game2048Screen = ({ route }) => {
             })}
           </View>
         ))}
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
-        <Text style={styles.buttonText}>Home</Text>
-      </TouchableOpacity>
       </View>
       </View>
     </PanGestureHandler>
