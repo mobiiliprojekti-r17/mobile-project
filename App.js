@@ -2,7 +2,7 @@ import * as React from 'react';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
+import { NicknameProvider } from './context/context'; // varmista että tiedoston nimi on oikein
 import HomeScreen from './screens/HomeScreen';
 import BubbleShooterScreen from './games/bubbleShooter/screens/ShooterScreen';
 import ShooterGameOver from './games/bubbleShooter/screens/ShooterGameOverScreen';
@@ -15,9 +15,8 @@ import TictactoeMultiplayer from './games/tictactoe/screens/TictactoeMulti';
 import TictactoeSingleplayer from './games/tictactoe/screens/TictactoeSingle';
 import Connect4 from './games/Connect4/screens/Connect4Screen';
 import BreakerResult from './games/brickBreaker/screens/BrickResultScreen';
-
-// ⬇️ Tämä on tärkeä!
-import { NicknameProvider } from './context/context'; // varmista että tiedoston nimi on oikein
+import MinesweeperScreen from './games/minesweeper/screens/minesweeperscreen';
+import MinesweeperResults from './games/minesweeper/screens/minesweeperResults';
 
 const Stack = createStackNavigator();
 
@@ -33,6 +32,8 @@ const App = () => {
           <Stack.Screen name="BreakerResults" component={BreakerResult} />
           <Stack.Screen name="Sudoku" component={Sudoku} />
           <Stack.Screen name="SudokuResult" component={SudokuResult} />
+          <Stack.Screen name="Minesweeper" component={MinesweeperScreen} />
+          <Stack.Screen name="MinesweeperResults" component={MinesweeperResults} />
           <Stack.Screen name="2048" component={Game2048Screen} />
           <Stack.Screen name="Game2048ResultScreen" component={Game2048ResultScreen} />
           <Stack.Screen name="TictactoeMultiplayer" component={TictactoeMultiplayer} />

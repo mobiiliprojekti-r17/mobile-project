@@ -94,9 +94,9 @@ export const getTileStyle = (value) => {
     64: { backgroundColor: "rgb(255, 246, 143)", color: "#776e65" },
     128: { backgroundColor: "rgb(194, 255, 154)", color: "#776e65" },
     256: { backgroundColor: "rgb(153, 255, 204)", color: "#776e65" },
-    512: { backgroundColor: "rgb(160, 220, 255)", color: "#776e65" }, 
-    1024: { backgroundColor: "rgb(140, 200, 255)", color: "#776e65" }, 
-    2048: { backgroundColor: "rgb(180, 160, 255)", color: "#776e65" },
+    512: { backgroundColor: "rgb(168, 223, 255)", color: "#776e65" }, 
+    1024: { backgroundColor: "rgb(137, 197, 253)", color: "#776e65" }, 
+    2048: { backgroundColor: "rgb(176, 154, 255)", color: "#776e65" },
     default: { backgroundColor: "rgb(210, 175, 255)", color: "#776e65" },
   };
 
