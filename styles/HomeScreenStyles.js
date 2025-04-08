@@ -121,7 +121,7 @@ export default StyleSheet.create({
     alignItems: 'center', 
   },
   BreakerButton: {
-    backgroundColor: "rgb(255, 199, 144)",
+    backgroundColor: "rgb(192, 253, 111)",
     padding: 12,
     borderRadius: 10,
     margin: 6,

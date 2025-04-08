@@ -44,29 +44,32 @@ const HomeScreen = ({ navigation }) => {
     setRestartModalVisible(true);
   };
 
-  const startGame = (difficulty) => {
-    if (selectedGame === 'Sudoku') {
-      navigation.navigate('Sudoku', { nickname, difficulty, autoStart: true });
-    } else if (selectedGame === 'Minesweeper') {
+  const startGame = (game, difficulty) => {
+    if (game === 'Sudoku') {
+      // Navigoidaan Sudoku-näyttöön ja annetaan vaikeustaso
+      navigation.navigate('Sudoku', { nickname, difficulty });
+    } else if (game === 'Minesweeper') {
+      // Navigoidaan Minesweeper-näyttöön ja annetaan vaikeustaso
       navigation.navigate('Minesweeper', { nickname, difficulty });
     } else {
-      // Muiden pelien osalta ei kysytä vaikeustasoa, vaan ne käynnistyvät suoraan
-      navigation.navigate(selectedGame, { nickname });
+      // Muut pelit käynnistetään oletusvaikeudella
+      navigation.navigate(game, { nickname });
     }
-    // Lisää tarvittaessa muita pelejä tänne
   };
 
   const checkNicknameAndProceed = (game) => {
     if (!nickname.trim()) {
+      // Jos nimimerkki puuttuu, näytetään virhe
       showModal('Warning', 'Please enter a nickname first!', 'error');
     } else {
-      setSelectedGame(game);
+      setSelectedGame(game);  // Asetetaan valittu peli
+      // Pelin käynnistäminen heti valinnan yhteydessä
       if (game === 'Sudoku' || game === 'Minesweeper') {
         setRestartModalVisible(true);
         setModalMessage('Choose difficulty');
         setModalType('difficulty');
       } else {
-        startGame('easy'); // Käynnistetään peli oletusvaikeudella (esim. 'easy')
+        startGame(game, 'easy');
       }
     }
   };
@@ -84,7 +87,7 @@ const HomeScreen = ({ navigation }) => {
 
   const handleDifficultyChange = (level) => {
     // Käynnistetään peli valitulla vaikeustasolla
-    startGame(level);
+    startGame(selectedGame, level);  // Käynnistetään valittu peli ja annetaan vaikeustaso
     setRestartModalVisible(false);
   };
 
@@ -183,6 +186,12 @@ const HomeScreen = ({ navigation }) => {
             )}
 
             {modalType === 'error' && (
+              <TouchableOpacity onPress={() => setRestartModalVisible(false)} style={styles.ModalButton}>
+                <Text style={styles.ModalButtonText}>OK</Text>
+              </TouchableOpacity>
+            )}
+
+            {modalType === 'success' && (
               <TouchableOpacity onPress={() => setRestartModalVisible(false)} style={styles.ModalButton}>
                 <Text style={styles.ModalButtonText}>OK</Text>
               </TouchableOpacity>
