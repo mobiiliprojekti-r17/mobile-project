@@ -2,7 +2,7 @@ import { StyleSheet, Dimensions } from "react-native";
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
-const baseWidth = 390; // Käytetään tätä perusleveytenä skaalauksen laskemisessa
+const baseWidth = 400; // Käytetään tätä perusleveytenä skaalauksen laskemisessa
 const scale = screenWidth / baseWidth;
 
 const scaleSize = (size) => Math.round(size * scale);
@@ -10,7 +10,7 @@ const scaleSize = (size) => Math.round(size * scale);
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#faf8ef",
+        backgroundColor: "rgb(180, 160, 255)", //"#faf8ef",
         alignItems: "center",
         justifyContent: "center",
         padding: scaleSize(50),
@@ -19,30 +19,31 @@ const styles = StyleSheet.create({
         fontFamily: 'ChangaOne_400Regular',
         fontSize: scaleSize(70),
         fontWeight: "bold",
-        color: "rgb(180, 160, 255)", // Game Over -otsikko
-        marginBottom: scaleSize(25), 
+        color: "#faf8ef", // Game Over -otsikko
+        marginBottom: scaleSize(20), 
       },
   resultBox: {
     backgroundColor: "rgb(180, 160, 255)", // äsk. tuloksille tausta
-    padding: scaleSize(7),
-    borderRadius: scaleSize(5),
-    marginBottom: scaleSize(20),
-    width: "70%",
+    padding: scaleSize(3),
+    marginBottom: scaleSize(10),
+    width: scaleSize(210),
     alignItems: "center",
   },
   infoText: {
-    fontSize: scaleSize(18),
+    fontSize: scaleSize(19),
     fontWeight: "bold",
-    color: "#FFFFFF",
+    color: "#faf8ef",
     marginBottom: scaleSize(5),
   },
   subtitle: {
-    fontSize: scaleSize(22),
+    fontFamily: 'ChangaOne_400Regular',
+    fontSize: scaleSize(35),
     fontWeight: "bold",
-    color: "#BB86FC", // Top Scores -otsikko
-    marginBottom: scaleSize(10),
+    color: "#faf8ef", // Top Scores -otsikko
+    marginBottom: scaleSize(5),
   },
   scrollView: {
+    maxHeight: screenHeight * 0.55,
     width: "90%",
   },
 
@@ -51,17 +52,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgb(180, 160, 255)",
     paddingVertical: scaleSize(12), 
-    paddingHorizontal: scaleSize(15), 
-    borderRadius: scaleSize(5),
+    paddingHorizontal: scaleSize(15),
     marginBottom: scaleSize(10),
   },
   rankContainer: {
-    width: scaleSize(60), 
+    width: scaleSize(70), 
     alignItems: "center",
     justifyContent: "center",
   },
   rank: {
-    fontSize: scaleSize(50), 
+    fontSize: scaleSize(45), 
     fontWeight: "bold",
     color: "#FFFFFF",
   },
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     fontSize: scaleSize(17),
     fontWeight: "bold",
     color: "#FFFFFF",
-    marginBottom: scaleSize(2),
+    marginBottom: scaleSize(1),
     textAlign: "center", // Varmistaa keskityksen
   },
   noScores: {
@@ -86,21 +86,22 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: scaleSize(15),
   },
   playAgainButton: {
-    backgroundColor: "#03DAC6", 
+    backgroundColor: "rgb(255, 158, 226)", 
     padding: scaleSize(12), 
     borderRadius: scaleSize(5),
     flex: 1,
     alignItems: "center",
+    marginRight: scaleSize(7.5),
   },
   homeButton: {
-    backgroundColor: "#6200EE",
+    backgroundColor: "rgb(168, 223, 255)",
     padding: scaleSize(12),
     borderRadius: scaleSize(5),
     flex: 1,
     alignItems: "center",
+    marginLeft: scaleSize(7.5),
   },
   homeButtonText: {
     color: "white",
