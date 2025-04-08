@@ -79,10 +79,10 @@ const Game2048Screen = ({ route }) => {
 
   useEffect(() => {
     if (newTile) {
-      scaleAnim.setValue(0.65);
+      scaleAnim.setValue(0.9);
       Animated.spring(scaleAnim, {
         toValue: 1,
-        friction: 5,
+        friction: 3,
         useNativeDriver: true,
       }).start();
     }
@@ -90,10 +90,10 @@ const Game2048Screen = ({ route }) => {
 
   useEffect(() => {
     if (mergedTiles.length > 0) {
-      mergeAnim.setValue(0.65);
+      mergeAnim.setValue(0.9);
       Animated.spring(mergeAnim, {
         toValue: 1,
-        friction: 7,
+        friction: 3,
         useNativeDriver: true,
       }).start();
     }
