@@ -4,11 +4,11 @@ const BALL_RADIUS = 20;
 
 export const getRandomPastelColor = () => {
 const pastelColors = [
-  '#ffc7fd',/* // vaaleanpunainen (pastelli pinkki)
+  '#ffc7fd', // vaaleanpunainen (pastelli pinkki)
   '#d3b5ff', // vaalea violetti / laventeli
   '#a0dcff', // vaaleansininen / syaaninen
   '#c2ff9a', // vaaleanvihreä / mintunvihreä
-  '#fff68f'  // vaaleankeltainen / kerma*/
+  '#fff68f'  // vaaleankeltainen / kerma
 ];
   return pastelColors[Math.floor(Math.random() * pastelColors.length)];
 };
@@ -23,7 +23,7 @@ export const createPhysics = (screenWidth, screenHeight) => {
   const ground = Matter.Bodies.rectangle(screenWidth / 2, screenHeight - 80, screenWidth, 50, wallOptions);
   const leftWall = Matter.Bodies.rectangle(0, screenHeight / 2, 50, screenHeight, wallOptions);
   const rightWall = Matter.Bodies.rectangle(screenWidth, screenHeight / 2, 50, screenHeight, wallOptions);
-  const ceiling = Matter.Bodies.rectangle(screenWidth / 2, 0, screenWidth, 50, wallOptions);
+  const ceiling = Matter.Bodies.rectangle(screenWidth / 2, 60, screenWidth, 10, wallOptions);
 
   Matter.World.add(world, [ground, leftWall, rightWall, ceiling]);
 
