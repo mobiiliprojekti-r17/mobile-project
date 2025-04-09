@@ -4,11 +4,11 @@ const BALL_RADIUS = 20;
 
 export const getRandomPastelColor = () => {
 const pastelColors = [
-  '#ffc7fd',/* // vaaleanpunainen (pastelli pinkki)
+  '#ffc7fd',// vaaleanpunainen (pastelli pinkki)
   '#d3b5ff', // vaalea violetti / laventeli
   '#a0dcff', // vaaleansininen / syaaninen
   '#c2ff9a', // vaaleanvihreä / mintunvihreä
-  '#fff68f'  // vaaleankeltainen / kerma*/
+  '#fff68f'  // vaaleankeltainen / kerma
 ];
   return pastelColors[Math.floor(Math.random() * pastelColors.length)];
 };
