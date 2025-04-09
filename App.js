@@ -2,7 +2,7 @@ import * as React from 'react';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { NicknameProvider } from './context/context'; // varmista että tiedoston nimi on oikein
+import { NicknameProvider } from './context/context'; 
 import HomeScreen from './screens/HomeScreen';
 import BubbleShooterScreen from './games/bubbleShooter/screens/ShooterScreen';
 import ShooterGameOver from './games/bubbleShooter/screens/ShooterGameOverScreen';
@@ -34,11 +34,11 @@ const App = () => {
   });
 
   if (!fontsLoaded) {
-    return null; // tai <AppLoading />
+    return null; 
   }
 
   return (
-    <NicknameProvider> {/* ⬅️ Tämä käärii NavigationContainerin */}
+    <NicknameProvider> 
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Home" component={HomeScreen} />

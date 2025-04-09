@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, TouchableWithoutFeedback, Dimensions, Text, TouchableOpacity} from 'react-native';
+import { View, TouchableWithoutFeedback, Dimensions, Text, TouchableOpacity } from 'react-native';
 import Matter from 'matter-js';
 import {
   createPhysics,
@@ -8,14 +8,16 @@ import {
   updatePhysics,
   getRandomPastelColor,
   findClusterAndRemove,
-  findFloatingBalls
+  findFloatingBalls,
+  getAvailableColors
 } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
 import { collection, addDoc } from "firebase/firestore";
 import shooterStyles from '../styles/shooterStyles';
 import { useNickname } from '../../../context/context';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
@@ -33,7 +35,7 @@ const BubbleShooter = ({ navigation }) => {
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
   const route = useRoute();
-  const { nickname } = useNickname(); 
+  const { nickname } = useNickname();
 
   useEffect(() => {
     staticBallsRef.current = staticBalls;
@@ -86,7 +88,6 @@ const BubbleShooter = ({ navigation }) => {
               setStaticBalls(prev => [...prev, shooter]);
             }
 
-            // Leijuvien pallojen tarkistus ja poisto
             const updatedBalls = staticBallsRef.current.filter(ball => !cluster.includes(ball));
             const floatingBalls = findFloatingBalls(updatedBalls);
             if (floatingBalls.length > 0) {
@@ -101,12 +102,39 @@ const BubbleShooter = ({ navigation }) => {
           }
         }
 
+        // 🆕 TÄMÄ KORJATTU OSUESSA KATTOON:
         if ((bodyA === shooter && bodyB === ceiling) || (bodyB === shooter && bodyA === ceiling)) {
-          Matter.World.remove(world, shooter);
+          // Sama logiikka kuin törmätessä muihin palloihin
+          Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
+          Matter.Body.setStatic(shooter, true);
+        
+          Matter.Body.setPosition(shooter, {
+            x: shooter.position.x,
+            y: 60 + BALL_RADIUS + 1 // katon alapuolelle vähän
+          });
+        
+          setStaticBalls(prev => [...prev, shooter]);
+        
+          const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
+          if (cluster.length > 0) {
+            cluster.forEach(ball => Matter.World.remove(world, ball));
+            setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
+            setScore(prev => prev + cluster.length * 10);
+          }
+        
+          const updatedBalls = staticBallsRef.current.filter(ball => !cluster.includes(ball));
+          const floatingBalls = findFloatingBalls(updatedBalls);
+          if (floatingBalls.length > 0) {
+            floatingBalls.forEach(ball => Matter.World.remove(world, ball));
+            setStaticBalls(prev => prev.filter(ball => !floatingBalls.includes(ball)));
+            setScore(prev => prev + floatingBalls.length * 15);
+          }
+        
           shooterBall.current = null;
           resetShooterBall();
           break;
         }
+        
       }
     });
 
@@ -131,12 +159,22 @@ const BubbleShooter = ({ navigation }) => {
   }, [staticBalls, ballsInitialized]);
 
   const initShooterBall = () => {
-    shooterBall.current = createShooterBall(world, width / 2, height - 200, BALL_RADIUS, getRandomPastelColor());
+    const availableColors = getAvailableColors(staticBallsRef.current);
+    const color = availableColors.length > 0
+      ? availableColors[Math.floor(Math.random() * availableColors.length)]
+      : getRandomPastelColor();
+  
+    shooterBall.current = createShooterBall(world, width / 2, height - 200, BALL_RADIUS, color);
     Matter.Body.setStatic(shooterBall.current, true);
   };
-
+  
   const resetShooterBall = () => {
-    const newBall = createShooterBall(world, width / 2, height - 200, BALL_RADIUS, getRandomPastelColor());
+    const availableColors = getAvailableColors(staticBallsRef.current);
+    const color = availableColors.length > 0
+      ? availableColors[Math.floor(Math.random() * availableColors.length)]
+      : getRandomPastelColor();
+  
+    const newBall = createShooterBall(world, width / 2, height - 200, BALL_RADIUS, color);
     Matter.Body.setStatic(newBall, true);
     shooterBall.current = newBall;
     setBallPosition({ x: newBall.position.x, y: newBall.position.y });
@@ -180,17 +218,24 @@ const BubbleShooter = ({ navigation }) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handleTouch}>
-      <View style={shooterStyles.shooterGameContainer}>
-        <Text style={shooterStyles.shooterScoreText}>Score: {score} | Time: {time}s</Text>
-        {staticBalls.map(ball => (
-          <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
-        ))}
-        <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
+    <>
+      <View style={{ position: 'absolute', top: 40, left: 20, zIndex: 10 }}>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+          <Ionicons name="home" size={32} color="black" />
+        </TouchableOpacity>
       </View>
 
-    </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback onPress={handleTouch}>
+        <View style={shooterStyles.shooterGameContainer}>
+          <Text style={shooterStyles.shooterScoreText}>Score: {score} | Time: {time}s</Text>
+          {staticBalls.map(ball => (
+            <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
+          ))}
+          <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
+        </View>
+      </TouchableWithoutFeedback>
+    </>
   );
-}
+};
 
 export default BubbleShooter;
