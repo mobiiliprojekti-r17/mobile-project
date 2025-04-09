@@ -112,7 +112,7 @@ const startFlappyBird = () => checkNicknameAndProceed ('FlappyBird');
 
           {/* Singleplayer Games Section */}
           <View style={styles.gameSection}>
-            <Text style={styles.sectionTitle}>Singleplayer games!</Text>
+            <Text style={styles.sectionTitle}>Singleplayer games</Text>
             <View style={styles.gameButtonsContainer}>
               <TouchableOpacity style={styles.g2048Button} onPress={new2048Game}>
                 <Text style={styles.gameButtonText}>2048</Text>
@@ -147,7 +147,7 @@ const startFlappyBird = () => checkNicknameAndProceed ('FlappyBird');
 
           {/* Multiplayer Games Section */}
           <View style={styles.gameSection}>
-            <Text style={styles.sectionTitle}>Multiplayer games!</Text>
+            <Text style={styles.sectionTitle}>Multiplayer games</Text>
             <View style={styles.gameButtonsContainer}>
               <TouchableOpacity style={styles.TTTMButton} onPress={() => navigation.navigate('TictactoeMultiplayer')}>
                 <Text style={styles.gameButtonText}>Tictactoe</Text>
