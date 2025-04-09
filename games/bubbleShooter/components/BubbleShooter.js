@@ -11,11 +11,13 @@ import {
   findFloatingBalls
 } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
 import { collection, addDoc } from "firebase/firestore";
 import shooterStyles from '../styles/shooterStyles';
 import { useNickname } from '../../../context/context';
+import { Ionicons } from '@expo/vector-icons';
+
 
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
@@ -180,17 +182,25 @@ const BubbleShooter = ({ navigation }) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handleTouch}>
-      <View style={shooterStyles.shooterGameContainer}>
-        <Text style={shooterStyles.shooterScoreText}>Score: {score} | Time: {time}s</Text>
-        {staticBalls.map(ball => (
-          <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
-        ))}
-        <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
+    <>
+      <View style={{ position: 'absolute', top: 40, left: 20, zIndex: 10 }}>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+          <Ionicons name="home" size={32} color="black" />
+        </TouchableOpacity>
       </View>
-
-    </TouchableWithoutFeedback>
+  
+      <TouchableWithoutFeedback onPress={handleTouch}>
+        <View style={shooterStyles.shooterGameContainer}>
+          <Text style={shooterStyles.shooterScoreText}>Score: {score} | Time: {time}s</Text>
+          {staticBalls.map(ball => (
+            <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
+          ))}
+          <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
+        </View>
+      </TouchableWithoutFeedback>
+    </>
   );
+  
 }
 
 export default BubbleShooter;
