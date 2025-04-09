@@ -1,129 +1,256 @@
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-  scrollView: {
+  container: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "lightblue",
+    paddingBottom: 40,
+  },
+
+  title: {
+    fontSize: 28,
+    fontFamily: 'PressStart2P_400Regular',
+    fontWeight: "bold",
+    marginTop: 80,
+    marginBottom: 20,
+    color: "#222",
+    textShadowColor: "rgba(0, 0, 0, 0.2)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+
+  input: {
+    width: "90%",
+    height: 45,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    marginBottom: 10,
+    backgroundColor: "white",
+  },
+
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    width: "90%",
+    marginBottom: 20,
+  },
+
+  button: {
+    backgroundColor: "rgb(58, 226, 255)",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    marginHorizontal: 5,
+    elevation: 3,
+    marginRight: 20,
+    marginLeft: 20,
+  },
+
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+
+  gameSection: {
+    width: "95%",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderRadius: 16,
+    padding: 15,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
+    textAlign: "center",
+    textDecorationLine: "underline",
+  },
+  fullScreen: {
     flex: 1,
     backgroundColor: 'lightblue',
   },
+  
   scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 20,
+    flex: 1, 
   },
   
+
   
-  container: {
-    width: '100%',
-    alignItems: 'center',
-    backgroundColor: 'lightblue',
+  gameButtonsContainer: {
+    flexDirection: 'row',     
+    flexWrap: 'wrap',          
+    justifyContent: 'center', 
+    alignItems: 'center',     
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    marginTop: 30,
-  },
-  input: {
-    width: 200,
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    backgroundColor: 'white',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  button: {
-    backgroundColor: "rgb(58, 226, 255)",
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
-    marginHorizontal: 5,
-    marginBottom: 20,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-
-  gameButton: {
-    padding: 10,
-    marginVertical: 2, 
-    borderRadius: 5,
-  },
-
-  g2048Text: {
+  
+  // Game buttons
+  g2048Button: {
     backgroundColor: "rgb(211, 181, 255)",
-    color: 'rgb(255, 199, 144)',
-    fontSize: 18,
-    textAlign: 'center',
-    padding: 10,
-    borderRadius: 5,
-    fontFamily: 'ChangaOne_400Regular',
+    padding: 12,
+    borderRadius: 10,
+    margin: 6, 
+    width: '40%',
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
-  shooterText: {
+  gameButtonText: {
+    color: "white",
+    fontSize: 15,  
+    fontWeight: "600",
+    textAlign: "center", 
+  },
+  ShooterButton: {
     backgroundColor: "rgb(255, 158, 226)",
-    color: 'rgb(153, 255, 204)',
-    fontSize: 20,
-    fontWeight: '600',
-    textAlign: 'center',
-    padding: 10,
-    borderRadius: 5,
-    fontFamily: 'CuteFont_400Regular',
+    padding: 12,
+    borderRadius: 10,
+    margin: 6,
+    width: '40%', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
-  breakerText: {
-    backgroundColor: "rgb(255, 199, 144)",
-    color: 'white',
-    fontSize: 19,
-    textAlign: 'center',
-    padding: 10,
-    borderRadius: 5,
-    fontFamily: 'FredokaOne_400Regular',
+  BreakerButton: {
+    backgroundColor: "rgb(192, 253, 111)",
+    padding: 12,
+    borderRadius: 10,
+    margin: 6,
+    width: '40%',  
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
-  tttsText: {
+  TTTSButton: {
     backgroundColor: "rgb(255, 216, 130)",
-    color: 'white',
-    fontSize: 18,
-    textAlign: 'center',
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 10,
+    margin: 6,
+    width: '40%',  
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
-  sudokuText: {
+  SudokuButton: {
     backgroundColor: "rgb(160, 220, 255)",
-    color: 'white',
-    fontSize: 18,
-    textAlign: 'center',
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 10,
+    margin: 6,
+    width: '40%',  
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
-  minesweeperText: {
+  MinesweeperButton: {
     backgroundColor: "rgb(153, 255, 204)",
-    color: 'white',
-    fontSize: 18,
-    textAlign: 'center',
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 10,
+    margin: 6,
+    width: '40%',  
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
-  tttmText: {
+  TTTMButton: {
     backgroundColor: "rgb(251, 151, 137)",
-    color: 'white',
-    fontSize: 18,
-    textAlign: 'center',
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 10,
+    margin: 6,
+    width: '40%', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
-  connect4Text: {
-    backgroundColor: "rgb(194, 255, 154)",
-    color: 'white',
-    fontSize: 18,
-    textAlign: 'center',
-    padding: 10,
-    borderRadius: 5,
+  Connect4Button: {
+    backgroundColor: "rgb(255, 199, 144)",
+    padding: 12,
+    borderRadius: 10,
+    margin: 6,
+    width: '40%',  
+    justifyContent: 'center', 
+    alignItems: 'center', 
+  },
+  
+    // Difficulty modal
+  modalOverlay: {
+    position: "absolute", 
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flex: 1,
+    justifyContent: "center", 
+    alignItems: "center", 
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    zIndex: 100, 
+  },
+
+  modalContent: {
+    backgroundColor: 'lightblue',
+    padding: 20,
+    borderRadius: 12,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+
+  modalText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "center",
+    color: "white",
+  },
+
+  ModalButton: {
+    backgroundColor: "rgb(58, 226, 255)",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+
+  ModalButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: 'center'
+  },
+
+  // Difficulty modal
+  difficultyModalContent: {
+    backgroundColor: 'lightblue',
+    padding: 20,
+    borderRadius: 12,
+    alignItems: "stretch", 
+    width: "80%", 
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: "space-between",
+  },
+  
+  difficultyModalButton: {
+    backgroundColor: "rgb(58, 226, 255)",
+    paddingVertical: 10,
+    borderRadius: 8,
+    width: "100%", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    marginVertical: 5, 
+  },
+
+  difficultyModalButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Modal } from 'react-native';
 import styles from "../styles/TictactoeSingleStyles";
 
 const checkWinner = (board) => {
@@ -47,8 +47,9 @@ export default function TictactoeSingleplayer({ navigation }) {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [gameOver, setGameOver] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [resultMessage, setResultMessage] = useState('');
 
-  // Pelaajien nimet
   const [playerName, setPlayerName] = useState("You");
   const [AIName, setAIName] = useState("AI");
 
@@ -63,19 +64,15 @@ export default function TictactoeSingleplayer({ navigation }) {
     const winner = checkWinner(newBoard);
     if (winner) {
       setGameOver(true);
-      Alert.alert(`${winner === 'X' ? playerName : AIName} wins!`, 'Game over!', [
-        { text: 'Play again', onPress: resetGame },
-        { text: 'Home', onPress: () => navigation.navigate("Home") },
-      ]);
+      setResultMessage(`${winner === 'X' ? playerName : AIName} wins!`);
+      setModalVisible(true);
       return;
     }
 
     if (!newBoard.includes(null)) {
       setGameOver(true);
-      Alert.alert('It is a tie!', 'The game ended in a draw.', [
-        { text: 'Play again', onPress: resetGame },
-        { text: 'Home', onPress: () => navigation.navigate("Home") },
-      ]);
+      setResultMessage('It is a tie!');
+      setModalVisible(true);
       return;
     }
 
@@ -88,21 +85,20 @@ export default function TictactoeSingleplayer({ navigation }) {
         const winner = checkWinner(newBoard);
         if (winner) {
           setGameOver(true);
-          Alert.alert(`${winner === 'O' ? AIName : playerName} wins!`, 'Game over!', [
-            { text: 'Play again', onPress: resetGame },
-            { text: 'Home', onPress: () => navigation.navigate("Home") },
-          ]);
+          setResultMessage(`${winner === 'O' ? AIName : playerName} wins!`);
+          setModalVisible(true);
           return;
         }
       }
       setIsPlayerTurn(true);
-    }, 1000); // AI odottaa 1 sekunnin ennen siirron tekemistä
+    }, 1000);
   };
 
   const resetGame = () => {
     setBoard(Array(9).fill(null));
     setIsPlayerTurn(true);
     setGameOver(false);
+    setModalVisible(false);
   };
 
   const renderSquare = (index) => (
@@ -129,15 +125,30 @@ export default function TictactoeSingleplayer({ navigation }) {
         ))}
       </View>
       
-      {/* Custom Restart Button */}
       <TouchableOpacity style={styles.button} onPress={resetGame}>
         <Text style={styles.buttonText}>Restart</Text>
       </TouchableOpacity>
 
-      {/* Custom Home Button */}
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
         <Text style={styles.buttonText}>Home</Text>
       </TouchableOpacity>
+
+      {/* Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={resetGame}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>{resultMessage}</Text>
+            <TouchableOpacity style={styles.modalButton} onPress={resetGame}>
+              <Text style={styles.modalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
