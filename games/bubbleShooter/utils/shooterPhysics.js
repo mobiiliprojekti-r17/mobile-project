@@ -3,13 +3,14 @@ import Matter from 'matter-js';
 const BALL_RADIUS = 20;
 
 export const getRandomPastelColor = () => {
+
   const pastelColors = [
     '#ffc7fd',
     '#d3b5ff',
     '#a0dcff',
     '#c2ff9a',
     '#fff68f'
-  ];
+
   return pastelColors[Math.floor(Math.random() * pastelColors.length)];
 };
 

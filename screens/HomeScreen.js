@@ -5,6 +5,7 @@ import styles from "../styles/HomeScreenStyles";
 import { useNickname } from '../context/context';
 import { useFonts, PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import FlappyBird from '../games/FlappyBird/screens/FlappyBirdScreen';
 
 const HomeScreen = ({ navigation }) => {
   const { nickname, setNickname } = useNickname();
@@ -46,24 +47,20 @@ const HomeScreen = ({ navigation }) => {
 
   const startGame = (game, difficulty) => {
     if (game === 'Sudoku') {
-      // Navigoidaan Sudoku-näyttöön ja annetaan vaikeustaso
       navigation.navigate('Sudoku', { nickname, difficulty });
     } else if (game === 'Minesweeper') {
-      // Navigoidaan Minesweeper-näyttöön ja annetaan vaikeustaso
       navigation.navigate('Minesweeper', { nickname, difficulty });
     } else {
-      // Muut pelit käynnistetään oletusvaikeudella
       navigation.navigate(game, { nickname });
     }
   };
 
   const checkNicknameAndProceed = (game) => {
     if (!nickname.trim()) {
-      // Jos nimimerkki puuttuu, näytetään virhe
+  
       showModal('Warning', 'Please enter a nickname first!', 'error');
     } else {
-      setSelectedGame(game);  // Asetetaan valittu peli
-      // Pelin käynnistäminen heti valinnan yhteydessä
+      setSelectedGame(game);  
       if (game === 'Sudoku' || game === 'Minesweeper') {
         setRestartModalVisible(true);
         setModalMessage('Choose difficulty');
@@ -84,10 +81,10 @@ const HomeScreen = ({ navigation }) => {
   const startMinesweeper = () => {
     checkNicknameAndProceed('Minesweeper');
   };
+const startFlappyBird = () => checkNicknameAndProceed ('FlappyBird');
 
   const handleDifficultyChange = (level) => {
-    // Käynnistetään peli valitulla vaikeustasolla
-    startGame(selectedGame, level);  // Käynnistetään valittu peli ja annetaan vaikeustaso
+    startGame(selectedGame, level); 
     setRestartModalVisible(false);
   };
 
@@ -140,6 +137,10 @@ const HomeScreen = ({ navigation }) => {
               <TouchableOpacity style={styles.MinesweeperButton} onPress={startMinesweeper}>
                 <Text style={styles.gameButtonText}>Minesweeper</Text>
                 <Icon name="bomb" size={30} color="white" style={{ marginTop: 5 }} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.FlappyBirdButton} onPress={startFlappyBird}>
+                <Text style={styles.gameButtonText}>FlappyBird</Text>
+                <Icon name="twitter" size={30} color="white" style={{ marginTop: 5 }} />
               </TouchableOpacity>
             </View>
           </View>
