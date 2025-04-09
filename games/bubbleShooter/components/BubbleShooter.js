@@ -1,5 +1,3 @@
-// BubbleShooter.js
-
 import React, { useEffect, useState, useRef } from 'react';
 import { View, TouchableWithoutFeedback, Dimensions, Text, TouchableOpacity } from 'react-native';
 import Matter from 'matter-js';
@@ -10,7 +8,8 @@ import {
   updatePhysics,
   getRandomPastelColor,
   findClusterAndRemove,
-  findFloatingBalls
+  findFloatingBalls,
+  getAvailableColors
 } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
 import { useRoute } from "@react-navigation/native";
@@ -160,12 +159,22 @@ const BubbleShooter = ({ navigation }) => {
   }, [staticBalls, ballsInitialized]);
 
   const initShooterBall = () => {
-    shooterBall.current = createShooterBall(world, width / 2, height - 200, BALL_RADIUS, getRandomPastelColor());
+    const availableColors = getAvailableColors(staticBallsRef.current);
+    const color = availableColors.length > 0
+      ? availableColors[Math.floor(Math.random() * availableColors.length)]
+      : getRandomPastelColor();
+  
+    shooterBall.current = createShooterBall(world, width / 2, height - 200, BALL_RADIUS, color);
     Matter.Body.setStatic(shooterBall.current, true);
   };
-
+  
   const resetShooterBall = () => {
-    const newBall = createShooterBall(world, width / 2, height - 200, BALL_RADIUS, getRandomPastelColor());
+    const availableColors = getAvailableColors(staticBallsRef.current);
+    const color = availableColors.length > 0
+      ? availableColors[Math.floor(Math.random() * availableColors.length)]
+      : getRandomPastelColor();
+  
+    const newBall = createShooterBall(world, width / 2, height - 200, BALL_RADIUS, color);
     Matter.Body.setStatic(newBall, true);
     shooterBall.current = newBall;
     setBallPosition({ x: newBall.position.x, y: newBall.position.y });

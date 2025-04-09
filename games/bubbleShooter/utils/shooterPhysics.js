@@ -3,13 +3,13 @@ import Matter from 'matter-js';
 const BALL_RADIUS = 20;
 
 export const getRandomPastelColor = () => {
-const pastelColors = [
-  '#ffc7fd', // vaaleanpunainen (pastelli pinkki)
-  '#d3b5ff', // vaalea violetti / laventeli
-  '#a0dcff', // vaaleansininen / syaaninen
-  '#c2ff9a', // vaaleanvihreä / mintunvihreä
-  '#fff68f'  // vaaleankeltainen / kerma
-];
+  const pastelColors = [
+    '#ffc7fd',
+    '#d3b5ff',
+    '#a0dcff',
+    '#c2ff9a',
+    '#fff68f'
+  ];
   return pastelColors[Math.floor(Math.random() * pastelColors.length)];
 };
 
@@ -23,7 +23,7 @@ export const createPhysics = (screenWidth, screenHeight) => {
   const ground = Matter.Bodies.rectangle(screenWidth / 2, screenHeight - 80, screenWidth, 50, wallOptions);
   const leftWall = Matter.Bodies.rectangle(0, screenHeight / 2, 50, screenHeight, wallOptions);
   const rightWall = Matter.Bodies.rectangle(screenWidth, screenHeight / 2, 50, screenHeight, wallOptions);
-  const ceiling = Matter.Bodies.rectangle(screenWidth / 2, 60, screenWidth, 10, wallOptions);
+  const ceiling = Matter.Bodies.rectangle(screenWidth / 2, 60, screenWidth, 10, wallOptions); // Katto asetettu ylös
 
   Matter.World.add(world, [ground, leftWall, rightWall, ceiling]);
 
@@ -71,7 +71,7 @@ export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
         },
       });
       staticBall.color = getRandomPastelColor();
-      staticBall.id = Matter.Common.nextId(); // 🛠 uniikki ID
+      staticBall.id = Matter.Common.nextId();
       Matter.World.add(world, staticBall);
       staticBallsArray.push(staticBall);
     }
@@ -135,4 +135,12 @@ export const findFloatingBalls = (balls) => {
   }
 
   return balls.filter(ball => !connectedToTop.has(ball.id));
+};
+
+export const getAvailableColors = (balls) => {
+  const colorSet = new Set();
+  for (let ball of balls) {
+    colorSet.add(ball.color);
+  }
+  return Array.from(colorSet);
 };
