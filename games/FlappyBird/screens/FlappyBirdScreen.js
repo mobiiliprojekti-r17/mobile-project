@@ -13,6 +13,7 @@ const FlappyBirdScreen = ({ navigation }) => {
     setOverlayType("gameover");
   };
 
+
   const startGame = () => {
     setOverlayType(null);
     setRunning(true);
@@ -43,6 +44,7 @@ const FlappyBirdScreen = ({ navigation }) => {
   );
 };
 
+//styleseihin sitten kun jaksaa
 const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
