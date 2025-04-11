@@ -23,8 +23,7 @@ export const createPhysics = (screenWidth, screenHeight) => {
   const ground = Matter.Bodies.rectangle(screenWidth / 2, screenHeight - 80, screenWidth, 50, wallOptions);
   const leftWall = Matter.Bodies.rectangle(0, screenHeight / 2, 50, screenHeight, wallOptions);
   const rightWall = Matter.Bodies.rectangle(screenWidth, screenHeight / 2, 50, screenHeight, wallOptions);
-  const ceiling = Matter.Bodies.rectangle(screenWidth / 2, 60, screenWidth, 10, wallOptions); // Katto asetettu ylös
-
+  const ceiling = Matter.Bodies.rectangle(screenWidth / 2, 60, screenWidth, 10, wallOptions);
   Matter.World.add(world, [ground, leftWall, rightWall, ceiling]);
 
   return { engine, world, ceiling };
@@ -49,7 +48,7 @@ export const createShooterBall = (world, x, y, radius, color) => {
 };
 
 export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
-  const staticBallRadius = 20;
+  const staticBallRadius = BALL_RADIUS;
   const staticBallsArray = [];
   const horizontalSpacing = staticBallRadius * 2;
   const verticalSpacing = staticBallRadius * Math.sqrt(3);
@@ -143,4 +142,20 @@ export const getAvailableColors = (balls) => {
     colorSet.add(ball.color);
   }
   return Array.from(colorSet);
+};
+
+// Uusi snap-to-grid -funktio: laskee pallon sijoituksen tarkasti ruudukkoon
+export const snapToGrid = (body, screenWidth, numCols) => {
+  const topOffset = 80;
+  const horizontalSpacing = BALL_RADIUS * 2;
+  const verticalSpacing = BALL_RADIUS * Math.sqrt(3);
+  let offsetX = (screenWidth - (numCols * horizontalSpacing)) / 2;
+  const row = Math.round((body.position.y - topOffset) / verticalSpacing);
+  if (row % 2 !== 0) {
+    offsetX += horizontalSpacing / 2;
+  }
+  const col = Math.round((body.position.x - offsetX) / horizontalSpacing);
+  const snappedX = offsetX + col * horizontalSpacing;
+  const snappedY = topOffset + row * verticalSpacing;
+  return { x: snappedX, y: snappedY };
 };

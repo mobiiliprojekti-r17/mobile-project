@@ -9,7 +9,8 @@ import {
   getRandomPastelColor,
   findClusterAndRemove,
   findFloatingBalls,
-  getAvailableColors
+  getAvailableColors,
+  snapToGrid
 } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
 import { useRoute } from "@react-navigation/native";
@@ -22,8 +23,8 @@ import { Ionicons } from '@expo/vector-icons';
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
 
-// The shooter ball spawns at y = height - 200.
-// The game will end (loss condition) when any static ball’s bottom edge intrudes into the shooter zone.
+// Ammuttava pallo spawnataan y = height - 200.
+// Pelin häviämisehto: kun staattisen pallon alareuna tunkeutuu ampumisalueelle.
 const SHOOTER_BALL_Y = height - 200;
 
 const BubbleShooter = ({ navigation }) => {
@@ -35,15 +36,18 @@ const BubbleShooter = ({ navigation }) => {
   const [ballsInitialized, setBallsInitialized] = useState(false);
   const [isBallAtCenter, setIsBallAtCenter] = useState(true);
   const [gameOver, setGameOver] = useState(false);
-  // We track score both with state and with a ref to ensure we have the final value.
+  // Pisteet seurataan sekä tilana että ref‑muuttujana
   const [score, setScore] = useState(0);
   const scoreRef = useRef(0);
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
-  // Use a flag so that the game-ending logic is triggered only once.
+  // Loppupelilogiikka aktivoituu vain kerran
   const gameOverTriggered = useRef(false);
   const route = useRoute();
   const { nickname } = useNickname();
+  
+  // Tallennetaan requestAnimationFrame:in id, jotta se voidaan perua
+  const rafIdRef = useRef(null);
 
   useEffect(() => {
     staticBallsRef.current = staticBalls;
@@ -61,30 +65,23 @@ const BubbleShooter = ({ navigation }) => {
       }, 1000);
     }
 
-    Matter.Events.on(engine, 'collisionStart', (event) => {
+    // Määritellään collisionStart-kuuntelija omaksi funktioksi, jotta se voidaan myöhemmin poistaa.
+    const collisionHandler = (event) => {
       for (let { bodyA, bodyB } of event.pairs) {
         if (!shooterBall.current) break;
         const shooter = shooterBall.current;
         let other = bodyA === shooter ? bodyB : bodyB === shooter ? bodyA : null;
 
         if (other) {
-          // When the shooter ball collides with a static ball:
+          // Kun ammuttu pallo osuu staattiseen palloon:
           const isStaticBall = staticBallsRef.current.some((b) => b.id === other.id);
           if (isStaticBall) {
             Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
             Matter.Body.setStatic(shooter, true);
 
-            const dx = shooter.position.x - other.position.x;
-            const dy = shooter.position.y - other.position.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist !== 0) {
-              const targetDistance = BALL_RADIUS * 2;
-              const factor = targetDistance / dist;
-              const newX = other.position.x + dx * factor;
-              const newY = other.position.y + dy * factor;
-              Matter.Body.setPosition(shooter, { x: newX, y: newY });
-            }
+            // Asetetaan pallo ruudukkoon snapToGrid-funktion avulla.
+            const snappedCoords = snapToGrid(shooter, width, 9);
+            Matter.Body.setPosition(shooter, { x: snappedCoords.x, y: snappedCoords.y });
 
             const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
 
@@ -118,14 +115,12 @@ const BubbleShooter = ({ navigation }) => {
           }
         }
 
-        // Collision with the ceiling:
+        // Törmäys kattoon:
         if ((bodyA === shooter && bodyB === ceiling) || (bodyB === shooter && bodyA === ceiling)) {
           Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
           Matter.Body.setStatic(shooter, true);
-          Matter.Body.setPosition(shooter, {
-            x: shooter.position.x,
-            y: 60 + BALL_RADIUS + 1 // Slightly below the ceiling.
-          });
+          const snappedCoords = snapToGrid(shooter, width, 9);
+          Matter.Body.setPosition(shooter, { x: snappedCoords.x, y: snappedCoords.y });
           setStaticBalls(prev => [...prev, shooter]);
 
           const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
@@ -155,40 +150,48 @@ const BubbleShooter = ({ navigation }) => {
           break;
         }
       }
-    });
+    };
+
+    Matter.Events.on(engine, 'collisionStart', collisionHandler);
 
     const update = () => {
       updatePhysics(engine);
 
-      // Update the shooter ball’s position (for rendering purposes).
+      // Päivitetään ammuttavan pallon sijainti renderöintiä varten.
       if (shooterBall.current) {
         const { x, y } = shooterBall.current.position;
         setBallPosition({ x, y });
       }
 
-      // --- GAME OVER CHECK ---
-      // Instead of ending the game immediately when the shooter ball is waiting,
-      // check if any static ball's bottom edge intrudes into the shooter zone.
+      // --- PELIN PÄÄTTYMISEN TARKASTUS ---
       if (!gameOverTriggered.current) {
         for (let ball of staticBallsRef.current) {
           if (ball.position.y + BALL_RADIUS >= SHOOTER_BALL_Y) {
             gameOverTriggered.current = true;
             setGameOver(true);
             clearInterval(timerRef.current);
-            // Store the score in Firestore—this runs regardless if it's a win or loss.
             storeShooterResults();
             break;
           }
         }
       }
       
-      requestAnimationFrame(update);
+      rafIdRef.current = requestAnimationFrame(update);
     };
 
     update();
+
+    // Cleanup: poistetaan timer, animation frame ja Matter.Events-kuuntelija komponentin unmount-vaiheessa.
+    return () => {
+      clearInterval(timerRef.current);
+      Matter.Events.off(engine, 'collisionStart', collisionHandler);
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+    };
   }, []);
 
-  // Also check if the board is cleared (win condition) and store the score.
+  // Tarkistetaan myös voittotilanne, eli jos kaikki pallot poistuvat.
   useEffect(() => {
     if (ballsInitialized && staticBalls.length === 0 && !gameOverTriggered.current) {
       gameOverTriggered.current = true;
@@ -245,7 +248,7 @@ const BubbleShooter = ({ navigation }) => {
     try {
       await addDoc(collection(db, "ShooterResults"), {
         Nickname: nickname,
-        score: scoreRef.current, // Final score stored from the ref
+        score: scoreRef.current,
       });
       console.log("Result stored in Firestore.");
     } catch (error) {
