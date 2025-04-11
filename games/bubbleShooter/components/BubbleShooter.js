@@ -22,7 +22,6 @@ import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
-// Pelin häviämisehto
 const SHOOTER_BALL_Y = height - 200;
 
 const BubbleShooter = ({ navigation }) => {
@@ -34,18 +33,22 @@ const BubbleShooter = ({ navigation }) => {
   const [ballsInitialized, setBallsInitialized] = useState(false);
   const [isBallAtCenter, setIsBallAtCenter] = useState(true);
   const [gameOver, setGameOver] = useState(false);
-  // Pisteet seurataan sekä tilana että ref‑muuttujana
   const [score, setScore] = useState(0);
   const scoreRef = useRef(0);
-  const [time, setTime] = useState(0);
-  const timerRef = useRef(null);
-  // Loppupelilogiikka aktivoituu vain kerran
   const gameOverTriggered = useRef(false);
   const route = useRoute();
   const { nickname } = useNickname();
-  
-  // Tallennetaan requestAnimationFrame:in id, jotta se voidaan perua
   const rafIdRef = useRef(null);
+
+  // Apufunktio, jolla lasketaan ruudukon rivi
+  const getGridRow = (y) => {
+    const topOffset = 80;
+    const verticalSpacing = BALL_RADIUS * Math.sqrt(3);
+    return Math.round((y - topOffset) / verticalSpacing);
+  };
+
+  // Häviämisehto: jos jokin staattinen pallo sijoittuu liian alas
+  const MAX_ROW = Math.floor((SHOOTER_BALL_Y - 80 - BALL_RADIUS) / (BALL_RADIUS * Math.sqrt(3)));
 
   useEffect(() => {
     staticBallsRef.current = staticBalls;
@@ -53,17 +56,10 @@ const BubbleShooter = ({ navigation }) => {
 
   useEffect(() => {
     initShooterBall();
-    const initialStaticBalls = createStaticBalls(world, 6, 9, width);
+    const initialStaticBalls = createStaticBalls(world, 9, 9, width);
     setStaticBalls(initialStaticBalls);
     setBallsInitialized(true);
 
-    if (!gameOver) {
-      timerRef.current = setInterval(() => {
-        setTime(prevTime => prevTime + 1);
-      }, 1000);
-    }
-
-    // Määritellään collisionStart-kuuntelija omaksi funktioksi, jotta se voidaan myöhemmin poistaa.
     const collisionHandler = (event) => {
       for (let { bodyA, bodyB } of event.pairs) {
         if (!shooterBall.current) break;
@@ -76,7 +72,7 @@ const BubbleShooter = ({ navigation }) => {
             Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
             Matter.Body.setStatic(shooter, true);
 
-            // Asetetaan pallo ruudukkoon snapToGrid-funktion avulla.
+            // Snapataan pallo ruudukkoon (ruudukkoindeksit tallentuvat snapToGrid:ssä)
             const snappedCoords = snapToGrid(shooter, width, 9);
             Matter.Body.setPosition(shooter, { x: snappedCoords.x, y: snappedCoords.y });
 
@@ -112,7 +108,7 @@ const BubbleShooter = ({ navigation }) => {
           }
         }
 
-        // Kattoon törmäys
+        // Törmäys kattoon
         if ((bodyA === shooter && bodyB === ceiling) || (bodyB === shooter && bodyA === ceiling)) {
           Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
           Matter.Body.setStatic(shooter, true);
@@ -141,7 +137,6 @@ const BubbleShooter = ({ navigation }) => {
               return newScore;
             });
           }
-
           shooterBall.current = null;
           resetShooterBall();
           break;
@@ -152,48 +147,42 @@ const BubbleShooter = ({ navigation }) => {
     Matter.Events.on(engine, 'collisionStart', collisionHandler);
 
     const update = () => {
-      updatePhysics(engine);
+      // Päivitetään fysiikka 30 fps:llä (~33ms per päivitys)
+      updatePhysics(engine, 33);
 
-      // Päivitetään ammuttavan pallon sijainti renderöintiä varten.
       if (shooterBall.current) {
         const { x, y } = shooterBall.current.position;
         setBallPosition({ x, y });
       }
 
-      //Pelin päättymisen tarkistus
       if (!gameOverTriggered.current) {
         for (let ball of staticBallsRef.current) {
-          if (ball.position.y + BALL_RADIUS >= SHOOTER_BALL_Y) {
+          if (getGridRow(ball.position.y) >= MAX_ROW) {
             gameOverTriggered.current = true;
             setGameOver(true);
-            clearInterval(timerRef.current);
             storeShooterResults();
             break;
           }
         }
       }
-      
+
       rafIdRef.current = requestAnimationFrame(update);
     };
 
     update();
 
-    // Poistetaan timer, animation frame ja Matter.Events-kuuntelija komponentin unmount-vaiheessa.
     return () => {
-      clearInterval(timerRef.current);
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
       Matter.Events.off(engine, 'collisionStart', collisionHandler);
-      if (rafIdRef.current) {
-        cancelAnimationFrame(rafIdRef.current);
-      }
+      Matter.World.clear(world, false);
+      Matter.Engine.clear(engine);
     };
   }, []);
 
-  // Tarkistetaan myös voittotilanne
   useEffect(() => {
     if (ballsInitialized && staticBalls.length === 0 && !gameOverTriggered.current) {
       gameOverTriggered.current = true;
       setGameOver(true);
-      clearInterval(timerRef.current);
       storeShooterResults();
     }
   }, [staticBalls, ballsInitialized]);
@@ -228,7 +217,6 @@ const BubbleShooter = ({ navigation }) => {
     const touchY = event.nativeEvent.pageY;
     const directionX = touchX - shooterBall.current.position.x;
     const directionY = touchY - shooterBall.current.position.y;
-
     const angle = Math.atan2(directionY, directionX);
     const speed = 15;
     const normalizedX = Math.cos(angle) * speed;
@@ -259,21 +247,20 @@ const BubbleShooter = ({ navigation }) => {
 
   return (
     <>
-      <View style={{ position: 'absolute', top: 40, left: 20, zIndex: 10 }}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Ionicons name="home" size={32} color="black" />
-        </TouchableOpacity>
-      </View>
-      
       <TouchableWithoutFeedback onPress={handleTouch}>
         <View style={shooterStyles.shooterGameContainer}>
-          <Text style={shooterStyles.shooterScoreText}>Score: {score} | Time: {time}s</Text>
+          <Text style={shooterStyles.shooterScoreText}>Score: {score}</Text>
           {staticBalls.map(ball => (
             <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
           ))}
           <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
         </View>
       </TouchableWithoutFeedback>
+      <View style={shooterStyles.shooterHomeButtonContainer}>
+        <TouchableOpacity onPress={() => navigation.replace('Home')}>
+          <Ionicons name="home" style={shooterStyles.shooterHomeIcon} />
+        </TouchableOpacity>
+      </View>
     </>
   );
 };
