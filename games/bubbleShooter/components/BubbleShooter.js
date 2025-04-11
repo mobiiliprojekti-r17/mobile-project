@@ -22,9 +22,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
-
-// Ammuttava pallo spawnataan y = height - 200.
-// Pelin häviämisehto: kun staattisen pallon alareuna tunkeutuu ampumisalueelle.
+// Pelin häviämisehto
 const SHOOTER_BALL_Y = height - 200;
 
 const BubbleShooter = ({ navigation }) => {
@@ -73,7 +71,6 @@ const BubbleShooter = ({ navigation }) => {
         let other = bodyA === shooter ? bodyB : bodyB === shooter ? bodyA : null;
 
         if (other) {
-          // Kun ammuttu pallo osuu staattiseen palloon:
           const isStaticBall = staticBallsRef.current.some((b) => b.id === other.id);
           if (isStaticBall) {
             Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
@@ -115,7 +112,7 @@ const BubbleShooter = ({ navigation }) => {
           }
         }
 
-        // Törmäys kattoon:
+        // Kattoon törmäys
         if ((bodyA === shooter && bodyB === ceiling) || (bodyB === shooter && bodyA === ceiling)) {
           Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
           Matter.Body.setStatic(shooter, true);
@@ -163,7 +160,7 @@ const BubbleShooter = ({ navigation }) => {
         setBallPosition({ x, y });
       }
 
-      // --- PELIN PÄÄTTYMISEN TARKASTUS ---
+      //Pelin päättymisen tarkistus
       if (!gameOverTriggered.current) {
         for (let ball of staticBallsRef.current) {
           if (ball.position.y + BALL_RADIUS >= SHOOTER_BALL_Y) {
@@ -181,7 +178,7 @@ const BubbleShooter = ({ navigation }) => {
 
     update();
 
-    // Cleanup: poistetaan timer, animation frame ja Matter.Events-kuuntelija komponentin unmount-vaiheessa.
+    // Poistetaan timer, animation frame ja Matter.Events-kuuntelija komponentin unmount-vaiheessa.
     return () => {
       clearInterval(timerRef.current);
       Matter.Events.off(engine, 'collisionStart', collisionHandler);
@@ -191,7 +188,7 @@ const BubbleShooter = ({ navigation }) => {
     };
   }, []);
 
-  // Tarkistetaan myös voittotilanne, eli jos kaikki pallot poistuvat.
+  // Tarkistetaan myös voittotilanne
   useEffect(() => {
     if (ballsInitialized && staticBalls.length === 0 && !gameOverTriggered.current) {
       gameOverTriggered.current = true;
