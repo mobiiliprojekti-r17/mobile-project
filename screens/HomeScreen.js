@@ -84,6 +84,7 @@ const HomeScreen = ({ navigation }) => {
   const startMinesweeper = () => {
     checkNicknameAndProceed('Minesweeper');
   };
+  const startFlappyBird = () => checkNicknameAndProceed('FlappyBird');
 
   const handleDifficultyChange = (level) => {
     // Käynnistetään peli valitulla vaikeustasolla
@@ -140,6 +141,10 @@ const HomeScreen = ({ navigation }) => {
               <TouchableOpacity style={styles.MinesweeperButton} onPress={startMinesweeper}>
                 <Text style={styles.gameButtonText}>Minesweeper</Text>
                 <Icon name="bomb" size={30} color="white" style={{ marginTop: 5 }} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.FlappyBirdButton} onPress={startFlappyBird}>
+                <Text style={styles.gameButtonText}>FlappyBird</Text>
+                <Icon name="twitter" size={30} color="white" style={{ marginTop: 5 }} />
               </TouchableOpacity>
             </View>
           </View>

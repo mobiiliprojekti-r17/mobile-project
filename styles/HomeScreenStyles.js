@@ -155,6 +155,16 @@ export default StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center', 
   },
+  FlappyBirdButton: {
+    backgroundColor: "#70c5ce",
+    padding: 12,
+    borderRadius: 10,
+    margin: 6,
+    width: '30%',
+    aspectRatio: 1,  
+    justifyContent: 'center', 
+    alignItems: 'center', 
+  },
   TTTMButton: {
     backgroundColor: "rgb(251, 151, 137)",
     padding: 12,
