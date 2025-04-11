@@ -32,21 +32,6 @@ export default StyleSheet.create({
     color: 'white',
     marginTop: 20,
   },
-  Homebutton: {
-    position: 'absolute',
-    bottom: 40,
-    alignSelf: 'center',
-    backgroundColor: '#2196F3',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    zIndex: 10,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
   startGameContainer: {
     position: 'absolute',
     top: screenHeight / 2 - 50,
