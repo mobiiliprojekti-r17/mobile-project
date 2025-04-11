@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { View, TouchableWithoutFeedback, Dimensions, Text, TouchableOpacity } from 'react-native';
 import Matter from 'matter-js';
@@ -23,18 +22,26 @@ import { Ionicons } from '@expo/vector-icons';
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
 
+// The shooter ball spawns at y = height - 200.
+// The game will end (loss condition) when any static ball’s bottom edge intrudes into the shooter zone.
+const SHOOTER_BALL_Y = height - 200;
+
 const BubbleShooter = ({ navigation }) => {
   const { engine, world, ceiling } = createPhysics(width, height);
   const shooterBall = useRef(null);
-  const [ballPosition, setBallPosition] = useState({ x: width / 2, y: height - 200 });
+  const [ballPosition, setBallPosition] = useState({ x: width / 2, y: SHOOTER_BALL_Y });
   const [staticBalls, setStaticBalls] = useState([]);
   const staticBallsRef = useRef([]);
   const [ballsInitialized, setBallsInitialized] = useState(false);
   const [isBallAtCenter, setIsBallAtCenter] = useState(true);
   const [gameOver, setGameOver] = useState(false);
+  // We track score both with state and with a ref to ensure we have the final value.
   const [score, setScore] = useState(0);
+  const scoreRef = useRef(0);
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
+  // Use a flag so that the game-ending logic is triggered only once.
+  const gameOverTriggered = useRef(false);
   const route = useRoute();
   const { nickname } = useNickname();
 
@@ -50,18 +57,18 @@ const BubbleShooter = ({ navigation }) => {
 
     if (!gameOver) {
       timerRef.current = setInterval(() => {
-        setTime((prevTime) => prevTime + 1);
+        setTime(prevTime => prevTime + 1);
       }, 1000);
     }
 
     Matter.Events.on(engine, 'collisionStart', (event) => {
       for (let { bodyA, bodyB } of event.pairs) {
         if (!shooterBall.current) break;
-
         const shooter = shooterBall.current;
         let other = bodyA === shooter ? bodyB : bodyB === shooter ? bodyA : null;
 
         if (other) {
+          // When the shooter ball collides with a static ball:
           const isStaticBall = staticBallsRef.current.some((b) => b.id === other.id);
           if (isStaticBall) {
             Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
@@ -84,7 +91,11 @@ const BubbleShooter = ({ navigation }) => {
             if (cluster.length > 0) {
               cluster.forEach(ball => Matter.World.remove(world, ball));
               setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
-              setScore(prev => prev + cluster.length * 10);
+              setScore(prev => {
+                const newScore = prev + cluster.length * 10;
+                scoreRef.current = newScore;
+                return newScore;
+              });
             } else {
               setStaticBalls(prev => [...prev, shooter]);
             }
@@ -94,7 +105,11 @@ const BubbleShooter = ({ navigation }) => {
             if (floatingBalls.length > 0) {
               floatingBalls.forEach(ball => Matter.World.remove(world, ball));
               setStaticBalls(prev => prev.filter(ball => !floatingBalls.includes(ball)));
-              setScore(prev => prev + floatingBalls.length * 15);
+              setScore(prev => {
+                const newScore = prev + floatingBalls.length * 15;
+                scoreRef.current = newScore;
+                return newScore;
+              });
             }
 
             shooterBall.current = null;
@@ -103,56 +118,80 @@ const BubbleShooter = ({ navigation }) => {
           }
         }
 
-        // 🆕 TÄMÄ KORJATTU OSUESSA KATTOON:
+        // Collision with the ceiling:
         if ((bodyA === shooter && bodyB === ceiling) || (bodyB === shooter && bodyA === ceiling)) {
-          // Sama logiikka kuin törmätessä muihin palloihin
           Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
           Matter.Body.setStatic(shooter, true);
-        
           Matter.Body.setPosition(shooter, {
             x: shooter.position.x,
-            y: 60 + BALL_RADIUS + 1 // katon alapuolelle vähän
+            y: 60 + BALL_RADIUS + 1 // Slightly below the ceiling.
           });
-        
           setStaticBalls(prev => [...prev, shooter]);
-        
+
           const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
           if (cluster.length > 0) {
             cluster.forEach(ball => Matter.World.remove(world, ball));
             setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
-            setScore(prev => prev + cluster.length * 10);
+            setScore(prev => {
+              const newScore = prev + cluster.length * 10;
+              scoreRef.current = newScore;
+              return newScore;
+            });
           }
-        
           const updatedBalls = staticBallsRef.current.filter(ball => !cluster.includes(ball));
           const floatingBalls = findFloatingBalls(updatedBalls);
           if (floatingBalls.length > 0) {
             floatingBalls.forEach(ball => Matter.World.remove(world, ball));
             setStaticBalls(prev => prev.filter(ball => !floatingBalls.includes(ball)));
-            setScore(prev => prev + floatingBalls.length * 15);
+            setScore(prev => {
+              const newScore = prev + floatingBalls.length * 15;
+              scoreRef.current = newScore;
+              return newScore;
+            });
           }
-        
+
           shooterBall.current = null;
           resetShooterBall();
           break;
         }
-        
       }
     });
 
     const update = () => {
       updatePhysics(engine);
+
+      // Update the shooter ball’s position (for rendering purposes).
       if (shooterBall.current) {
         const { x, y } = shooterBall.current.position;
         setBallPosition({ x, y });
       }
+
+      // --- GAME OVER CHECK ---
+      // Instead of ending the game immediately when the shooter ball is waiting,
+      // check if any static ball's bottom edge intrudes into the shooter zone.
+      if (!gameOverTriggered.current) {
+        for (let ball of staticBallsRef.current) {
+          if (ball.position.y + BALL_RADIUS >= SHOOTER_BALL_Y) {
+            gameOverTriggered.current = true;
+            setGameOver(true);
+            clearInterval(timerRef.current);
+            // Store the score in Firestore—this runs regardless if it's a win or loss.
+            storeShooterResults();
+            break;
+          }
+        }
+      }
+      
       requestAnimationFrame(update);
     };
 
     update();
   }, []);
 
+  // Also check if the board is cleared (win condition) and store the score.
   useEffect(() => {
-    if (ballsInitialized && staticBalls.length === 0 && !gameOver) {
+    if (ballsInitialized && staticBalls.length === 0 && !gameOverTriggered.current) {
+      gameOverTriggered.current = true;
       setGameOver(true);
       clearInterval(timerRef.current);
       storeShooterResults();
@@ -161,21 +200,21 @@ const BubbleShooter = ({ navigation }) => {
 
   const initShooterBall = () => {
     const availableColors = getAvailableColors(staticBallsRef.current);
-    const color = availableColors.length > 0
+    const color = availableColors.length > 0 
       ? availableColors[Math.floor(Math.random() * availableColors.length)]
       : getRandomPastelColor();
-  
-    shooterBall.current = createShooterBall(world, width / 2, height - 200, BALL_RADIUS, color);
+
+    shooterBall.current = createShooterBall(world, width / 2, SHOOTER_BALL_Y, BALL_RADIUS, color);
     Matter.Body.setStatic(shooterBall.current, true);
   };
-  
+
   const resetShooterBall = () => {
     const availableColors = getAvailableColors(staticBallsRef.current);
-    const color = availableColors.length > 0
+    const color = availableColors.length > 0 
       ? availableColors[Math.floor(Math.random() * availableColors.length)]
       : getRandomPastelColor();
-  
-    const newBall = createShooterBall(world, width / 2, height - 200, BALL_RADIUS, color);
+
+    const newBall = createShooterBall(world, width / 2, SHOOTER_BALL_Y, BALL_RADIUS, color);
     Matter.Body.setStatic(newBall, true);
     shooterBall.current = newBall;
     setBallPosition({ x: newBall.position.x, y: newBall.position.y });
@@ -184,7 +223,7 @@ const BubbleShooter = ({ navigation }) => {
 
   const handleTouch = (event) => {
     if (!isBallAtCenter || gameOver) return;
-
+    
     const touchX = event.nativeEvent.pageX;
     const touchY = event.nativeEvent.pageY;
     const directionX = touchX - shooterBall.current.position.x;
@@ -206,7 +245,7 @@ const BubbleShooter = ({ navigation }) => {
     try {
       await addDoc(collection(db, "ShooterResults"), {
         Nickname: nickname,
-        score: score,
+        score: scoreRef.current, // Final score stored from the ref
       });
       console.log("Result stored in Firestore.");
     } catch (error) {
@@ -214,7 +253,7 @@ const BubbleShooter = ({ navigation }) => {
     }
     navigation.navigate("ShooterGameOver", {
       nickname,
-      finalScore: score,
+      finalScore: scoreRef.current,
     });
   };
 
@@ -225,7 +264,7 @@ const BubbleShooter = ({ navigation }) => {
           <Ionicons name="home" size={32} color="black" />
         </TouchableOpacity>
       </View>
-
+      
       <TouchableWithoutFeedback onPress={handleTouch}>
         <View style={shooterStyles.shooterGameContainer}>
           <Text style={shooterStyles.shooterScoreText}>Score: {score} | Time: {time}s</Text>

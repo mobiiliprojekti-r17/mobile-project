@@ -46,13 +46,10 @@ const HomeScreen = ({ navigation }) => {
 
   const startGame = (game, difficulty) => {
     if (game === 'Sudoku') {
-      // Navigoidaan Sudoku-näyttöön ja annetaan vaikeustaso
       navigation.navigate('Sudoku', { nickname, difficulty });
     } else if (game === 'Minesweeper') {
-      // Navigoidaan Minesweeper-näyttöön ja annetaan vaikeustaso
       navigation.navigate('Minesweeper', { nickname, difficulty });
     } else {
-      // Muut pelit käynnistetään oletusvaikeudella
       navigation.navigate(game, { nickname });
     }
   };
@@ -63,7 +60,6 @@ const HomeScreen = ({ navigation }) => {
       showModal('Warning', 'Please enter a nickname first!', 'error');
     } else {
       setSelectedGame(game);  // Asetetaan valittu peli
-      // Pelin käynnistäminen heti valinnan yhteydessä
       if (game === 'Sudoku' || game === 'Minesweeper') {
         setRestartModalVisible(true);
         setModalMessage('Choose difficulty');
@@ -86,8 +82,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleDifficultyChange = (level) => {
-    // Käynnistetään peli valitulla vaikeustasolla
-    startGame(selectedGame, level);  // Käynnistetään valittu peli ja annetaan vaikeustaso
+    startGame(selectedGame, level);  
     setRestartModalVisible(false);
   };
 
@@ -112,8 +107,6 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.buttonText}>Clear</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Singleplayer Games Section */}
           <View style={styles.gameSection}>
             <Text style={styles.sectionTitle}>Singleplayer games</Text>
             <View style={styles.gameButtonsContainer}>
@@ -144,7 +137,6 @@ const HomeScreen = ({ navigation }) => {
             </View>
           </View>
 
-          {/* Multiplayer Games Section */}
           <View style={styles.gameSection}>
             <Text style={styles.sectionTitle}>Multiplayer games</Text>
             <View style={styles.gameButtonsContainer}>
@@ -160,8 +152,6 @@ const HomeScreen = ({ navigation }) => {
           </View>
         </ScrollView>
       </View>
-
-      {/* Modal for error/success */}
       <Modal
         transparent
         animationType="fade"

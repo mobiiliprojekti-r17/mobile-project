@@ -175,8 +175,7 @@ export default StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center', 
   },
-  
-    // Difficulty modal
+
   modalOverlay: {
     position: "absolute", 
     top: 0,
@@ -223,8 +222,6 @@ export default StyleSheet.create({
     fontWeight: "bold",
     textAlign: 'center'
   },
-
-  // Difficulty modal
   difficultyModalContent: {
     backgroundColor: 'lightblue',
     padding: 20,
