@@ -144,7 +144,6 @@ export const getAvailableColors = (balls) => {
   return Array.from(colorSet);
 };
 
-// snap-to-grid -funktio: laskee pallon sijoituksen tarkasti ruudukkoon
 export const snapToGrid = (body, screenWidth, numCols) => {
   const topOffset = 80;
   const horizontalSpacing = BALL_RADIUS * 2;
