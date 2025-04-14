@@ -4,103 +4,148 @@ import { GameEngine } from 'react-native-game-engine';
 import Matter from 'matter-js';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// Configuration Constants
 const PIPE_WIDTH = 60;
 const PIPE_GAP = 250;
 const GROUND_HEIGHT = 50;
+const ROOF_HEIGHT = 50;
+const GRAVITY = 0.7;
+const JUMP_VELOCITY = -8; // Consistent jump velocity
+const PIPE_VELOCITY = 1.5;
 
-const Bird = (props) => {
-  const { body, size, color } = props;
+// Bird component for the Matter engine
+const Bird = ({ body, size, color }) => {
   const x = body.position.x - size[0] / 2;
   const y = body.position.y - size[1] / 2;
   return (
-    <View style={[
-      styles.bird,
-      { left: x, top: y, width: size[0], height: size[1], backgroundColor: color || 'yellow' }
-    ]} />
+    <View
+      style={[
+        styles.bird,
+        { left: x, top: y, width: size[0], height: size[1], backgroundColor: color || 'yellow' },
+      ]}
+    />
   );
 };
 
-const Ground = (props) => {
-  const { body, size } = props;
+const Ground = ({ body, size }) => {
   const x = body.position.x - size[0] / 2;
   const y = body.position.y - size[1] / 2;
-  return (
-    <View style={[
-      styles.ground,
-      { left: x, top: y, width: size[0], height: size[1] }
-    ]} />
-  );
+  return <View style={[styles.ground, { left: x, top: y, width: size[0], height: size[1] }]} />;
 };
 
-const Pipe = (props) => {
-  const { body, size } = props;
+const Pipe = ({ body, size }) => {
   const x = body.position.x - size[0] / 2;
   const y = body.position.y - size[1] / 2;
-  return (
-    <View style={[
-      styles.pipe,
-      { left: x, top: y, width: size[0], height: size[1] }
-    ]} />
-  );
+  return <View style={[styles.pipe, { left: x, top: y, width: size[0], height: size[1] }]} />;
 };
 
-const Physics = (entities, { time, dispatch }) => {
+// Physics system: update physics, move pipes, handle collisions & scoring.
+const Physics = (entities, { dispatch }) => {
   const engine = entities.physics.engine;
-  Matter.Engine.update(engine, 16); 
+  Matter.Engine.update(engine, 16);
 
-  const pipeVelocity = 1.5;
+  // Move pipes horizontally and recycle them when off screen.
   if (entities.topPipe && entities.bottomPipe) {
     const topPipe = entities.topPipe.body;
     const bottomPipe = entities.bottomPipe.body;
-    Matter.Body.translate(topPipe, { x: -pipeVelocity, y: 0 });
-    Matter.Body.translate(bottomPipe, { x: -pipeVelocity, y: 0 });
+    Matter.Body.translate(topPipe, { x: -PIPE_VELOCITY, y: 0 });
+    Matter.Body.translate(bottomPipe, { x: -PIPE_VELOCITY, y: 0 });
 
+    // Recycle pipes when the top pipe is off screen.
     if (topPipe.position.x < -PIPE_WIDTH / 2) {
-      const minPipeHeight = 50;
-      const maxPipeHeight = SCREEN_HEIGHT - PIPE_GAP - GROUND_HEIGHT - 50;
-      const newTopPipeHeight = Math.random() * (maxPipeHeight - minPipeHeight) + minPipeHeight;
-      Matter.Body.setPosition(topPipe, { x: SCREEN_WIDTH + PIPE_WIDTH / 2, y: newTopPipeHeight / 2 });
+      const MIN_PIPE_HEIGHT = 50;
+      const maxPipeHeight = SCREEN_HEIGHT - PIPE_GAP - GROUND_HEIGHT - MIN_PIPE_HEIGHT;
+      const newTopPipeHeight = Math.random() * (maxPipeHeight - MIN_PIPE_HEIGHT) + MIN_PIPE_HEIGHT;
+      Matter.Body.setPosition(topPipe, {
+        x: SCREEN_WIDTH + PIPE_WIDTH / 2,
+        y: newTopPipeHeight / 2,
+      });
       entities.topPipe.size[1] = newTopPipeHeight;
+      entities.topPipe.scored = false; // reset flag for new pipe set
 
       const newBottomPipeHeight = SCREEN_HEIGHT - newTopPipeHeight - PIPE_GAP - GROUND_HEIGHT;
-      Matter.Body.setPosition(bottomPipe, { 
-        x: SCREEN_WIDTH + PIPE_WIDTH / 2, 
-        y: newTopPipeHeight + PIPE_GAP + newBottomPipeHeight / 2 
+      Matter.Body.setPosition(bottomPipe, {
+        x: SCREEN_WIDTH + PIPE_WIDTH / 2,
+        y: newTopPipeHeight + PIPE_GAP + newBottomPipeHeight / 2,
       });
       entities.bottomPipe.size[1] = newBottomPipeHeight;
     }
   }
 
+  // Check collisions with ground and roof using Matter's collision test.
   if (
-    entities.bird && entities.ground && entities.topPipe && entities.bottomPipe &&
-    entities.bird.body && entities.ground.body && entities.topPipe.body && entities.bottomPipe.body
+    entities.bird &&
+    entities.ground &&
+    entities.roof &&
+    entities.bird.body &&
+    entities.ground.body &&
+    entities.roof.body
   ) {
-    const bird = entities.bird.body;
-    const ground = entities.ground.body;
-    const topPipe = entities.topPipe.body;
-    const bottomPipe = entities.bottomPipe.body;
-
-    const collisionWithGround = Matter.SAT.collides(bird, ground);
-    const collisionWithTopPipe = Matter.SAT.collides(bird, topPipe);
-    const collisionWithBottomPipe = Matter.SAT.collides(bird, bottomPipe);
-
-    const minOverlap = 1;
-    if (
-      (collisionWithGround && collisionWithGround.collided && collisionWithGround.overlap > minOverlap) ||
-      (collisionWithTopPipe && collisionWithTopPipe.collided && collisionWithTopPipe.overlap > minOverlap) ||
-      (collisionWithBottomPipe && collisionWithBottomPipe.collided && collisionWithBottomPipe.overlap > minOverlap)
-    ) {
+    const birdBody = entities.bird.body;
+    const collisionWithGround = Matter.Collision.collides(birdBody, entities.ground.body) || {};
+    const collisionWithRoof = Matter.Collision.collides(birdBody, entities.roof.body) || {};
+    if (collisionWithGround.collided || collisionWithRoof.collided) {
       dispatch({ type: 'game-over' });
+    }
+  }
+
+  // Manual pipe collision and scoring using full bird boundaries.
+  if (
+    entities.bird &&
+    entities.topPipe &&
+    entities.bottomPipe &&
+    entities.bird.body &&
+    entities.topPipe.body &&
+    entities.bottomPipe.body
+  ) {
+    const birdBody = entities.bird.body;
+    const topPipeBody = entities.topPipe.body;
+
+    // Calculate bird boundaries.
+    const birdHalfWidth = entities.bird.size[0] / 2;
+    const birdHalfHeight = entities.bird.size[1] / 2;
+    const birdLeft = birdBody.position.x - birdHalfWidth;
+    const birdRight = birdBody.position.x + birdHalfWidth;
+    const birdTop = birdBody.position.y - birdHalfHeight;
+    const birdBottom = birdBody.position.y + birdHalfHeight;
+
+    // Calculate pipe horizontal boundaries.
+    const pipeCenterX = topPipeBody.position.x;
+    const pipeLeft = pipeCenterX - PIPE_WIDTH / 2;
+    const pipeRight = pipeCenterX + PIPE_WIDTH / 2;
+
+    // Safe gap boundaries.
+    const gapTop = entities.topPipe.size[1]; // bottom edge of the top pipe
+    const gapBottom = gapTop + PIPE_GAP;       // top edge of the bottom pipe
+
+    // Collision Check:
+    // Check if there is any horizontal overlap between the bird and the pipe.
+    if (birdLeft < pipeRight && birdRight > pipeLeft) {
+      // If any portion of the bird is outside the safe gap, trigger game over.
+      if (birdTop < gapTop || birdBottom > gapBottom) {
+        dispatch({ type: 'game-over' });
+      }
+    }
+
+    // Scoring Check:
+    // Award score if the pipe is completely past the bird and the bird is safe.
+    if (pipeRight < birdLeft && !entities.topPipe.scored) {
+      if (birdTop >= gapTop && birdBottom <= gapBottom) {
+        entities.topPipe.scored = true;
+        dispatch({ type: 'score' });
+      }
     }
   }
 
   return entities;
 };
 
+// Set up the Matter.js world and initialize game entities.
 const setupWorld = () => {
   const engine = Matter.Engine.create({ enableSleeping: false });
   const world = engine.world;
-  world.gravity.y = 0.7;
+  world.gravity.y = GRAVITY;
 
   const bird = Matter.Bodies.rectangle(50, SCREEN_HEIGHT / 2, 40, 30);
   const ground = Matter.Bodies.rectangle(
@@ -110,10 +155,17 @@ const setupWorld = () => {
     GROUND_HEIGHT,
     { isStatic: true }
   );
+  const roof = Matter.Bodies.rectangle(
+    SCREEN_WIDTH / 2,
+    ROOF_HEIGHT / 2,
+    SCREEN_WIDTH,
+    ROOF_HEIGHT,
+    { isStatic: true }
+  );
 
-  const minPipeHeight = 50;
-  const maxPipeHeight = SCREEN_HEIGHT - PIPE_GAP - GROUND_HEIGHT - 50;
-  const topPipeHeight = Math.random() * (maxPipeHeight - minPipeHeight) + minPipeHeight;
+  const MIN_PIPE_HEIGHT = 50;
+  const maxPipeHeight = SCREEN_HEIGHT - PIPE_GAP - GROUND_HEIGHT - MIN_PIPE_HEIGHT;
+  const topPipeHeight = Math.random() * (maxPipeHeight - MIN_PIPE_HEIGHT) + MIN_PIPE_HEIGHT;
   const topPipe = Matter.Bodies.rectangle(
     SCREEN_WIDTH + PIPE_WIDTH / 2,
     topPipeHeight / 2,
@@ -130,38 +182,28 @@ const setupWorld = () => {
     { isStatic: true }
   );
 
-  Matter.World.add(world, [bird, ground, topPipe, bottomPipe]);
+  Matter.World.add(world, [bird, ground, roof, topPipe, bottomPipe]);
 
   return {
     physics: { engine, world },
     bird: { body: bird, size: [40, 30], color: 'yellow', renderer: Bird },
     ground: { body: ground, size: [SCREEN_WIDTH, GROUND_HEIGHT], renderer: Ground },
-    topPipe: { body: topPipe, size: [PIPE_WIDTH, topPipeHeight], renderer: Pipe },
+    roof: { body: roof, size: [SCREEN_WIDTH, ROOF_HEIGHT], renderer: () => null },
+    topPipe: { body: topPipe, size: [PIPE_WIDTH, topPipeHeight], renderer: Pipe, scored: false },
     bottomPipe: { body: bottomPipe, size: [PIPE_WIDTH, bottomPipeHeight], renderer: Pipe },
   };
 };
 
-const MatterGameEngine = ({ running, onGameOver, resetGame }) => {
+// Main Game Engine component tying everything together.
+const MatterGameEngine = ({ running, onGameOver }) => {
   const gameEngine = useRef(null);
-  const [entities, setEntities] = useState(setupWorld());
+  const [entities] = useState(setupWorld());
 
-  const lastJumpTime = useRef(0);
-  
+  // Handle jump: reset bird's vertical velocity for a consistent impulse.
   const onTouch = () => {
-    const now = Date.now();
-    if (now - lastJumpTime.current < 150) return;
-    lastJumpTime.current = now;
-  
     const birdBody = entities.bird.body;
-    if (birdBody.velocity.y < -5) return;
-  
-    Matter.Body.applyForce(
-      birdBody,
-      { x: birdBody.position.x, y: birdBody.position.y },
-      { x: 0, y: -0.05 }
-    );
+    Matter.Body.setVelocity(birdBody, { x: birdBody.velocity.x, y: JUMP_VELOCITY });
   };
-  
 
   return (
     <TouchableWithoutFeedback onPress={onTouch}>
@@ -203,3 +245,4 @@ const styles = StyleSheet.create({
 });
 
 export default MatterGameEngine;
+

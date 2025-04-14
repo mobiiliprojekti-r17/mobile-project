@@ -5,14 +5,14 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: "rgb(255, 199, 144)", // Pehmeä vaalea vihreä tausta
+    backgroundColor: "rgb(255, 199, 144)", 
   },
   title: {
     fontSize: 40,
     fontWeight: 'bold',
     marginTop: 20,
     marginBottom: 20,
-    color: '#3b2a3a',  // Darker text for contrast, a richer shade to match background
+    color: '#3b2a3a', 
     textShadowColor: '#fff',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
@@ -24,11 +24,11 @@ marginBottom: 10,
   winnerText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#3b2a3a', // Tumma väri voittajan tekstille, jotta se on luettavissa
+    color: '#3b2a3a', 
     marginTop: 10,
   },
   board: {
-    backgroundColor: "rgb(252, 128, 4)", // Vaalea vihreä lauta, joka täydentää taustaväriä
+    backgroundColor: "rgb(252, 128, 4)", 
     padding: 10,
     borderRadius: 15,
     shadowColor: "#000",
@@ -57,11 +57,11 @@ marginBottom: 10,
   button: {
     marginTop: 20,
     padding: 10,
-    backgroundColor:"rgb(252, 128, 4)", // Vihreä nappi, joka sulautuu teemaan
+    backgroundColor:"rgb(252, 128, 4)", 
     borderRadius: 5,
   },
   buttonText: {
-    color: 'white', // Valkoinen teksti vihreällä napilla, jotta se erottuu
+    color: 'white', 
     fontSize: 18,
   },
 // Modal styles
@@ -79,7 +79,6 @@ modalOverlay: {
 },
 
 modalContent: {
-  backgroundColor: "rgb(63, 210, 136)",
   padding: 20,
   borderRadius: 12,
   alignItems: "center",

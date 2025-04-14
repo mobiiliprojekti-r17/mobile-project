@@ -1,12 +1,9 @@
-
-
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView, ImageBackground } from 'react-native';
 import { db, collection, addDoc } from '../firebase/Config';
 import styles from "../styles/HomeScreenStyles";
 import { useNickname } from '../context/context';
 import { useFonts, PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
-import Icon from 'react-native-vector-icons/FontAwesome';
 
 const HomeScreen = ({ navigation }) => {
   const { nickname, setNickname } = useNickname();
@@ -91,7 +88,8 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.fullScreen}>
       <View style={styles.scrollContainer}>
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}>
           <Text style={[styles.title, { fontFamily: 'PressStart2P_400Regular' }]}>GameBits</Text>
 
           <TextInput
@@ -113,33 +111,41 @@ const HomeScreen = ({ navigation }) => {
           <View style={styles.gameSection}>
             <Text style={styles.sectionTitle}>Singleplayer games</Text>
             <View style={styles.gameButtonsContainer}>
-              <TouchableOpacity style={styles.g2048Button} onPress={new2048Game}>
-                <Text style={styles.gameButtonText}>2048</Text>
-                <Icon name="gamepad" size={30} color="white" style={{ marginTop: 5 }} />
+              <TouchableOpacity style={styles.game2048Button} onPress={new2048Game}>
+                <ImageBackground source={require('../assets/2048Icon.jpg')} style={styles.backgroundImage}
+                    imageStyle={{ borderRadius: 10 }}>
+                   <Text style={styles.game2048ButtonText}>2048</Text></ImageBackground>
               </TouchableOpacity>
               <TouchableOpacity style={styles.ShooterButton} onPress={startBubbleShooter}>
-                <Text style={styles.gameButtonText}>BubbleShooter</Text>
-                <Icon name="play" size={30} color="white" style={{ marginTop: 5 }} />
+                <ImageBackground source={require('../assets/ShooterIcon.jpg')} style={styles.backgroundImage}
+                    imageStyle={{ borderRadius: 10 }}>
+                <Text style={styles.ShooterButtonText}></Text></ImageBackground>
               </TouchableOpacity>
               <TouchableOpacity style={styles.BreakerButton} onPress={startBrickBreaker}>
-                <Text style={styles.gameButtonText}>BrickBreaker</Text>
-                <Icon name="arrow-right" size={30} color="white" style={{ marginTop: 5 }} />
+                <ImageBackground source={require('../assets/BreakerIcon.jpg')} style={styles.backgroundImage}
+                    imageStyle={{ borderRadius: 10 }}>
+                <Text style={styles.BreakerButtonText}></Text></ImageBackground>
               </TouchableOpacity>
               <TouchableOpacity style={styles.TTTSButton} onPress={() => navigation.navigate('TictactoeSingleplayer')}>
-                <Text style={styles.gameButtonText}>Tictactoe</Text>
-                <Icon name="puzzle-piece" size={30} color="white" style={{ marginTop: 5 }} />
+                <ImageBackground source={require('../assets/TTTSIcon.jpg')} style={styles.backgroundImage}
+                imageStyle={{ borderRadius: 10}}>
+                  <Text style={styles.TTTSButtonText}></Text></ImageBackground>
               </TouchableOpacity>
               <TouchableOpacity style={styles.SudokuButton} onPress={newSudokuGame}>
-                <Text style={styles.gameButtonText}>Sudoku</Text>
-                <Icon name="square" size={30} color="white" style={{ marginTop: 5 }} />
+                <ImageBackground source={require('../assets/SudokuIcon.jpg')} style={styles.backgroundImage}
+                    imageStyle={{ borderRadius: 10 }}><Text style={styles.SudokuButtonText}></Text></ImageBackground>
               </TouchableOpacity>
               <TouchableOpacity style={styles.MinesweeperButton} onPress={startMinesweeper}>
-                <Text style={styles.gameButtonText}>Minesweeper</Text>
-                <Icon name="bomb" size={30} color="white" style={{ marginTop: 5 }} />
+              <ImageBackground source={require('../assets/MinesweeperIcon.jpg')} style={styles.backgroundImage}
+                imageStyle={{ borderRadius: 10 }}><Text style={styles.MinesweeperButtonText}></Text></ImageBackground>
               </TouchableOpacity>
               <TouchableOpacity style={styles.FlappyBirdButton} onPress={startFlappyBird}>
-                <Text style={styles.gameButtonText}>FlappyBird</Text>
-                <Icon name="twitter" size={30} color="white" style={{ marginTop: 5 }} />
+              <ImageBackground source={require('../assets/FlappyBirdIcon.jpg')} style={styles.backgroundImage}
+                imageStyle={{ borderRadius: 10 }}><Text style={styles.FlappyBirdButtonText}></Text></ImageBackground>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.Connect4SingleButton} onPress={() => navigation.navigate('Connect4Singleplayer')}>
+              <ImageBackground source={require('../assets/Connect4SingleIcon.jpg')} style={styles.backgroundImage}
+                imageStyle={{ borderRadius: 10 }}><Text style={styles.Connect4SingleButtonText}></Text></ImageBackground>
               </TouchableOpacity>
             </View>
           </View>
@@ -148,18 +154,18 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.sectionTitle}>Multiplayer games</Text>
             <View style={styles.gameButtonsContainer}>
               <TouchableOpacity style={styles.TTTMButton} onPress={() => navigation.navigate('TictactoeMultiplayer')}>
-                <Text style={styles.gameButtonText}>Tictactoe</Text>
-                <Icon name="users" size={30} color="white" style={{ marginTop: 5 }} />
+              <ImageBackground source={require('../assets/TTTMIcon.jpg')} style={styles.backgroundImage}
+                imageStyle={{ borderRadius: 10}}>
+                  <Text style={styles.TTTMButtonText}></Text></ImageBackground>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.Connect4Button} onPress={() => navigation.navigate('Connect4')}>
-                <Text style={styles.gameButtonText}>Connect4</Text>
-                <Icon name="share-alt" size={30} color="white" style={{ marginTop: 5 }} />
+              <TouchableOpacity style={styles.Connect4MultiButton} onPress={() => navigation.navigate('Connect4Multiplayer')}>
+              <ImageBackground source={require('../assets/Connect4MultiIcon.jpg')} style={styles.backgroundImage}
+                imageStyle={{ borderRadius: 10 }}><Text style={styles.Connect4MultiButtonText}></Text></ImageBackground>
               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
       </View>
-
       <Modal
         transparent
         animationType="fade"
