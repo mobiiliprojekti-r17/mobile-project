@@ -22,8 +22,8 @@ export default function TictactoeMultiplayer({ navigation }) {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isXNext, setIsXNext] = useState(true);
   const [gameOver, setGameOver] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false); // Modaalin näkyvyys
-  const [winner, setWinner] = useState(null); // Voittaja
+  const [modalVisible, setModalVisible] = useState(false); 
+  const [winner, setWinner] = useState(null); 
 
   const handlePress = (index) => {
     if (board[index] || gameOver) return;
@@ -36,14 +36,14 @@ export default function TictactoeMultiplayer({ navigation }) {
     if (winner) {
       setWinner(winner);
       setGameOver(true);
-      setModalVisible(true); // Avaa modaalin
+      setModalVisible(true); 
       return;
     }
 
     if (!newBoard.includes(null)) {
       setWinner('Tie');
       setGameOver(true);
-      setModalVisible(true); // Avaa modaalin, jos tasapeli
+      setModalVisible(true); 
       return;
     }
 
@@ -55,7 +55,7 @@ export default function TictactoeMultiplayer({ navigation }) {
     setIsXNext(true);
     setGameOver(false);
     setWinner(null);
-    setModalVisible(false); // Sulje modaalin
+    setModalVisible(false); 
   };
 
   const renderSquare = (index) => (
@@ -95,8 +95,8 @@ export default function TictactoeMultiplayer({ navigation }) {
               {winner === 'Tie' ? 'It\'s a tie!' : `${winner} wins!`}
             </Text>
             <TouchableOpacity
-              style={styles.modalButton} // Käytetään samaa tyyliä
-              onPress={resetGame} // Sulkee modaalin ja aloittaa uuden pelin
+              style={styles.modalButton} 
+              onPress={resetGame} 
             >
               <Text style={styles.modalButtonText}>OK</Text>
             </TouchableOpacity>
@@ -104,12 +104,10 @@ export default function TictactoeMultiplayer({ navigation }) {
         </View>
       </Modal>
 
-      {/* Custom Restart Button */}
       <TouchableOpacity style={styles.button} onPress={resetGame}>
         <Text style={styles.buttonText}>Restart</Text>
       </TouchableOpacity>
 
-      {/* Custom Home Button */}
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
         <Text style={styles.buttonText}>Home</Text>
       </TouchableOpacity>

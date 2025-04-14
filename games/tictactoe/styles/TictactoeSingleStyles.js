@@ -5,7 +5,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: "rgb(255, 216, 130)", // Taustaväri
+    backgroundColor: "rgb(255, 216, 130)", 
     padding: 20,
   },
   title: {
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     color: '#4c4c4c', 
   },
   button: {
-    backgroundColor: '#fbc02d', // Keltainen värikoodi
+    backgroundColor: '#fbc02d', 
     width: 120,
     height: 45,
     padding: 12,
@@ -88,12 +88,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center", 
     alignItems: "center", 
-    backgroundColor: "rgba(0, 0, 0, 0.4)", // Taustan hämärtyminen
+    backgroundColor: "rgba(0, 0, 0, 0.4)", 
     zIndex: 100, 
   },
 
   modalContent: {
-    backgroundColor: "rgb(255, 234, 0)", // Keltainen taustaväri
+    backgroundColor: "rgb(255, 234, 0)", 
     padding: 20,
     borderRadius: 12,
     alignItems: "center",
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
 
   modalButton: {
-    backgroundColor: "#fbc02d", // Sama keltainen nappiväri
+    backgroundColor: "#fbc02d", 
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
