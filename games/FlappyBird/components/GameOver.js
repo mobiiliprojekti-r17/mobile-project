@@ -2,8 +2,6 @@ import React from 'react';
 import { View, Text, Dimensions } from 'react-native';
 import gameStyles from '../styles/GameStyles';
 
-const screenHeight = Dimensions.get('window').height;
-
 const GameOver = () => {
   return (
     <View style={gameStyles.gameOver}>
