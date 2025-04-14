@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
-import styles from '../styles/Connect4Styles';
+import styles from '../styles/Connect4MultiStyles';
 
-const Connect4 = ({ navigation }) => {
+const Connect4Multiplayer = ({ navigation }) => {
   const [board, setBoard] = useState(Array(6).fill(null).map(() => Array(7).fill(null)));
   const [currentPlayer, setCurrentPlayer] = useState('Orange');
   const [winner, setWinner] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false); // Modaalin näkyvyys
+  const [modalVisible, setModalVisible] = useState(false); 
 
   const dropDisc = (col) => {
     if (winner) return;
@@ -17,10 +17,10 @@ const Connect4 = ({ navigation }) => {
         newBoard[row][col] = currentPlayer;
         setBoard(newBoard);
 
-        const winner = checkWinner(newBoard);
-        if (winner) {
-          setWinner(winner);
-          setModalVisible(true); // Asetetaan modaalin näkyvyys päälle, kun voittaja löytyy
+        const win = checkWinner(newBoard);
+        if (win) {
+          setWinner(win);
+          setModalVisible(true);
         } else {
           setCurrentPlayer(currentPlayer === 'Orange' ? 'Yellow' : 'Orange');
         }
@@ -62,6 +62,7 @@ const Connect4 = ({ navigation }) => {
   };
 
   const checkWinner = (board) => {
+
     for (let row = 0; row < 6; row++) {
       for (let col = 0; col < 4; col++) {
         if (
@@ -74,7 +75,6 @@ const Connect4 = ({ navigation }) => {
         }
       }
     }
-
     for (let col = 0; col < 7; col++) {
       for (let row = 0; row < 3; row++) {
         if (
@@ -87,7 +87,6 @@ const Connect4 = ({ navigation }) => {
         }
       }
     }
-
     for (let row = 0; row < 3; row++) {
       for (let col = 0; col < 4; col++) {
         if (
@@ -100,7 +99,6 @@ const Connect4 = ({ navigation }) => {
         }
       }
     }
-
     for (let row = 0; row < 3; row++) {
       for (let col = 6; col > 2; col--) {
         if (
@@ -121,25 +119,24 @@ const Connect4 = ({ navigation }) => {
     setBoard(Array(6).fill(null).map(() => Array(7).fill(null)));
     setWinner(null);
     setCurrentPlayer('Orange');
-    setModalVisible(false); // Suljetaan modaalin
+    setModalVisible(false); 
   };
 
-  // Määritellään modaalin taustaväri voittajan mukaan
   const modalBackgroundColor = winner === 'Orange' ? 'rgb(255, 94, 0)' : 'rgb(255, 234, 0)';
-  // Määritellään nappiväri niin, että se erottuu taustasta
   const modalButtonBackgroundColor = winner === 'Orange' ? 'rgb(200, 75, 0)' : 'rgb(255, 204, 0)';
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Connect4</Text>
-      <Text style={styles.player}>
-        Current Player:{' '}
-        <Text style={{ color: currentPlayer === 'Orange' ? 'rgb(255, 94, 0)' : 'rgb(255, 234, 0)' }}>
-          {currentPlayer === 'Orange' ? 'Orange' : 'Yellow'}
+      {!winner && (
+        <Text style={styles.player}>
+          Current Player:{' '}
+          <Text style={{ color: currentPlayer === 'Orange' ? 'rgb(255, 94, 0)' : 'rgb(255, 234, 0)' }}>
+            {currentPlayer === 'Orange' ? 'Orange' : 'Yellow'}
+          </Text>
         </Text>
-      </Text>
+      )}
 
-      {/* Modaalin näkyvyys */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -152,8 +149,8 @@ const Connect4 = ({ navigation }) => {
               {winner === 'Orange' ? 'Orange' : 'Yellow'} Wins!
             </Text>
             <TouchableOpacity
-              style={[styles.modalButton, { backgroundColor: modalButtonBackgroundColor }]} // Erilainen väri napille
-              onPress={() => setModalVisible(false)} // "OK"-nappi sulkee modaalin
+              style={[styles.modalButton, { backgroundColor: modalButtonBackgroundColor }]}
+              onPress={() => setModalVisible(false)}
             >
               <Text style={styles.modalButtonText}>OK</Text>
             </TouchableOpacity>
@@ -179,4 +176,4 @@ const Connect4 = ({ navigation }) => {
   );
 };
 
-export default Connect4;
+export default Connect4Multiplayer;

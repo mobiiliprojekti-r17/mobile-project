@@ -7,8 +7,7 @@ export const generateBoard = (size, minesCount) => {
         number: 0,
       }))
     );
-  
-    // Asetetaan miinat satunnaisesti
+
     let placedMines = 0;
     while (placedMines < minesCount) {
       let row = Math.floor(Math.random() * size);
@@ -19,7 +18,6 @@ export const generateBoard = (size, minesCount) => {
       }
     }
   
-    // Lasketaan numerot (montako miinaa ympärillä)
     for (let r = 0; r < size; r++) {
       for (let c = 0; c < size; c++) {
         if (board[r][c].mine) continue;

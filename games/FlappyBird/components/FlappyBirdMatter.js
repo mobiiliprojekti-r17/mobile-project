@@ -46,7 +46,7 @@ const Pipe = (props) => {
 
 const Physics = (entities, { time, dispatch }) => {
   const engine = entities.physics.engine;
-  Matter.Engine.update(engine, 16); // Kiinteä päivitys 16ms
+  Matter.Engine.update(engine, 16); 
 
   const pipeVelocity = 1.5;
   if (entities.topPipe && entities.bottomPipe) {

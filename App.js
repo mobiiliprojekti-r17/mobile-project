@@ -13,7 +13,8 @@ import Game2048Screen from './games/2048/screens/2048Screen';
 import Game2048ResultScreen from './games/2048/screens/2048ResultScreen';
 import TictactoeMultiplayer from './games/tictactoe/screens/TictactoeMulti';
 import TictactoeSingleplayer from './games/tictactoe/screens/TictactoeSingle';
-import Connect4 from './games/Connect4/screens/Connect4Screen';
+import Connect4Multiplayer from './games/Connect4/screens/Connect4MultiScreen';
+import Connect4Singleplayer from './games/Connect4/screens/Connect4SingleScreen';
 import BreakerResult from './games/brickBreaker/screens/BrickResultScreen';
 import MinesweeperScreen from './games/minesweeper/screens/minesweeperscreen';
 import MinesweeperResults from './games/minesweeper/screens/minesweeperResults';
@@ -41,7 +42,7 @@ const App = () => {
   return (
     <NicknameProvider> 
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, gestureEnabled: false }}>
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="BubbleShooter" component={BubbleShooterScreen} />
           <Stack.Screen name="ShooterGameOver" component={ShooterGameOver} />
@@ -56,7 +57,8 @@ const App = () => {
           <Stack.Screen name="FlappyBird" component={FlappyBirdScreen} />
           <Stack.Screen name="TictactoeMultiplayer" component={TictactoeMultiplayer} />
           <Stack.Screen name="TictactoeSingleplayer" component={TictactoeSingleplayer} />
-          <Stack.Screen name="Connect4" component={Connect4} />
+          <Stack.Screen name="Connect4Multiplayer" component={Connect4Multiplayer} />
+          <Stack.Screen name="Connect4Singleplayer" component={Connect4Singleplayer} />
         </Stack.Navigator>
       </NavigationContainer>
     </NicknameProvider>

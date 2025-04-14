@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "rgb(160, 220, 255)", // Taustaväri yhtenäiseksi
+    backgroundColor: "rgb(160, 220, 255)", 
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
@@ -11,19 +11,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color:  "#2162aa", // Vastaa toisen tiedoston tummaa tekstiä
+    color:  "#2162aa",
     marginBottom: 20,
     marginTop: 60,
   },  
   title2: {
     fontSize: 28,
     fontWeight: "bold",
-    color:  "#2162aa", // Vastaa toisen tiedoston tummaa tekstiä
+    color:  "#2162aa", 
     marginBottom: 10,
     marginTop: 10,
   },
   resultBox: {
-    backgroundColor: "rgb(188, 231, 255)", // Neutraali tausta tuloksille
+    backgroundColor: "rgb(188, 231, 255)", 
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
@@ -32,20 +32,20 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 18,
-    color: "#333", // Yhtenäinen tumma teksti
+    color: "#333", 
     marginBottom: 5,
   },
   subtitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#2162aa", // Korvaava väri violettiin nähden
+    color: "#2162aa", 
     marginBottom: 10,
   },
   scrollView: {
     width: "90%",
   },
   scoreItem: {
-    backgroundColor: "rgb(205, 235, 252)", // Matchaa nappeihin
+    backgroundColor: "rgb(205, 235, 252)", 
     padding: 10,
     borderRadius: 8,
     marginBottom: 10,
@@ -56,25 +56,25 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     fontSize: 16,
-    color: "#333", // Selkeä tumma teksti
+    color: "#333", 
     marginBottom: 2,
   },
   noScores: {
     fontSize: 16,
-    color: "#555", // Hillitty harmaa
+    color: "#555", 
     textAlign: "center",
     marginTop: 10,
   },
   difficultySection: {
     marginBottom: 15,
-    backgroundColor: "rgb(188, 231, 255)", // Sama kuin napit
+    backgroundColor: "rgb(188, 231, 255)", 
     padding: 10,
     borderRadius: 8,
   },
   difficultyTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#2162aa", // Sama sävy kuin subtitle
+    color: "#2162aa",
     marginBottom: 5,
   },
   picker: {
@@ -100,15 +100,16 @@ const styles = StyleSheet.create({
     backgroundColor: "rgb(127, 203, 244)",
   },
   buttonText: {
-    color: "#000", // Musta teksti vaalealla taustalla
+    color: "#000", 
     fontWeight: "bold",
   },
   rank: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#2162aa", // Yhtenäinen sävy muiden otsikoiden kanssa
+    color: "#2162aa", 
     marginBottom: 5,
   },
+  
   Homebutton: {
     backgroundColor: "rgb(188, 231, 255)", 
     width: 100,
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
   },
   
   HomebuttonText: {
-    color: '#fff', // White text on buttons for contrast
+    color: '#fff', 
     fontSize: 18,
     textAlign: 'center',
     fontWeight: 'bold',

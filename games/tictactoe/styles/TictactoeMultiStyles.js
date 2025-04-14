@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   },
 
   modalContent: {
-    backgroundColor: "rgb(251, 151, 137)", // Keltainen taustaväri
+    backgroundColor: "rgb(251, 151, 137)", 
     padding: 20,
     borderRadius: 12,
     alignItems: "center",
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
 
   modalButton: {
-    backgroundColor: "rgb(252, 109, 90)", // Sama nappiväri
+    backgroundColor: "rgb(252, 109, 90)", 
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,

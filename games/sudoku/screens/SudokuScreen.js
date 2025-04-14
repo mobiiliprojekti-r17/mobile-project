@@ -46,13 +46,13 @@ export default function Sudoku({ route, navigation }) {
     let filledCells;
     switch (level) {
       case "easy":
-        filledCells = 80; //60
+        filledCells = 60; //60
         break;
       case "medium":
-        filledCells = 80; //40
+        filledCells = 40; //40
         break;
       case "hard":
-        filledCells = 80; //30
+        filledCells = 30; //30
         break;
       default:
         filledCells = 40;
@@ -100,7 +100,7 @@ export default function Sudoku({ route, navigation }) {
 
       if (!newBoard[row][col].preFilled) {
         newBoard[row][col].value = number.toString();
-        setBoard(newBoard); // Päivitetään peli
+        setBoard(newBoard); 
       } else {
         Toast.show({
           type: "error",
@@ -108,7 +108,7 @@ export default function Sudoku({ route, navigation }) {
         });
       }
 
-      setSelectedCell(null); // Nollataan vittu solu
+      setSelectedCell(null);
     }
   };
 
@@ -154,18 +154,16 @@ export default function Sudoku({ route, navigation }) {
   
     if (isCorrect) {
       setIsRunning(false);
+
+      const formattedTime = formatTime(timer); 
   
-      // Aikamuotoilun korjaus: aika tallennetaan valmiiksi muotoiltuna
-      const formattedTime = formatTime(timer); // Aika muotoillaan "mm:ss"
-  
-      // Tallennetaan pelin tulos Firestoreen
       try {
         const gameResultsRef = collection(db, "SudokuGameResults");
         await addDoc(gameResultsRef, {
          
-          Nickname: Nickname,  // Pelaajan nimimerkki
-          difficulty: difficulty, // Pelin vaikeustaso
-          time: formattedTime,  // Tallennetaan muotoiltu aika
+          Nickname: Nickname, 
+          difficulty: difficulty, 
+          time: formattedTime,  
         });
         console.log("Pelitulos tallennettu Firebaseen");
       } catch (error) {
@@ -202,7 +200,7 @@ export default function Sudoku({ route, navigation }) {
                   rowIndex === 8 && styles.boldBottom,
                   selectedCell?.row === rowIndex && selectedCell?.col === colIndex && styles.selectedCell,
                   cell.isError && styles.cellError,
-                  cell.preFilled && styles.preFilledCell, // Taustan väri valmiiksi täytetyille
+                  cell.preFilled && styles.preFilledCell, 
                 ]}
                 onPress={() => handleCellPress(rowIndex, colIndex)}
               >

@@ -47,7 +47,7 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  // Uudet tyylit aloitusnäytölle:
+
   startGameContainer: {
     position: 'absolute',
     top: screenHeight / 2 - 50,
