@@ -10,12 +10,7 @@ const BubbleShooterScreen = ({ navigation }) => {
       <BubbleShooter navigation={navigation} />
 
       <View style={shooterStyles.shooterFooter}>
-        <TouchableOpacity
-          style={shooterStyles.shooterButton}
-          onPress={() => navigation.navigate("Home")}
-        >
-          <Text style={shooterStyles.shooterButtonText}>Home</Text>
-        </TouchableOpacity>
+      
       </View>
     </View>
   );

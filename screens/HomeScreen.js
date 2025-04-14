@@ -1,3 +1,5 @@
+
+
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView } from 'react-native';
 import { db, collection, addDoc } from '../firebase/Config';
@@ -56,10 +58,9 @@ const HomeScreen = ({ navigation }) => {
 
   const checkNicknameAndProceed = (game) => {
     if (!nickname.trim()) {
-      // Jos nimimerkki puuttuu, näytetään virhe
       showModal('Warning', 'Please enter a nickname first!', 'error');
     } else {
-      setSelectedGame(game);  // Asetetaan valittu peli
+      setSelectedGame(game);  
       if (game === 'Sudoku' || game === 'Minesweeper') {
         setRestartModalVisible(true);
         setModalMessage('Choose difficulty');
@@ -80,9 +81,10 @@ const HomeScreen = ({ navigation }) => {
   const startMinesweeper = () => {
     checkNicknameAndProceed('Minesweeper');
   };
+  const startFlappyBird = () => checkNicknameAndProceed('FlappyBird');
 
   const handleDifficultyChange = (level) => {
-    startGame(selectedGame, level);  
+    startGame(selectedGame, level); 
     setRestartModalVisible(false);
   };
 
@@ -107,6 +109,7 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.buttonText}>Clear</Text>
             </TouchableOpacity>
           </View>
+
           <View style={styles.gameSection}>
             <Text style={styles.sectionTitle}>Singleplayer games</Text>
             <View style={styles.gameButtonsContainer}>
@@ -134,6 +137,10 @@ const HomeScreen = ({ navigation }) => {
                 <Text style={styles.gameButtonText}>Minesweeper</Text>
                 <Icon name="bomb" size={30} color="white" style={{ marginTop: 5 }} />
               </TouchableOpacity>
+              <TouchableOpacity style={styles.FlappyBirdButton} onPress={startFlappyBird}>
+                <Text style={styles.gameButtonText}>FlappyBird</Text>
+                <Icon name="twitter" size={30} color="white" style={{ marginTop: 5 }} />
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -152,6 +159,7 @@ const HomeScreen = ({ navigation }) => {
           </View>
         </ScrollView>
       </View>
+
       <Modal
         transparent
         animationType="fade"

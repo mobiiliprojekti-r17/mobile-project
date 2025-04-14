@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
@@ -17,6 +18,7 @@ import Connect4 from './games/Connect4/screens/Connect4Screen';
 import BreakerResult from './games/brickBreaker/screens/BrickResultScreen';
 import MinesweeperScreen from './games/minesweeper/screens/minesweeperscreen';
 import MinesweeperResults from './games/minesweeper/screens/minesweeperResults';
+import FlappyBirdScreen from './games/FlappyBird/screens/FlappyBirdScreen';
 import { useFonts, CuteFont_400Regular } from '@expo-google-fonts/cute-font';
 import { ChangaOne_400Regular } from '@expo-google-fonts/changa-one';
 import { PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
@@ -52,6 +54,7 @@ const App = () => {
           <Stack.Screen name="MinesweeperResults" component={MinesweeperResults} />
           <Stack.Screen name="2048" component={Game2048Screen} />
           <Stack.Screen name="Game2048ResultScreen" component={Game2048ResultScreen} />
+          <Stack.Screen name="FlappyBird" component={FlappyBirdScreen} />
           <Stack.Screen name="TictactoeMultiplayer" component={TictactoeMultiplayer} />
           <Stack.Screen name="TictactoeSingleplayer" component={TictactoeSingleplayer} />
           <Stack.Screen name="Connect4" component={Connect4} />
