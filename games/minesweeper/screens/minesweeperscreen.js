@@ -28,6 +28,7 @@ const MinesweeperScreen = () => {
   const [resultModalVisible, setResultModalVisible] = useState(false);
   const [restartModalVisible, setRestartModalVisible] = useState(false);
   const [resultMessage, setResultMessage] = useState("");
+  const [remainingMines, setRemainingMines] = useState(DIFFICULTY_LEVELS[difficulty].mines);
 
   useEffect(() => {
     if (route.params?.nickname) {
@@ -40,11 +41,11 @@ const MinesweeperScreen = () => {
   }, [difficulty]);
 
   useEffect(() => {
-    let timer;
+    let timerInterval;
     if (!gameOver && !win) {
-      timer = setInterval(() => setTimer(prev => prev + 1), 1000);
+      timerInterval = setInterval(() => setTimer((prev) => prev + 1), 1000);
     }
-    return () => clearInterval(timer);
+    return () => clearInterval(timerInterval);
   }, [gameOver, win]);
 
   const formatTime = (seconds) => {
@@ -55,6 +56,7 @@ const MinesweeperScreen = () => {
 
   const resetGame = () => {
     const { size, mines } = DIFFICULTY_LEVELS[difficulty];
+    setRemainingMines(mines);
     setBoard(generateBoard(size, mines));
     setGameOver(false);
     setWin(false);
@@ -71,29 +73,31 @@ const MinesweeperScreen = () => {
         difficulty,
         time: formatTime(timer),
       });
+      console.log("✅ Pelitulos tallennettu Firebaseen");
     } catch (error) {
-      console.error("Error saving result:", error);
+      console.error("❌ Virhe tallennettaessa tulosta: ", error);
     }
   };
 
   const revealAllTiles = () => {
-    setBoard(prev =>
-      prev.map(row =>
-        row.map(cell => ({ ...cell, revealed: true })))
+    setBoard((prev) =>
+      prev.map((row) => row.map((cell) => ({ ...cell, revealed: true })))
     );
   };
 
   const revealTile = (row, col) => {
     if (gameOver || win) return;
+    board[row][col].exploded = true;
     if (board[row][col].mine) {
       revealAllMines();
       setGameOver(true);
-      setResultMessage("You hit a mine! 💥");
+      setResultMessage("You hit a mine!");
+      setShowResultButton(true);
       setTimeout(() => setResultModalVisible(true), 500);
       return;
     }
 
-    const newBoard = board.map(row => row.map(cell => ({ ...cell })));
+    const newBoard = board.map((row) => row.map((cell) => ({ ...cell })));
     revealCells(newBoard, row, col);
     setBoard(newBoard);
 
@@ -102,7 +106,7 @@ const MinesweeperScreen = () => {
       saveGameResult();
       setShowResultButton(true);
       revealAllTiles();
-      setResultMessage("You win! 🎉");
+      setResultMessage("You win!");
       setTimeout(() => setResultModalVisible(true), 500);
     }
   };
@@ -113,7 +117,8 @@ const MinesweeperScreen = () => {
     if (board[row][col].number === 0) {
       for (let dr = -1; dr <= 1; dr++) {
         for (let dc = -1; dc <= 1; dc++) {
-          const nr = row + dr, nc = col + dc;
+          const nr = row + dr,
+            nc = col + dc;
           if (nr >= 0 && nr < board.length && nc >= 0 && nc < board[0].length) {
             revealCells(board, nr, nc);
           }
@@ -123,22 +128,31 @@ const MinesweeperScreen = () => {
   };
 
   const revealAllMines = () => {
-    setBoard(prev =>
-      prev.map(row =>
-        row.map(cell => (cell.mine ? { ...cell, revealed: true } : cell))
+    setBoard((prev) =>
+      prev.map((row) =>
+        row.map((cell) => (cell.mine ? { ...cell, revealed: true } : cell))
       )
     );
   };
 
   const checkWin = (board) => {
-    return board.every(row =>
-      row.every(cell => cell.mine || cell.revealed)
+    return board.every((row) =>
+      row.every((cell) => cell.mine || cell.revealed)
     );
   };
 
   const flagTile = (row, col) => {
     if (gameOver || win) return;
-    setBoard(prevBoard =>
+    if (board[row][col].revealed) return;
+    
+    const targetCell = board[row][col];
+    if (targetCell.flagged) {
+      setRemainingMines((prev) => prev + 1);
+    } else {
+      setRemainingMines((prev) => prev - 1);
+    }
+
+    setBoard((prevBoard) =>
       prevBoard.map((r, ri) =>
         r.map((cell, ci) =>
           ri === row && ci === col ? { ...cell, flagged: !cell.flagged } : cell
@@ -159,6 +173,7 @@ const MinesweeperScreen = () => {
       <View style={styles.header}>
         <Text style={styles.difficultyText}>Difficulty: {difficulty.toUpperCase()}</Text>
         <Text style={styles.timerText}>Time: {formatTime(timer)}</Text>
+        <Text style={styles.mineCountText}>Mines left: {remainingMines}</Text>
       </View>
 
       <Board board={board} revealTile={revealTile} flagTile={flagTile} difficulty={difficulty} />
@@ -190,7 +205,7 @@ const MinesweeperScreen = () => {
 
       {/* Modal for Game Result */}
       <Modal transparent animationType="fade" visible={resultModalVisible}>
-        <View style={styles.modalOverlay}> {/* Changed from modalContainer to modalOverlay */}
+        <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>{resultMessage}</Text>
             <TouchableOpacity onPress={() => setResultModalVisible(false)} style={styles.modalButton}>
@@ -202,27 +217,24 @@ const MinesweeperScreen = () => {
 
       {/* Modal for Restart Difficulty Selection */}
       <Modal transparent animationType="fade" visible={restartModalVisible}>
-  <View style={styles.modalOverlay}>
-    <View style={styles.difficultyModalContent}>
-      <Text style={styles.modalText}>Choose difficulty</Text>
-      {["easy", "medium", "hard"].map(level => (
-        <TouchableOpacity 
-          key={level} 
-          onPress={() => handleDifficultyChange(level)} 
-          style={styles.difficultyModalButton}>
-          <Text style={styles.modalButtonText}>{level}</Text>
-        </TouchableOpacity>
-      ))}
-      <TouchableOpacity 
-        onPress={() => setRestartModalVisible(false)} 
-        style={styles.difficultyModalButton}>
-        <Text style={styles.modalButtonText}>Cancel</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-</Modal>
-
-
+        <View style={styles.modalOverlay}>
+          <View style={styles.difficultyModalContent}>
+            <Text style={styles.modalText}>Choose difficulty</Text>
+            {["easy", "medium", "hard"].map((level) => (
+              <TouchableOpacity
+                key={level}
+                onPress={() => handleDifficultyChange(level)}
+                style={styles.difficultyModalButton}
+              >
+                <Text style={styles.modalButtonText}>{level}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity onPress={() => setRestartModalVisible(false)} style={styles.difficultyModalButton}>
+              <Text style={styles.modalButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
