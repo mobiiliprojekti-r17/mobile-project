@@ -11,6 +11,5 @@ Bird.propTypes = {
   birdBottom: PropTypes.number.isRequired,
 };
 
-// Optionally wrap with React.memo for performance optimization
-// export default React.memo(Bird);
+
 export default Bird;
