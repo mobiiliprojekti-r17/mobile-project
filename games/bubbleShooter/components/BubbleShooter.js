@@ -69,48 +69,62 @@ const BubbleShooter = ({ navigation }) => {
 
   // addRow: repositionoi olemassa olevat pallot (gridRow-arvoa kasvatetaan) ja lisää uuden yläreunan.
   // Lisäksi poistaa "leijuvat" pallot.
-  const addRow = () => {
+  const addRows = (numRows = 1) => {
     setStaticBalls(prevBalls => {
-      const repositionedBalls = prevBalls.map(ball => {
-        if (typeof ball.gridRow !== 'number' || typeof ball.gridCol !== 'number') {
-          const snappedCoords = snapToGrid(ball, width, numCols);
-          Matter.Body.setPosition(ball, { x: snappedCoords.x, y: snappedCoords.y });
-          const row = Math.round((snappedCoords.y - topOffset) / verticalSpacing);
-          let baseOffset = (width - (numCols * horizontalSpacing)) / 2;
-          if (row % 2 !== 0) baseOffset += horizontalSpacing / 2;
-          const col = Math.round((snappedCoords.x - baseOffset) / horizontalSpacing);
-          ball.gridRow = row;
-          ball.gridCol = col;
-        }
-        ball.gridRow += 1;
-        const newPos = gridToPosition(ball.gridRow, ball.gridCol);
-        Matter.Body.setPosition(ball, newPos);
-        return ball;
-      });
-
-      const newRowBalls = [];
-      for (let col = 0; col < numCols; col++) {
-        const pos = gridToPosition(0, col);
-        const newBall = Matter.Bodies.circle(pos.x, pos.y, BALL_RADIUS, {
-          isStatic: true,
-          restitution: 0,
-          collisionFilter: { category: 0x0001, mask: 0x0002 },
+      let combinedBalls = prevBalls;
+      for (let i = 0; i < numRows; i++) {
+        // Repositionoi olemassa olevat pallot ja siirretään niitä alaspäin
+        combinedBalls = combinedBalls.map(ball => {
+          if (typeof ball.gridRow !== 'number' || typeof ball.gridCol !== 'number') {
+            const snappedCoords = snapToGrid(ball, width, numCols);
+            Matter.Body.setPosition(ball, { x: snappedCoords.x, y: snappedCoords.y });
+            const row = Math.round((snappedCoords.y - topOffset) / verticalSpacing);
+            let baseOffset = (width - (numCols * horizontalSpacing)) / 2;
+            if (row % 2 !== 0) baseOffset += horizontalSpacing / 2;
+            const col = Math.round((snappedCoords.x - baseOffset) / horizontalSpacing);
+            ball.gridRow = row;
+            ball.gridCol = col;
+          }
+          ball.gridRow += 1;
+          const newPos = gridToPosition(ball.gridRow, ball.gridCol);
+          Matter.Body.setPosition(ball, newPos);
+          return ball;
         });
-        newBall.color = getRandomPastelColor();
-        newBall.id = Matter.Common.nextId();
-        newBall.gridRow = 0;
-        newBall.gridCol = col;
-        Matter.World.add(world, newBall);
-        newRowBalls.push(newBall);
+  
+        // Lasketaan käytettävissä olevat värit nykyisistä palloista
+        const availableColors = getAvailableColors(combinedBalls);
+  
+        // Luodaan uusi rivi
+        const newRowBalls = [];
+        for (let col = 0; col < numCols; col++) {
+          const pos = gridToPosition(0, col);
+          const newBall = Matter.Bodies.circle(pos.x, pos.y, BALL_RADIUS, {
+            isStatic: true,
+            restitution: 0,
+            collisionFilter: { category: 0x0001, mask: 0x0002 },
+          });
+          // Käytetään vain niitä värejä, jotka ovat vielä käytössä
+          newBall.color = availableColors.length > 0 
+            ? availableColors[Math.floor(Math.random() * availableColors.length)]
+            : getRandomPastelColor();
+          newBall.id = Matter.Common.nextId();
+          newBall.gridRow = 0;
+          newBall.gridCol = col;
+          Matter.World.add(world, newBall);
+          newRowBalls.push(newBall);
+        }
+  
+        combinedBalls = [...newRowBalls, ...combinedBalls];
+        // Poistetaan mahdolliset leijuvat pallot
+        const floating = findFloatingBalls(combinedBalls);
+        floating.forEach(ball => Matter.World.remove(world, ball));
+        combinedBalls = combinedBalls.filter(ball => !floating.includes(ball));
       }
-
-      let combined = [...newRowBalls, ...repositionedBalls];
-      const floating = findFloatingBalls(combined);
-      floating.forEach(ball => Matter.World.remove(world, ball));
-      combined = combined.filter(ball => !floating.includes(ball));
-      return combined;
+      return combinedBalls;
     });
   };
+  
+  
 
   // Tarkistetaan törmäystilanteet: sekä osuma staattiseen palloon että kattoon
   useEffect(() => {
@@ -156,11 +170,15 @@ const BubbleShooter = ({ navigation }) => {
               shotCounterRef.current += 1;
               // Liitetään ohjauspallo aina ruudukkoon
               setStaticBalls(prev => [...prev, shooter]);
-              if (shotCounterRef.current >= 5) {
-                // Kun viides laukaisu on tehty, resetataan laskuri, lisätään uusi rivi ja repositionoidaan pallot.
-                shotCounterRef.current = 0;
-                addRow();
-              }
+              // Esimerkiksi törmäyksessä, kun laukaisulaskuri saavuttaa rajan:
+            if (shotCounterRef.current >= 5) {
+              shotCounterRef.current = 0;
+              // Hae käytettävissä olevien värejen määrä nykyisistä staattisista palloista
+              const availableColors = getAvailableColors(staticBallsRef.current);
+              // Jos jäljellä on tarkalleen 2 väriä, lisätään 2 riviä, muuten 1 rivi
+              const rowsToAdd = availableColors.length === 2 ? 4 : 1;
+              addRows(rowsToAdd);
+            }
             }
 
             // Poistetaan mahdolliset "floating" pallot
@@ -211,7 +229,7 @@ const BubbleShooter = ({ navigation }) => {
             setStaticBalls(prev => [...prev, shooter]);
             if (shotCounterRef.current >= 5) {
               shotCounterRef.current = 0;
-              addRow();
+              addRows();
             }
           }
           
