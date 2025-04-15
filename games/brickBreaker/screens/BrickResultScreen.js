@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, ScrollView } from "react-native";
+import { View, Text, Button, ScrollView, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import { db } from "../../../firebase/Config";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { useNickname } from "../../../context/context";
+import styles from "../styles/BrickResultScreenStyles";
+
 
 export default function BreakerResult({ route, navigation }) {
   const { nickname } = useNickname();
@@ -36,28 +38,39 @@ export default function BreakerResult({ route, navigation }) {
   }, [navigation]);
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold" }}>Peli päättyi!</Text>
-      <Text style={{ fontSize: 18 }}>Käyttäjä: {nickname}</Text>
-      <Text style={{ fontSize: 18 }}>Taso: {level}</Text>
-      <Text style={{ fontSize: 18 }}>Pisteet: {score}</Text>
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <Text style={styles.title}>Game Over!</Text>
 
-      <Text style={{ fontSize: 18, marginTop: 20 }}>Top list:</Text>
-      <ScrollView style={{ width: "90%" }}>
-        {results.length > 0 ? (
-          results.map((result, index) => (
-            <View key={index} style={{ marginBottom: 10 }}>
-              <Text>Käyttäjä: {result.Nickname}</Text>
-              <Text>Taso: {result.level}</Text>
-              <Text>Pisteet: {result.score}</Text>
-            </View>
-          ))
-        ) : (
-          <Text>No scores yet!</Text>
-        )}
-      </ScrollView>
+        <View style={styles.resultBox}>
+          <Text style={styles.resultText}>Player: {nickname}</Text>
+          <Text style={styles.resultText}>Level: {level}</Text>
+          <Text style={styles.resultText}>Score: {score}</Text>
+        </View>
 
-      <Button title="Palaa päävalikkoon" onPress={() => navigation.navigate("Home")} />
-    </View>
+        <Text style={styles.topListTitle}>Top list:</Text>
+
+        <ScrollView style={styles.scrollView}>
+          {results.length > 0 ? (
+            results.map((result, index) => (
+              <View key={index} style={styles.resultItem}>
+                <Text style={styles.resultItemText}>Player: {result.Nickname}</Text>
+                <Text style={styles.resultItemText}>Level: {result.level}</Text>
+                <Text style={styles.resultItemText}>Score: {result.score}</Text>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.resultText}>No scores yet!</Text>
+          )}
+        </ScrollView>
+
+        <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate("Home")}>
+          <Text style={styles.homeButtonText}>Home</Text>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

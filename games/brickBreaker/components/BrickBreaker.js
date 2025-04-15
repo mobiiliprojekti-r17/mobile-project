@@ -1,13 +1,5 @@
 import React, { useRef, useState, useMemo } from "react";
-import {
-  View,
-  StyleSheet,
-  PanResponder,
-  Text,
-  Button,
-  Dimensions,
-  TouchableOpacity,
-} from "react-native";
+import { View, StyleSheet, PanResponder, Text, Button, TouchableOpacity, Dimensions } from "react-native";
 import { GameEngine } from "react-native-game-engine";
 import Matter from "matter-js";
 import { Paddle, Ball, Brick } from "./BrickBreakRender";
@@ -16,6 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
 import { collection, addDoc } from "firebase/firestore";
 import { useNickname } from "../../../context/context";
+import BreakerStyles from "../styles/BreakerStyles";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const BASE_WIDTH = 400; 
@@ -237,65 +230,78 @@ export default function BrickBreaker() {
   };
 
   return (
-    <View style={styles.container} {...panResponder.panHandlers}>
-      <Text style={styles.score}>
-        Pisteet: {score} | Taso: {gameState.level}
+    <View style={BreakerStyles.container} {...panResponder.panHandlers}
+    onStartShouldSetResponder={() => {
+      if (!gameStarted && !gameOver && !levelCleared) {
+        setGameStarted(true);
+        const baseSpeed = 3 * scaleFactor;
+        const fixedSpeed = baseSpeed + gameState.level;
+        Matter.Body.setVelocity(gameState.ball, { x: 0, y: -fixedSpeed });
+      }
+      return false;
+    }}
+    >
+      <Text style={BreakerStyles.score}>
+        Score:{score}  Level:{gameState.level}
       </Text>
 
       {gameOver && (
-        <View style={styles.overlay}>
-          <Text style={styles.gameOverText}>Peli päättyi!</Text>
-          <Button
-            title="Try Again"
-            onPress={() => {
-              const newGameState = setupWorld(1);
-              setGameOver(false);
-              setLevelCleared(false);
-              setScore(0);
-              setGameStarted(false);
-              setGameState(newGameState);
+  <View style={BreakerStyles.overlay}>
+    <Text style={BreakerStyles.overlayText}>Game Over!</Text>
+    <TouchableOpacity
+      style={BreakerStyles.button}
+      onPress={() => {
+        const newGameState = setupWorld(1);
+        setGameOver(false);
+        setLevelCleared(false);
+        setScore(0);
+        setGameStarted(false);
+        setGameState(newGameState);
 
-              setTimeout(() => {
-                gameEngine.current.swap({
-                  physics: {
-                    engine: newGameState.engine,
-                    world: newGameState.world,
-                  },
-                  ball: { body: newGameState.ball, renderer: Ball },
-                  paddle: { body: newGameState.paddle, renderer: Paddle },
-                  wallLeft: { body: newGameState.wallLeft },
-                  wallRight: { body: newGameState.wallRight },
-                  ceiling: { body: newGameState.ceiling },
-                  ...newGameState.bricks.reduce((acc, brickObj, index) => {
-                    acc[`brick_${index}`] = {
-                      body: brickObj.body,
-                      renderer: Brick,
-                      hits: brickObj.hits,
-                      brickType: brickObj.brickType,
-                      damaged: false,
-                    };
-                    return acc;
-                  }, {}),
-                });
-              }, 50);
-            }}
-          />
-          <Button title="Results" onPress={() => 
-            navigation.navigate("BreakerResults", {
-              nickname,
-              level: gameState.level,
-              score,
-            })
-          } />
-        </View>
-      )}
+        setTimeout(() => {
+          gameEngine.current.swap({
+            physics: {
+              engine: newGameState.engine,
+              world: newGameState.world,
+            },
+            ball: { body: newGameState.ball, renderer: Ball },
+            paddle: { body: newGameState.paddle, renderer: Paddle },
+            wallLeft: { body: newGameState.wallLeft },
+            wallRight: { body: newGameState.wallRight },
+            ceiling: { body: newGameState.ceiling },
+            ...newGameState.bricks.reduce((acc, brickObj, index) => {
+              acc[`brick_${index}`] = {
+                body: brickObj.body,
+                renderer: Brick,
+                hits: brickObj.hits,
+                brickType: brickObj.brickType,
+                damaged: false,
+              };
+              return acc;
+            }, {}),
+          });
+        }, 50);
+      }}
+    >
+      <Text style={BreakerStyles.buttonText}>Play Again</Text>
+    </TouchableOpacity>
 
-      {levelCleared && (
-        <View style={styles.overlay}>
-          <Text style={styles.gameOverText}>Taso läpäisty!</Text>
-          <Button title="Next Level" onPress={nextLevel} />
-        </View>
-      )}
+    <TouchableOpacity style={BreakerStyles.button} onPress={storeResult}>
+      <Text style={BreakerStyles.buttonText}>Results</Text>
+    </TouchableOpacity>
+  </View>
+)}
+
+
+{levelCleared && (
+  <View style={BreakerStyles.overlay}>
+    <Text style={BreakerStyles.overlayText}>Level Cleared!</Text>
+    <TouchableOpacity style={BreakerStyles.button} onPress={nextLevel}>
+      <Text style={BreakerStyles.buttonText}>Next Level</Text>
+    </TouchableOpacity>
+  </View>
+)}
+
 
 {!gameOver && !levelCleared && !gameStarted && (
   <TouchableOpacity
@@ -315,7 +321,7 @@ export default function BrickBreaker() {
 
       <GameEngine
         ref={gameEngine}
-        style={styles.gameContainer}
+        style={BreakerStyles.container}
         systems={[Physics]}
         running={gameStarted}
         entities={{
@@ -357,19 +363,3 @@ export default function BrickBreaker() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "rgb(192, 253, 111)" },
-  gameContainer: { flex: 1 },
-  score: { color: "white", fontSize: 20, textAlign: "center", marginTop: 60 },
-  overlay: {
-    position: "absolute",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
-    zIndex: 10,
-    height: "120%",
-    width: "100%",
-  },
-  gameOverText: { color: "white", fontSize: 30, marginBottom: 20 },
-});

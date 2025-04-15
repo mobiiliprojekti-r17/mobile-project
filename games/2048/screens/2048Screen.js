@@ -55,6 +55,7 @@ const Game2048Screen = ({ route }) => {
     const handleGameOver = async () => {
       setGameOverHandled(true);
 
+      
       try {
         const gameResultsRef = collection(db, "2048Results");
         await addDoc(gameResultsRef, {
