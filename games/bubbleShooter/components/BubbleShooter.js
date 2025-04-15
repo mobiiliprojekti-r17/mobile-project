@@ -13,6 +13,7 @@ import {
   snapToGrid
 } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
+import AnimatedBall from './ShooterBallAnimation';
 import { useRoute } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
 import { collection, addDoc } from "firebase/firestore";
@@ -24,9 +25,17 @@ const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
 const SHOOTER_BALL_Y = height - 200;
 
+// Gridin perusparametrit
+const topOffset = 80;
+const horizontalSpacing = BALL_RADIUS * 2;
+const verticalSpacing = BALL_RADIUS * Math.sqrt(3);
+const numCols = 9;
+
 const BubbleShooter = ({ navigation }) => {
   const { engine, world, ceiling } = createPhysics(width, height);
   const shooterBall = useRef(null);
+  // Laukaisulaskuri kasvatetaan, kun laukaus ei tuota poistuvaa klusteria.
+  const shotCounterRef = useRef(0);
   const [ballPosition, setBallPosition] = useState({ x: width / 2, y: SHOOTER_BALL_Y });
   const [staticBalls, setStaticBalls] = useState([]);
   const staticBallsRef = useRef([]);
@@ -39,24 +48,82 @@ const BubbleShooter = ({ navigation }) => {
   const route = useRoute();
   const { nickname } = useNickname();
   const rafIdRef = useRef(null);
+  const [poppedBalls, setPoppedBalls] = useState([]);
 
-  // Apufunktio, jolla lasketaan ruudukon rivi
-  const getGridRow = (y) => {
-    const topOffset = 80;
-    const verticalSpacing = BALL_RADIUS * Math.sqrt(3);
-    return Math.round((y - topOffset) / verticalSpacing);
+  // Muunnetaan ruudukko kordinaateiksi
+  const gridToPosition = (row, col) => {
+    let baseOffset = (width - (numCols * horizontalSpacing)) / 2;
+    if (row % 2 !== 0) {
+      baseOffset += horizontalSpacing / 2;
+    }
+    return { x: baseOffset + col * horizontalSpacing, y: topOffset + row * verticalSpacing };
   };
+  const getGridRow = (y) => Math.round((y - topOffset) / verticalSpacing);
 
-  // Häviämisehto: jos jokin staattinen pallo sijoittuu liian alas
-  const MAX_ROW = Math.floor((SHOOTER_BALL_Y - 80 - BALL_RADIUS) / (BALL_RADIUS * Math.sqrt(3)));
+  // Häviämisehto: jos jonkin pallon ruudukon rivi ylittää sallitun rajan.
+  const MAX_ROW = Math.floor((SHOOTER_BALL_Y - topOffset - BALL_RADIUS) / verticalSpacing);
 
   useEffect(() => {
     staticBallsRef.current = staticBalls;
   }, [staticBalls]);
 
+  // addRow: repositionoi olemassa olevat pallot ja lisää uuden yläreunan.
+  // Lisäksi poistaa "leijuvat" pallot.
+  const addRows = (numRows = 1) => {
+    setStaticBalls(prevBalls => {
+      let combinedBalls = prevBalls;
+      for (let i = 0; i < numRows; i++) {
+        // Siirretään olemassa olevia palloja alaspäin
+        combinedBalls = combinedBalls.map(ball => {
+          if (typeof ball.gridRow !== 'number' || typeof ball.gridCol !== 'number') {
+            const snappedCoords = snapToGrid(ball, width, numCols);
+            Matter.Body.setPosition(ball, { x: snappedCoords.x, y: snappedCoords.y });
+            const row = Math.round((snappedCoords.y - topOffset) / verticalSpacing);
+            let baseOffset = (width - (numCols * horizontalSpacing)) / 2;
+            if (row % 2 !== 0) baseOffset += horizontalSpacing / 2;
+            const col = Math.round((snappedCoords.x - baseOffset) / horizontalSpacing);
+            ball.gridRow = row;
+            ball.gridCol = col;
+          }
+          ball.gridRow += 1;
+          const newPos = gridToPosition(ball.gridRow, ball.gridCol);
+          Matter.Body.setPosition(ball, newPos);
+          return ball;
+        });
+  
+        const availableColors = getAvailableColors(combinedBalls);
+  
+        const newRowBalls = [];
+        for (let col = 0; col < numCols; col++) {
+          const pos = gridToPosition(0, col);
+          const newBall = Matter.Bodies.circle(pos.x, pos.y, BALL_RADIUS, {
+            isStatic: true,
+            restitution: 0,
+            collisionFilter: { category: 0x0001, mask: 0x0002 },
+          });
+          newBall.color = availableColors.length > 0 
+            ? availableColors[Math.floor(Math.random() * availableColors.length)]
+            : getRandomPastelColor();
+          newBall.id = Matter.Common.nextId();
+          newBall.gridRow = 0;
+          newBall.gridCol = col;
+          Matter.World.add(world, newBall);
+          newRowBalls.push(newBall);
+        }
+  
+        combinedBalls = [...newRowBalls, ...combinedBalls];
+        const floating = findFloatingBalls(combinedBalls);
+        floating.forEach(ball => Matter.World.remove(world, ball));
+        combinedBalls = combinedBalls.filter(ball => !floating.includes(ball));
+      }
+      return combinedBalls;
+    });
+  };
+
+  // Törmäystapahtumien hallinta: sekä osuma staattiseen palloon että kattoon
   useEffect(() => {
     initShooterBall();
-    const initialStaticBalls = createStaticBalls(world, 9, 9, width);
+    const initialStaticBalls = createStaticBalls(world, 9, numCols, width);
     setStaticBalls(initialStaticBalls);
     setBallsInitialized(true);
 
@@ -69,17 +136,27 @@ const BubbleShooter = ({ navigation }) => {
         if (other) {
           const isStaticBall = staticBallsRef.current.some((b) => b.id === other.id);
           if (isStaticBall) {
+            // Pysäytetään ohjauspallo ja snapataan ruudukkoon
             Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
             Matter.Body.setStatic(shooter, true);
 
-            // Snapataan pallo ruudukkoon (ruudukkoindeksit tallentuvat snapToGrid:ssä)
-            const snappedCoords = snapToGrid(shooter, width, 9);
+            const snappedCoords = snapToGrid(shooter, width, numCols);
             Matter.Body.setPosition(shooter, { x: snappedCoords.x, y: snappedCoords.y });
+            const row = Math.round((snappedCoords.y - topOffset) / verticalSpacing);
+            let baseOffset = (width - (numCols * horizontalSpacing)) / 2;
+            if (row % 2 !== 0) baseOffset += horizontalSpacing / 2;
+            const col = Math.round((snappedCoords.x - baseOffset) / horizontalSpacing);
+            shooter.gridRow = row;
+            shooter.gridCol = col;
 
             const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
 
             if (cluster.length > 0) {
-              cluster.forEach(ball => Matter.World.remove(world, ball));
+              // Lisätään poistettujen pallojen tiedot animaatiota varten
+              cluster.forEach(ball => {
+                setPoppedBalls(prev => [...prev, { id: ball.id, x: ball.position.x, y: ball.position.y, color: ball.color }]);
+                Matter.World.remove(world, ball);
+              });
               setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
               setScore(prev => {
                 const newScore = prev + cluster.length * 10;
@@ -87,14 +164,23 @@ const BubbleShooter = ({ navigation }) => {
                 return newScore;
               });
             } else {
+              shotCounterRef.current += 1;
               setStaticBalls(prev => [...prev, shooter]);
+              if (shotCounterRef.current >= 5) {
+                shotCounterRef.current = 0;
+                const availableColors = getAvailableColors(staticBallsRef.current);
+                const rowsToAdd = availableColors.length === 2 ? 4 : 1;
+                addRows(rowsToAdd);
+              }
             }
 
             const updatedBalls = staticBallsRef.current.filter(ball => !cluster.includes(ball));
             const floatingBalls = findFloatingBalls(updatedBalls);
             if (floatingBalls.length > 0) {
               floatingBalls.forEach(ball => Matter.World.remove(world, ball));
-              setStaticBalls(prev => prev.filter(ball => !floatingBalls.includes(ball)));
+              setStaticBalls(prev =>
+                prev.filter(ball => !floatingBalls.includes(ball))
+              );
               setScore(prev => {
                 const newScore = prev + floatingBalls.length * 15;
                 scoreRef.current = newScore;
@@ -112,20 +198,36 @@ const BubbleShooter = ({ navigation }) => {
         if ((bodyA === shooter && bodyB === ceiling) || (bodyB === shooter && bodyA === ceiling)) {
           Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
           Matter.Body.setStatic(shooter, true);
-          const snappedCoords = snapToGrid(shooter, width, 9);
+          const snappedCoords = snapToGrid(shooter, width, numCols);
           Matter.Body.setPosition(shooter, { x: snappedCoords.x, y: snappedCoords.y });
-          setStaticBalls(prev => [...prev, shooter]);
+          const row = Math.round((snappedCoords.y - topOffset) / verticalSpacing);
+          let baseOffset = (width - (numCols * horizontalSpacing)) / 2;
+          if (row % 2 !== 0) baseOffset += horizontalSpacing / 2;
+          const col = Math.round((snappedCoords.x - baseOffset) / horizontalSpacing);
+          shooter.gridRow = row;
+          shooter.gridCol = col;
 
           const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
           if (cluster.length > 0) {
-            cluster.forEach(ball => Matter.World.remove(world, ball));
+            cluster.forEach(ball => {
+              setPoppedBalls(prev => [...prev, { id: ball.id, x: ball.position.x, y: ball.position.y, color: ball.color }]);
+              Matter.World.remove(world, ball);
+            });
             setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
             setScore(prev => {
               const newScore = prev + cluster.length * 10;
               scoreRef.current = newScore;
               return newScore;
             });
+          } else {
+            shotCounterRef.current += 1;
+            setStaticBalls(prev => [...prev, shooter]);
+            if (shotCounterRef.current >= 5) {
+              shotCounterRef.current = 0;
+              addRows();
+            }
           }
+          
           const updatedBalls = staticBallsRef.current.filter(ball => !cluster.includes(ball));
           const floatingBalls = findFloatingBalls(updatedBalls);
           if (floatingBalls.length > 0) {
@@ -147,7 +249,6 @@ const BubbleShooter = ({ navigation }) => {
     Matter.Events.on(engine, 'collisionStart', collisionHandler);
 
     const update = () => {
-      // Päivitetään fysiikka 30 fps:llä (~33ms per päivitys)
       updatePhysics(engine, 33);
 
       if (shooterBall.current) {
@@ -249,20 +350,36 @@ const BubbleShooter = ({ navigation }) => {
     <>
       <TouchableWithoutFeedback onPress={handleTouch}>
         <View style={shooterStyles.shooterGameContainer}>
-          <Text style={shooterStyles.shooterScoreText}>Score: {score}</Text>
+          {/* Header container sisältää score-tekstin ja home-ikonin */}
+          <View style={shooterStyles.headerContainer}>
+          <TouchableOpacity onPress={() => navigation.replace('Home')}>
+              <Ionicons name="home" style={shooterStyles.shooterHomeIcon} />
+            </TouchableOpacity>
+            <Text style={shooterStyles.shooterScoreText}>Score: {score}</Text>
+          </View>
+  
+          {/* Pelin elementit */}
           {staticBalls.map(ball => (
             <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
           ))}
           <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
+          {/* Pop-animaatiot */}
+          {poppedBalls.map(pop => (
+            <AnimatedBall
+              key={pop.id}
+              x={pop.x}
+              y={pop.y}
+              size={40}
+              color={pop.color}
+              onAnimationEnd={() => {
+                setPoppedBalls(prev => prev.filter(item => item.id !== pop.id));
+              }}
+            />
+          ))}
         </View>
       </TouchableWithoutFeedback>
-      <View style={shooterStyles.shooterHomeButtonContainer}>
-        <TouchableOpacity onPress={() => navigation.replace('Home')}>
-          <Ionicons name="home" style={shooterStyles.shooterHomeIcon} />
-        </TouchableOpacity>
-      </View>
     </>
-  );
+  );  
 };
 
 export default BubbleShooter;

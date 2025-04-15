@@ -23,6 +23,8 @@ import { useFonts, CuteFont_400Regular } from '@expo-google-fonts/cute-font';
 import { ChangaOne_400Regular } from '@expo-google-fonts/changa-one';
 import { PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
 import { FredokaOne_400Regular } from '@expo-google-fonts/fredoka-one';
+import { VT323_400Regular } from '@expo-google-fonts/vt323';
+
 
 const Stack = createStackNavigator();
 
@@ -33,6 +35,7 @@ const App = () => {
     CuteFont_400Regular,
     PressStart2P_400Regular,
     FredokaOne_400Regular,
+    VT323_400Regular
   });
 
   if (!fontsLoaded) {

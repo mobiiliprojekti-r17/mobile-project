@@ -8,10 +8,6 @@ const BubbleShooterScreen = ({ navigation }) => {
   return (
     <View style={shooterStyles.ShooterScreenContainer}>
       <BubbleShooter navigation={navigation} />
-
-      <View style={shooterStyles.shooterFooter}>
-      
-      </View>
     </View>
   );
 };

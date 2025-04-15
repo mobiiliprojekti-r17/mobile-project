@@ -6,6 +6,8 @@ import { generateBoard } from "../components/generateboard";
 import { styles } from "../styles/minesweeperStyles";
 import { db } from "../../../firebase/Config";
 import { collection, addDoc } from "firebase/firestore";
+import Icon from "react-native-vector-icons/Feather";
+import InstructionsModal from "../components/InstructionsModal";
 
 const DIFFICULTY_LEVELS = {
   easy: { size: 8, mines: 1 },
@@ -29,6 +31,7 @@ const MinesweeperScreen = () => {
   const [restartModalVisible, setRestartModalVisible] = useState(false);
   const [resultMessage, setResultMessage] = useState("");
   const [remainingMines, setRemainingMines] = useState(DIFFICULTY_LEVELS[difficulty].mines);
+  const [instructionsVisible, setInstructionsVisible] = useState(true);
 
   useEffect(() => {
     if (route.params?.nickname) {
@@ -182,9 +185,8 @@ const MinesweeperScreen = () => {
         <TouchableOpacity style={styles.button} onPress={() => setRestartModalVisible(true)}>
           <Text style={styles.buttonText}>Restart</Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
-          <Text style={styles.buttonText}>Home</Text>
+          <Icon name="home" size={24} color="#fff" />
         </TouchableOpacity>
 
         {showResultButton && (
@@ -214,7 +216,6 @@ const MinesweeperScreen = () => {
           </View>
         </View>
       </Modal>
-
       {/* Modal for Restart Difficulty Selection */}
       <Modal transparent animationType="fade" visible={restartModalVisible}>
         <View style={styles.modalOverlay}>
