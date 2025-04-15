@@ -3,8 +3,9 @@ import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView, ImageBackgr
 import { db, collection, addDoc } from '../firebase/Config';
 import styles from "../styles/HomeScreenStyles";
 import { useNickname } from '../context/context';
-import { useFonts, PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
+import { useFonts, PressStart2P_400Regular} from '@expo-google-fonts/press-start-2p';
 import { LinearGradient } from 'expo-linear-gradient';
+import { CuteFont_400Regular } from '@expo-google-fonts/cute-font';
 
 
 const HomeScreen = ({ navigation }) => {
@@ -17,6 +18,7 @@ const HomeScreen = ({ navigation }) => {
 
   const [fontsLoaded] = useFonts({
     PressStart2P_400Regular,
+    CuteFont_400Regular,
   });
 
   if (!fontsLoaded) return null;

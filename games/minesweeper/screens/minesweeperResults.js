@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { db } from "../../../firebase/Config";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import styles from "../styles/minesweeperResultsStyles";
 import { useNickname } from "../../../context/context";
+import DifficultySelectorModal from "../components/difficultyModals";
+import Icon from "react-native-vector-icons/Feather";
 
 export default function SudokuResult({ route, navigation }) {
-  const { nickname } = useNickname()
+  const { nickname } = useNickname();
   const { time, difficulty } = route.params;
   const [scores, setScores] = useState([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
+  const [playAgainModalVisible, setPlayAgainModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchScores = async () => {
@@ -18,13 +21,13 @@ export default function SudokuResult({ route, navigation }) {
           collection(db, "MinesweeperResults"),
           orderBy("time")
         );
-
         const querySnapshot = await getDocs(scoresQuery);
         const scoresList = querySnapshot.docs.map((doc) => {
           const data = doc.data();
           if (data.time) {
             const timeParts = data.time.split(":");
-            data.timeInSeconds = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]);
+            data.timeInSeconds =
+              parseInt(timeParts[0], 10) * 60 + parseInt(timeParts[1], 10);
           } else {
             data.timeInSeconds = 0;
           }
@@ -39,7 +42,6 @@ export default function SudokuResult({ route, navigation }) {
     fetchScores();
   }, [navigation]);
 
-
   const formattedTime = (timeInSeconds) => {
     if (timeInSeconds == null) return "N/A";
     const minutes = Math.floor(timeInSeconds / 60);
@@ -53,6 +55,15 @@ export default function SudokuResult({ route, navigation }) {
     return acc;
   }, {});
 
+  // Kutsutaan, kun käyttäjä valitsee uuden vaikeustason modalista
+  const handlePlayAgainSelect = (newDifficulty) => {
+    setPlayAgainModalVisible(false);
+    navigation.navigate("Minesweeper", {
+      difficulty: newDifficulty,
+      nickname,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>GAME OVER!</Text>
@@ -60,7 +71,26 @@ export default function SudokuResult({ route, navigation }) {
       <View style={styles.resultBox}>
         <Text style={styles.infoText}>Nickname: {nickname}</Text>
         <Text style={styles.infoText}>Difficulty: {difficulty}</Text>
-        <Text style={styles.infoText}>Time: {time ? formattedTime(time) : "N/A"}</Text>
+        <Text style={styles.infoText}>
+          Time: {time ? formattedTime(time) : "N/A"}
+        </Text>
+      </View>
+
+      {/* Napit oman tuloksen alapuolella, ennen toplistaa.
+          Ensimmäisenä "Play Again", sen jälkeen "Home" */}
+      <View style={styles.resultButtonContainer}>
+        <TouchableOpacity
+          style={styles.Button}
+          onPress={() => setPlayAgainModalVisible(true)}
+        >
+          <Text style={styles.ButtonText}>Play Again</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.Button}
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Icon name="home" size={30} color="#fff" />
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.title2}>Top list:</Text>
@@ -85,7 +115,9 @@ export default function SudokuResult({ route, navigation }) {
       <ScrollView style={styles.scrollView}>
         {Object.keys(groupedScores).length > 0 ? (
           Object.keys(groupedScores)
-            .filter((diffLevel) => !selectedDifficulty || diffLevel === selectedDifficulty)
+            .filter(
+              (diffLevel) => !selectedDifficulty || diffLevel === selectedDifficulty
+            )
             .map((diffLevel) => (
               <View key={diffLevel} style={styles.difficultySection}>
                 <Text style={styles.difficultyTitle}>
@@ -97,13 +129,16 @@ export default function SudokuResult({ route, navigation }) {
                     <View key={index} style={styles.scoreItem}>
                       <Text style={styles.rank}>#{index + 1}</Text>
                       <Text style={styles.scoreText}>
-                        Nickname: {score.Nickname ?? "Unknown"}
+                        Nickname: {score.nickname ?? "Unknown"}
                       </Text>
                       <Text style={styles.scoreText}>
                         Difficulty: {score.difficulty ?? "Unknown"}
                       </Text>
                       <Text style={styles.scoreText}>
-                        Time: {score.timeInSeconds != null ? formattedTime(score.timeInSeconds) : "N/A"}
+                        Time:{" "}
+                        {score.timeInSeconds != null
+                          ? formattedTime(score.timeInSeconds)
+                          : "N/A"}
                       </Text>
                     </View>
                   ))}
@@ -113,9 +148,13 @@ export default function SudokuResult({ route, navigation }) {
           <Text style={styles.noScores}>No scores yet!</Text>
         )}
       </ScrollView>
-      <TouchableOpacity style={styles.Homebutton} onPress={() => navigation.navigate("Home")}>
-        <Text style={styles.buttonText}>Home</Text>
-      </TouchableOpacity>
+
+      {/* Modal: Valitse vaikeustaso uudelleen pelatakseen */}
+      <DifficultySelectorModal
+        visible={playAgainModalVisible}
+        onSelect={handlePlayAgainSelect}
+        onCancel={() => setPlayAgainModalVisible(false)}
+      />
     </View>
   );
 }

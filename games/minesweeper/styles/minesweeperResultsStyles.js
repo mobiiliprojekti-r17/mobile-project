@@ -103,7 +103,13 @@ const styles = StyleSheet.create({
     color: "rgb(4, 201, 103)",                                        
 marginBottom: 5,
   },
-  Homebutton: {
+  resultButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around", // tai 'space-evenly', jos haluat tasaisen etäisyyden
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  Button: {
   backgroundColor: "rgb(71, 224, 148)", 
   width: 100,
   height: 40,
@@ -111,13 +117,13 @@ marginBottom: 5,
   alignItems: "center",
   margin: 5,
   borderRadius: 5,
-  marginLeft: 20,
-  marginRight: 10,
+  marginLeft: 5,
+  marginRight: 5,
   marginBottom: 30,
   marginTop: 10,
   },
   
-  HomebuttonText: {
+  ButtonText: {
     color: '#fff', 
     fontSize: 18,
     textAlign: 'center',

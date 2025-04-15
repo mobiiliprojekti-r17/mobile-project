@@ -27,6 +27,8 @@ export default StyleSheet.create({
     marginBottom: 10,
     backgroundColor: "rgb(204, 159, 254)",
     color: "rgb(127, 0, 255)",
+    fontFamily: 'CuteFont_400Regular',
+    fontSize: 25,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -46,9 +48,10 @@ export default StyleSheet.create({
   },
   buttonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 25,
     fontWeight: "bold",
     textAlign: "center",
+    fontFamily: 'CuteFont_400Regular',
   },
   gameSection: {
     width: "96%",
@@ -60,14 +63,16 @@ export default StyleSheet.create({
     borderWidth: 5,
     borderRadius: 10,
   },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 20,
-    marginTop: 10,
-    textAlign: "center",
-  },
+sectionTitle: {
+  fontSize: 35,
+  fontWeight: "bold",
+  color: "rgb(127, 0, 255)",
+  marginBottom: 20,
+  marginTop: 10,
+  textAlign: "center",
+  fontFamily: 'CuteFont_400Regular',
+},
+
   fullScreen: {
     flex: 1,
     width: '100%',
@@ -128,11 +133,12 @@ export default StyleSheet.create({
     borderRadius: 10,
   },
   modalText: {
-    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 15,
     textAlign: "center",
     color: "rgb(127, 0, 255)",
+    fontFamily: 'CuteFont_400Regular',
+    fontSize: 35,
   },
   ModalButton: {
     backgroundColor: "rgb(127, 0, 255)",
@@ -142,7 +148,8 @@ export default StyleSheet.create({
   },
   ModalButtonText: {
     color: "white",
-    fontSize: 16,
+    fontFamily: 'CuteFont_400Regular',
+    fontSize: 25,
     fontWeight: "bold",
     textAlign: 'center'
   },
@@ -173,7 +180,8 @@ export default StyleSheet.create({
   },
   difficultyModalButtonText: {
     color: "white",
-    fontSize: 16,
+    fontFamily: 'CuteFont_400Regular',
+    fontSize: 25,
     fontWeight: "bold",
   },
 });
