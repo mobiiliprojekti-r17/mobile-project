@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"; 
 import { View, Text, Alert, Button, Animated } from "react-native";
+import { useNickname } from "../../../context/context";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import { initializeGrid, moveTiles, checkGameOver } from "../utils/2048Logic";
 import { styles, getTileStyle } from "../styles/2048Styles";
@@ -12,7 +13,7 @@ import { ChangaOne_400Regular } from '@expo-google-fonts/changa-one';
 
 const Game2048Screen = ({ route }) => {
   const navigation = useNavigation();
-  const [Nickname, setNickname] = useState('');
+  const { nickname, setNickname } = useNickname();
   const [grid, setGrid] = useState(initializeGrid());
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
@@ -59,7 +60,7 @@ const Game2048Screen = ({ route }) => {
       try {
         const gameResultsRef = collection(db, "2048Results");
         await addDoc(gameResultsRef, {
-          Nickname: Nickname,
+          nickname: nickname || "Unknown",
           score: score,
           time: formatTime(time),
         });
@@ -69,7 +70,6 @@ const Game2048Screen = ({ route }) => {
       }
 
       navigation.replace("Game2048ResultScreen", {
-        Nickname,
         score,
         time: formatTime(time),
       });
