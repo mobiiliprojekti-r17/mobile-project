@@ -8,7 +8,7 @@ const FlappyBirdScreen = ({ navigation }) => {
   const [running, setRunning] = useState(false);
   const [overlayType, setOverlayType] = useState("start");
   const [score, setScore] = useState(0);
-  const [gameKey, setGameKey] = useState(0); // New state to trigger remount
+  const [gameKey, setGameKey] = useState(0); 
 
   const onGameOver = () => {
     setRunning(false);
@@ -16,7 +16,6 @@ const FlappyBirdScreen = ({ navigation }) => {
   };
 
   const startGame = () => {
-    // Reset everything on a new start, including the key so the engine remounts.
     setScore(0);
     setOverlayType(null);
     setRunning(true);
@@ -24,7 +23,6 @@ const FlappyBirdScreen = ({ navigation }) => {
   };
 
   const resetGame = () => {
-    // On game over, reset everything just as in startGame.
     setScore(0);
     setOverlayType(null);
     setRunning(true);
@@ -34,7 +32,7 @@ const FlappyBirdScreen = ({ navigation }) => {
   return (
     <View style={{ flex: 1 }}>
       <MatterGameEngine
-        key={gameKey}  // Changing key forces remount and reinitializes the engine
+        key={gameKey}  
         running={running}
         onGameOver={onGameOver}
         onEvent={(e) => {
@@ -56,7 +54,6 @@ const FlappyBirdScreen = ({ navigation }) => {
       <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate("Home")}>
         <Text style={styles.buttonText}>Home</Text>
       </TouchableOpacity>
-      {/* Display the current score */}
       <Text style={styles.score}>{score}</Text>
     </View>
   );

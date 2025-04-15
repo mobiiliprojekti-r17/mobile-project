@@ -1,9 +1,11 @@
-import { StyleSheet } from 'react-native';
+
+import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   pipe: {
-    position: 'absolute',
-    backgroundColor: 'green',
+    backgroundColor: "green",
     width: 60,
+    borderWidth: 1,
+    borderColor: "#004400",
   },
 });
