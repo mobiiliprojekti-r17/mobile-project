@@ -73,7 +73,7 @@ export default function Game2048ResultScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.ChangaOneText, {fontFamily: 'ChangaOne_400Regular'}]}>Game Over</Text>
+      <Text style={[styles.ChangaOneText, {fontFamily: 'ChangaOne_400Regular'}]}>Game Over!</Text>
       
       <View style={styles.resultBox}>
         <Text style={styles.infoText}>Player: {nickname}</Text>
