@@ -2,6 +2,7 @@
   "expo": {
     "name": "mobile-project",
     "slug": "mobile-project",
+    "owner": "mobiiliprojekti_r17",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

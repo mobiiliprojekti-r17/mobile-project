@@ -1,16 +1,25 @@
 import React from 'react';
-import { View } from 'react-native';
-import PropTypes from 'prop-types';
-import birdStyles from '../styles/birdStyles';
+import { Image } from 'react-native';
 
-const Bird = ({ birdBottom }) => {
-  return <View style={[birdStyles.bird, { bottom: birdBottom }]} />;
+  const Bird = (props) => {
+  const width = props.body.bounds.max.x - props.body.bounds.min.x;
+  const height = props.body.bounds.max.y - props.body.bounds.min.y;
+  const x = props.body.position.x - width / 2;
+  const y = props.body.position.y - height / 2;
+
+  return (
+    <Image 
+        source={require('../../../assets/FlappyBirdIcon.jpg')}
+    style={{
+        position: 'absolute',
+        left: x,
+        top: y,
+        width: width,
+        height: height,
+      }}
+      resizeMode="contain"
+    />
+  );
 };
 
-Bird.propTypes = {
-  birdBottom: PropTypes.number.isRequired,
-};
-
-// Optionally wrap with React.memo for performance optimization
-// export default React.memo(Bird);
 export default Bird;
