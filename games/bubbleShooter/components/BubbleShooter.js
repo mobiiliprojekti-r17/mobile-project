@@ -13,6 +13,7 @@ import {
   snapToGrid
 } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
+import AnimatedBall from './ShooterBallAnimation';
 import { useRoute } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
 import { collection, addDoc } from "firebase/firestore";
@@ -47,8 +48,9 @@ const BubbleShooter = ({ navigation }) => {
   const route = useRoute();
   const { nickname } = useNickname();
   const rafIdRef = useRef(null);
+  const [poppedBalls, setPoppedBalls] = useState([]);
 
-  // Muuntaa ruudukon koordinaateiksi
+  // Muunnetaan ruudukko kordinaateiksi
   const gridToPosition = (row, col) => {
     let baseOffset = (width - (numCols * horizontalSpacing)) / 2;
     if (row % 2 !== 0) {
@@ -56,8 +58,6 @@ const BubbleShooter = ({ navigation }) => {
     }
     return { x: baseOffset + col * horizontalSpacing, y: topOffset + row * verticalSpacing };
   };
-
-  // Palauttaa ruudukon rivin indeksin annetusta y-arvosta
   const getGridRow = (y) => Math.round((y - topOffset) / verticalSpacing);
 
   // Häviämisehto: jos jonkin pallon ruudukon rivi ylittää sallitun rajan.
@@ -67,13 +67,13 @@ const BubbleShooter = ({ navigation }) => {
     staticBallsRef.current = staticBalls;
   }, [staticBalls]);
 
-  // addRow: repositionoi olemassa olevat pallot (gridRow-arvoa kasvatetaan) ja lisää uuden yläreunan.
+  // addRow: repositionoi olemassa olevat pallot ja lisää uuden yläreunan.
   // Lisäksi poistaa "leijuvat" pallot.
   const addRows = (numRows = 1) => {
     setStaticBalls(prevBalls => {
       let combinedBalls = prevBalls;
       for (let i = 0; i < numRows; i++) {
-        // Repositionoi olemassa olevat pallot ja siirretään niitä alaspäin
+        // Siirretään olemassa olevia palloja alaspäin
         combinedBalls = combinedBalls.map(ball => {
           if (typeof ball.gridRow !== 'number' || typeof ball.gridCol !== 'number') {
             const snappedCoords = snapToGrid(ball, width, numCols);
@@ -91,10 +91,8 @@ const BubbleShooter = ({ navigation }) => {
           return ball;
         });
   
-        // Lasketaan käytettävissä olevat värit nykyisistä palloista
         const availableColors = getAvailableColors(combinedBalls);
   
-        // Luodaan uusi rivi
         const newRowBalls = [];
         for (let col = 0; col < numCols; col++) {
           const pos = gridToPosition(0, col);
@@ -103,7 +101,6 @@ const BubbleShooter = ({ navigation }) => {
             restitution: 0,
             collisionFilter: { category: 0x0001, mask: 0x0002 },
           });
-          // Käytetään vain niitä värejä, jotka ovat vielä käytössä
           newBall.color = availableColors.length > 0 
             ? availableColors[Math.floor(Math.random() * availableColors.length)]
             : getRandomPastelColor();
@@ -115,7 +112,6 @@ const BubbleShooter = ({ navigation }) => {
         }
   
         combinedBalls = [...newRowBalls, ...combinedBalls];
-        // Poistetaan mahdolliset leijuvat pallot
         const floating = findFloatingBalls(combinedBalls);
         floating.forEach(ball => Matter.World.remove(world, ball));
         combinedBalls = combinedBalls.filter(ball => !floating.includes(ball));
@@ -123,10 +119,8 @@ const BubbleShooter = ({ navigation }) => {
       return combinedBalls;
     });
   };
-  
-  
 
-  // Tarkistetaan törmäystilanteet: sekä osuma staattiseen palloon että kattoon
+  // Törmäystapahtumien hallinta: sekä osuma staattiseen palloon että kattoon
   useEffect(() => {
     initShooterBall();
     const initialStaticBalls = createStaticBalls(world, 9, numCols, width);
@@ -142,7 +136,7 @@ const BubbleShooter = ({ navigation }) => {
         if (other) {
           const isStaticBall = staticBallsRef.current.some((b) => b.id === other.id);
           if (isStaticBall) {
-            // Aseta ohjauspallo pysähtymään ja snapataan ruudukkoon
+            // Pysäytetään ohjauspallo ja snapataan ruudukkoon
             Matter.Body.setVelocity(shooter, { x: 0, y: 0 });
             Matter.Body.setStatic(shooter, true);
 
@@ -158,7 +152,11 @@ const BubbleShooter = ({ navigation }) => {
             const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
 
             if (cluster.length > 0) {
-              cluster.forEach(ball => Matter.World.remove(world, ball));
+              // Lisätään poistettujen pallojen tiedot animaatiota varten
+              cluster.forEach(ball => {
+                setPoppedBalls(prev => [...prev, { id: ball.id, x: ball.position.x, y: ball.position.y, color: ball.color }]);
+                Matter.World.remove(world, ball);
+              });
               setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
               setScore(prev => {
                 const newScore = prev + cluster.length * 10;
@@ -166,22 +164,16 @@ const BubbleShooter = ({ navigation }) => {
                 return newScore;
               });
             } else {
-              // Kasvata laukaisulaskuria – nyt aina attachataan ohjauspallo
               shotCounterRef.current += 1;
-              // Liitetään ohjauspallo aina ruudukkoon
               setStaticBalls(prev => [...prev, shooter]);
-              // Esimerkiksi törmäyksessä, kun laukaisulaskuri saavuttaa rajan:
-            if (shotCounterRef.current >= 5) {
-              shotCounterRef.current = 0;
-              // Hae käytettävissä olevien värejen määrä nykyisistä staattisista palloista
-              const availableColors = getAvailableColors(staticBallsRef.current);
-              // Jos jäljellä on tarkalleen 2 väriä, lisätään 2 riviä, muuten 1 rivi
-              const rowsToAdd = availableColors.length === 2 ? 4 : 1;
-              addRows(rowsToAdd);
-            }
+              if (shotCounterRef.current >= 5) {
+                shotCounterRef.current = 0;
+                const availableColors = getAvailableColors(staticBallsRef.current);
+                const rowsToAdd = availableColors.length === 2 ? 4 : 1;
+                addRows(rowsToAdd);
+              }
             }
 
-            // Poistetaan mahdolliset "floating" pallot
             const updatedBalls = staticBallsRef.current.filter(ball => !cluster.includes(ball));
             const floatingBalls = findFloatingBalls(updatedBalls);
             if (floatingBalls.length > 0) {
@@ -217,7 +209,10 @@ const BubbleShooter = ({ navigation }) => {
 
           const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
           if (cluster.length > 0) {
-            cluster.forEach(ball => Matter.World.remove(world, ball));
+            cluster.forEach(ball => {
+              setPoppedBalls(prev => [...prev, { id: ball.id, x: ball.position.x, y: ball.position.y, color: ball.color }]);
+              Matter.World.remove(world, ball);
+            });
             setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
             setScore(prev => {
               const newScore = prev + cluster.length * 10;
@@ -355,20 +350,36 @@ const BubbleShooter = ({ navigation }) => {
     <>
       <TouchableWithoutFeedback onPress={handleTouch}>
         <View style={shooterStyles.shooterGameContainer}>
-          <Text style={shooterStyles.shooterScoreText}>Score: {score}</Text>
+          {/* Header container sisältää score-tekstin ja home-ikonin */}
+          <View style={shooterStyles.headerContainer}>
+          <TouchableOpacity onPress={() => navigation.replace('Home')}>
+              <Ionicons name="home" style={shooterStyles.shooterHomeIcon} />
+            </TouchableOpacity>
+            <Text style={shooterStyles.shooterScoreText}>Score: {score}</Text>
+          </View>
+  
+          {/* Pelin elementit */}
           {staticBalls.map(ball => (
             <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
           ))}
           <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
+          {/* Pop-animaatiot */}
+          {poppedBalls.map(pop => (
+            <AnimatedBall
+              key={pop.id}
+              x={pop.x}
+              y={pop.y}
+              size={40}
+              color={pop.color}
+              onAnimationEnd={() => {
+                setPoppedBalls(prev => prev.filter(item => item.id !== pop.id));
+              }}
+            />
+          ))}
         </View>
       </TouchableWithoutFeedback>
-      <View style={shooterStyles.shooterHomeButtonContainer}>
-        <TouchableOpacity onPress={() => navigation.replace('Home')}>
-          <Ionicons name="home" style={shooterStyles.shooterHomeIcon} />
-        </TouchableOpacity>
-      </View>
     </>
-  );
+  );  
 };
 
 export default BubbleShooter;
