@@ -1,27 +1,25 @@
+import React from 'react';
+import { Image } from 'react-native';
 
+  const Bird = (props) => {
+  const width = props.body.bounds.max.x - props.body.bounds.min.x;
+  const height = props.body.bounds.max.y - props.body.bounds.min.y;
+  const x = props.body.position.x - width / 2;
+  const y = props.body.position.y - height / 2;
 
-import React from "react";
-import { View } from "react-native";
-import PropTypes from "prop-types";
-import birdStyles from "../styles/birdStyles";
-
-const Bird = ({ body, size, color }) => {
-  const x = body.position.x - size[0] / 2;
-  const y = body.position.y - size[1] / 2;
   return (
-    <View
-      style={[
-        birdStyles.bird,
-        { left: x, top: y, width: size[0], height: size[1], backgroundColor: color || "yellow" },
-      ]}
+    <Image 
+        source={require('../../../assets/FlappyBirdIcon.jpg')}
+    style={{
+        position: 'absolute',
+        left: x,
+        top: y,
+        width: width,
+        height: height,
+      }}
+      resizeMode="contain"
     />
   );
-};
-
-Bird.propTypes = {
-  body: PropTypes.object.isRequired,
-  size: PropTypes.arrayOf(PropTypes.number).isRequired,
-  color: PropTypes.string,
 };
 
 export default Bird;
