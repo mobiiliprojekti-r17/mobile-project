@@ -156,4 +156,27 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  instruction: {
+    fontSize: 16,
+    marginVertical: 4,
+    textAlign: "center",
+  },
+  button: {
+    marginTop: 20,
+    backgroundColor: "rgb(63, 210, 136)",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  buttonText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+
 });
