@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Modal } from "react-native";
+import { View, Text } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Board from "../components/minesweeperboad";
-import { styles } from "../styles/minesweeperStyles";
-import Icon from "react-native-vector-icons/Feather";
-import InstructionsModal from "../components/InstructionsModal";
+import styles from "../styles/minesweeperStyles";
 import useTimer from "../hooks/useTimer";
 import useMinesweeper from "../hooks/useMinesweeper";
-import DifficultySelectorModal from "../components/difficultyModals";
+import DifficultySelectorModal from "../Modals/difficultyModals";
 import { saveMinesweeperResult } from "../hooks/useFirebase";
 import GameHeader from "../components/gameHeader";
+import InstructionsModal from "../Modals/InstructionsModal";
+import GameButtons from "../components/GameButtons";
+import ResultModal from "../Modals/ResultModal";
+import { useFonts, VT323_400Regular } from "@expo-google-fonts/vt323";
 
 const MinesweeperScreen = () => {
+  const [fontsLoaded] = useFonts({
+    VT323_400Regular,
+  });
+
   const route = useRoute();
   const navigation = useNavigation();
   const { difficulty: initialDifficulty } = route.params || { difficulty: "easy" };
@@ -20,8 +26,8 @@ const MinesweeperScreen = () => {
   const [resultModalVisible, setResultModalVisible] = useState(false);
   const [restartModalVisible, setRestartModalVisible] = useState(false);
   const [resultMessage, setResultMessage] = useState("");
-  const [instructionsVisible, setInstructionsVisible] = useState(true);
-  const { board, gameOver, win, difficulty, remainingMines, resetGame, revealTile, flagTile, changeDifficulty, revealAllTiles  } = useMinesweeper(initialDifficulty);
+  const [instructionsVisible, setInstructionsVisible] = useState(false);
+  const { board, gameOver, win, difficulty, remainingMines, resetGame, revealTile, flagTile, changeDifficulty, revealAllTiles, } = useMinesweeper(initialDifficulty);
   const isTimerRunning = !gameOver && !win;
   const { timer, formatTime, resetTimer } = useTimer(isTimerRunning);
 
@@ -45,17 +51,13 @@ const MinesweeperScreen = () => {
       revealAllTiles();
       setResultMessage("You win!");
       setTimeout(() => setResultModalVisible(true), 500);
-    }
-  }, [win]);
-
-  useEffect(() => {
-    if (gameOver && !win) {
-      setResultMessage("You hit a bomb!");
+    } else if (gameOver) {
+      setResultMessage("You hit a mine!");
       setTimeout(() => setResultModalVisible(true), 500);
-      setShowResultButton(true);
+      setShowResultButton(false);
     }
-  }, [gameOver, win]);
-
+  }, [win, gameOver]);
+  
   const handleDifficultyChange = (newDifficulty) => {
     changeDifficulty(newDifficulty);
     resetTimer();
@@ -65,9 +67,14 @@ const MinesweeperScreen = () => {
     setRestartModalVisible(false);
   };
 
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Minesweeper</Text>
+      
       <GameHeader 
         difficulty={difficulty} 
         timer={timer} 
@@ -77,47 +84,35 @@ const MinesweeperScreen = () => {
 
       <Board board={board} revealTile={revealTile} flagTile={flagTile} difficulty={difficulty} />
 
-      <View style={styles.buttonContainer}>
-        {/* Restart- ja Home-napit ovat aina näkyvillä */}
-        <TouchableOpacity style={styles.button} onPress={() => setRestartModalVisible(true)}>
-          <Text style={styles.buttonText}>Restart</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
-          <Icon name="home" size={24} color="#fff" />
-        </TouchableOpacity>
-        
-        {/* Result-nappi näytetään vain voiton tai häviön jälkeen */}
-        {showResultButton && (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              navigation.navigate("MinesweeperResults", {
-                nickname,
-                time: timer,
-                difficulty,})
-               }>
-            <Text style={styles.buttonText}>Results</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      <GameButtons
+        onInfoPress={() => setInstructionsVisible(true)}
+        onRestartPress={() => setRestartModalVisible(true)}
+        onHomePress={() => navigation.navigate("Home")}
+        onResultsPress={() =>
+          navigation.navigate("MinesweeperResults", {
+            nickname,
+            time: timer,
+            difficulty,
+          })
+        }
+        showResults={showResultButton}
+      />
 
-      <Modal transparent animationType="fade" visible={resultModalVisible}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>{resultMessage}</Text>
-            <TouchableOpacity 
-              onPress={() => setResultModalVisible(false)} 
-              style={styles.modalButton}>
-              <Text style={styles.modalButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <ResultModal
+        visible={resultModalVisible}
+        message={resultMessage}
+        onClose={() => setResultModalVisible(false)}
+      />
 
       <DifficultySelectorModal
         visible={restartModalVisible}
         onSelect={handleDifficultyChange}
         onCancel={() => setRestartModalVisible(false)}
+      />
+
+      <InstructionsModal 
+        visible={instructionsVisible} 
+        onClose={() => setInstructionsVisible(false)} 
       />
     </View>
   );

@@ -1,4 +1,3 @@
-// utils/boardUtils.js
 export const revealCells = (board, row, col) => {
     if (board[row][col].revealed || board[row][col].flagged) return;
     board[row][col].revealed = true;

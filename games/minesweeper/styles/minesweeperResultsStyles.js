@@ -9,18 +9,20 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 70,
     fontWeight: "bold",
     color:  "rgb(4, 201, 103)", 
     marginBottom: 20,
     marginTop: 60,
+    fontFamily: "VT323_400Regular",
   },  
   title2: {
-    fontSize: 28,
+    fontSize: 40,
     fontWeight: "bold",
     color:  "rgb(4, 201, 103)", 
     marginBottom: 10,
     marginTop: 10,
+    fontFamily: "VT323_400Regular",
   },
   resultBox: {
     backgroundColor: "rgb(119, 250, 185)", 
@@ -31,9 +33,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   infoText: {
-    fontSize: 18,
-    color: "rgb(0, 0, 0)", 
+    fontSize: 25,
+    color: "rgb(0, 105, 53)", 
     marginBottom: 5,
+    fontFamily: "VT323_400Regular",
   },
   scrollView: {
     width: "90%",
@@ -49,15 +52,17 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   scoreText: {
-    fontSize: 16,
-    color: "rgb(0, 0, 0)", 
+    fontSize: 20,
+    color: "rgb(0, 105, 53)", 
     marginBottom: 2,
+    fontFamily: "VT323_400Regular",
   },
   noScores: {
     fontSize: 16,
     color: "#555", 
     textAlign: "center",
     marginTop: 10,
+    fontFamily: "VT323_400Regular",
   },
   difficultySection: {
     marginBottom: 15,
@@ -66,10 +71,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   difficultyTitle: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: "bold",
-    color:"rgb(4, 201, 103)", 
+    color:"rgb(0, 105, 53)", 
     marginBottom: 5,
+    fontFamily: "VT323_400Regular",
   },
   picker: {
     width: "80%",
@@ -94,40 +100,36 @@ const styles = StyleSheet.create({
     backgroundColor: "rgb(71, 224, 148)",
   },
   buttonText: {
-    color: "#000", 
+    color: "rgb(0, 105, 53)", 
     fontWeight: "bold",
+    fontFamily: "VT323_400Regular",
+    fontSize: 23,
   },
   rank: {
-    fontSize: 20,
+    fontSize: 40,
     fontWeight: "bold",
-    color: "rgb(4, 201, 103)",                                        
-marginBottom: 5,
+    color: "rgb(0, 105, 53)",                                        
+    marginBottom: 5,
+    fontFamily: "VT323_400Regular",
   },
   resultButtonContainer: {
     flexDirection: "row",
-    justifyContent: "space-around", // tai 'space-evenly', jos haluat tasaisen etäisyyden
+    justifyContent: "space-around",
     alignItems: "center",
     marginVertical: 5,
   },
   Button: {
   backgroundColor: "rgb(71, 224, 148)", 
-  width: 100,
-  height: 40,
-  justifyContent: "center",
-  alignItems: "center",
-  margin: 5,
+  padding: 10,
+  marginHorizontal: 10,
   borderRadius: 5,
-  marginLeft: 5,
-  marginRight: 5,
-  marginBottom: 30,
-  marginTop: 10,
   },
-  
   ButtonText: {
-    color: '#fff', 
-    fontSize: 18,
+    color: "rgb(0, 105, 53)", 
+    fontSize: 25,
     textAlign: 'center',
     fontWeight: 'bold',
+    fontFamily: "VT323_400Regular",
   }
 });
 

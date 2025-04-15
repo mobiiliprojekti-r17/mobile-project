@@ -1,4 +1,3 @@
-// hooks/useMinesweeper.js
 import { useState } from "react";
 import { generateBoard } from "../components/generateboard";
 
@@ -14,16 +13,28 @@ const useMinesweeper = (initialDifficulty = "easy") => {
   const [gameOver, setGameOver] = useState(false);
   const [win, setWin] = useState(false);
   const [remainingMines, setRemainingMines] = useState(DIFFICULTY_LEVELS[initialDifficulty].mines);
+  const [isFirstClick, setIsFirstClick] = useState(true);
 
   const resetGame = () => {
     const { size, mines } = DIFFICULTY_LEVELS[difficulty];
     setRemainingMines(mines);
-    setBoard(generateBoard(size, mines));
+    const emptyBoard = Array(size)
+      .fill()
+      .map(() =>
+        Array(size)
+          .fill()
+          .map(() => ({
+            mine: false,
+            revealed: false,
+            flagged: false,
+            number: 0,
+          }))
+      );
+    setBoard(emptyBoard);
     setGameOver(false);
     setWin(false);
+    setIsFirstClick(true);
   };
-
-  // Funktioiden paljastus, liputus jne. voidaan myös siirtää tänne
 
   const revealAllTiles = () => {
     setBoard((prev) =>
@@ -31,42 +42,14 @@ const useMinesweeper = (initialDifficulty = "easy") => {
     );
   };
 
- // hooks/useMinesweeper.js (osa funktiota)
-const revealTile = (row, col) => {
-    if (gameOver || win) return;
-  
-    // Kopioidaan nykyinen lauta
-    const newBoard = board.map((r) => r.map((cell) => ({ ...cell })));
-  
-    // Jos solussa on pommi, asetetaan eksplosio
-    if (newBoard[row][col].mine) {
-      newBoard[row][col].exploded = true;  // Tämä tila käytetään solun punaisena näyttämisenä
-      setBoard(newBoard);
-      // Aseta pelin tilaksi gameOver
-      setGameOver(true);
-      // Optionaalisesti: paljasta kaikki pommit
-      revealAllMines();
-      return;
-    }
-  
-    // Jos solussa ei ole pommia, jatketaan normaalilla paljastuksella
-    revealCells(newBoard, row, col);
-    setBoard(newBoard);
-  
-    if (checkWin(newBoard)) {
-      setWin(true);
-      revealAllTiles();
-    }
-  };
-  
-
   const revealCells = (board, row, col) => {
     if (board[row][col].revealed || board[row][col].flagged) return;
     board[row][col].revealed = true;
     if (board[row][col].number === 0) {
       for (let dr = -1; dr <= 1; dr++) {
         for (let dc = -1; dc <= 1; dc++) {
-          const nr = row + dr, nc = col + dc;
+          const nr = row + dr,
+            nc = col + dc;
           if (nr >= 0 && nr < board.length && nc >= 0 && nc < board[0].length) {
             revealCells(board, nr, nc);
           }
@@ -84,13 +67,14 @@ const revealTile = (row, col) => {
   };
 
   const checkWin = (board) => {
-    return board.every((row) => row.every((cell) => cell.mine || cell.revealed));
+    return board.every((row) =>
+      row.every((cell) => cell.mine || cell.revealed)
+    );
   };
 
   const flagTile = (row, col) => {
     if (gameOver || win) return;
     if (board[row][col].revealed) return;
-    // Päivitä liputuksen logiikkaa
     const targetCell = board[row][col];
     if (targetCell.flagged) {
       setRemainingMines((prev) => prev + 1);
@@ -111,18 +95,39 @@ const revealTile = (row, col) => {
     resetGame();
   };
 
-  return {
-    board,
-    gameOver,
-    win,
-    difficulty,
-    remainingMines,
-    resetGame,
-    revealTile,
-    flagTile,
-    changeDifficulty,
-    revealAllTiles,
+  const revealTile = (row, col) => {
+    if (gameOver || win) return;
+
+    if (isFirstClick) {
+      const { size, mines } = DIFFICULTY_LEVELS[difficulty];
+      const newBoard = generateBoard(size, mines, row, col); 
+      setBoard(newBoard);
+      setIsFirstClick(false);
+      revealCells(newBoard, row, col);
+      if (checkWin(newBoard)) {
+        setWin(true);
+        revealAllTiles();
+      }
+      return;
+    }
+
+    const newBoard = board.map((r) => r.map((cell) => ({ ...cell })));
+    if (newBoard[row][col].mine) {
+      newBoard[row][col].exploded = true;
+      setBoard(newBoard);
+      setGameOver(true);
+      revealAllMines();
+      return;
+    }
+    revealCells(newBoard, row, col);
+    setBoard(newBoard);
+    if (checkWin(newBoard)) {
+      setWin(true);
+      revealAllTiles();
+    }
   };
+
+  return { board, gameOver, win, difficulty, remainingMines, resetGame, revealTile, flagTile, changeDifficulty, revealAllTiles};
 };
 
 export default useMinesweeper;

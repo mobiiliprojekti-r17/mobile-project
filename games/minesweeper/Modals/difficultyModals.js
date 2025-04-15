@@ -1,25 +1,24 @@
-// components/DifficultySelectorModal.js
 import React from "react";
 import { View, Text, TouchableOpacity, Modal } from "react-native";
-import { styles } from "../styles/minesweeperStyles";
+import  ModalStyles  from "../styles/ModalStyles";
 
 const DifficultySelectorModal = ({ visible, onSelect, onCancel }) => {
   return (
     <Modal transparent animationType="fade" visible={visible}>
-      <View style={styles.modalOverlay}>
-        <View style={styles.difficultyModalContent}>
-          <Text style={styles.modalText}>Choose difficulty</Text>
+      <View style={ModalStyles.modalOverlay}>
+        <View style={ModalStyles.difficultyModalContent}>
+          <Text style={ModalStyles.modalText}>Choose difficulty</Text>
           {["easy", "medium", "hard"].map((level) => (
             <TouchableOpacity
               key={level}
               onPress={() => onSelect(level)}
-              style={styles.difficultyModalButton}
+              style={ModalStyles.difficultyModalButton}
             >
-              <Text style={styles.modalButtonText}>{level}</Text>
+              <Text style={ModalStyles.modalButtonText}>{level}</Text>
             </TouchableOpacity>
           ))}
-          <TouchableOpacity onPress={onCancel} style={styles.difficultyModalButton}>
-            <Text style={styles.modalButtonText}>Cancel</Text>
+          <TouchableOpacity onPress={onCancel} style={ModalStyles.difficultyModalButton}>
+            <Text style={ModalStyles.modalButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
       </View>

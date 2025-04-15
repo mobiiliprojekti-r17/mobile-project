@@ -60,7 +60,7 @@ export default StyleSheet.create({
     padding: sectionPadding,
     marginBottom: 20,
     borderColor: "rgb(127, 0, 255)",
-    borderWidth: 5,
+    borderWidth: 2,
     borderRadius: 10,
   },
 sectionTitle: {
@@ -100,7 +100,7 @@ sectionTitle: {
     justifyContent: 'center',
     alignItems: 'center',
     borderColor: "rgb(127, 0, 255)",
-    borderWidth: 5,
+    borderWidth: 2,
     borderRadius: 15,
     overflow: 'hidden',
     marginBottom: buttonSpacing,

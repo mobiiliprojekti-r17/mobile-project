@@ -1,7 +1,6 @@
-// components/GameHeader.js
 import React from "react";
 import { View, Text } from "react-native";
-import { styles } from "../styles/minesweeperStyles";
+import  styles  from "../styles/minesweeperStyles";
 
 const GameHeader = ({ difficulty, timer, remainingMines, formatTime }) => {
   return (
