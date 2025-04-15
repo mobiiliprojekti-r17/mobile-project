@@ -178,6 +178,11 @@ export default function BrickBreaker() {
         score: score,
       });
       console.log("Result stored in Firestore.");
+      navigation.navigate("BreakerResults", {
+        Nickname: nickname,
+        level: gameState.level,
+        score: score,
+      });
     } catch (error) {
       console.error("Error storing result: ", error);
     }
@@ -226,7 +231,6 @@ export default function BrickBreaker() {
     setGameStarted(false);
     setLevelCleared(false);
     gameEngine.current.stop();
-    storeResult()
   };
 
   return (
@@ -286,9 +290,17 @@ export default function BrickBreaker() {
       <Text style={BreakerStyles.buttonText}>Play Again</Text>
     </TouchableOpacity>
 
-    <TouchableOpacity style={BreakerStyles.button} onPress={storeResult}>
-      <Text style={BreakerStyles.buttonText}>Results</Text>
-    </TouchableOpacity>
+    <TouchableOpacity style={BreakerStyles.button} onPress={() => {
+  storeResult().then(() => {
+    navigation.navigate("BreakerResults", {
+      Nickname: nickname,
+      level: gameState.level,
+      score: score,
+    });
+  });
+}}>
+  <Text style={BreakerStyles.buttonText}>Results</Text>
+</TouchableOpacity>
   </View>
 )}
 
@@ -305,7 +317,7 @@ export default function BrickBreaker() {
 
 {!gameOver && !levelCleared && !gameStarted && (
   <TouchableOpacity
-    style={styles.overlay}
+    style={BreakerStyles.overlay}
     activeOpacity={0.8}
     onPress={() => {
       setGameStarted(true);
@@ -315,7 +327,7 @@ export default function BrickBreaker() {
       Matter.Body.setVelocity(gameState.ball, { x: 0, y: fixedSpeed });   //Alas
     }}
   >
-    <Text style={styles.gameOverText}>Press to Start</Text>
+    <Text style={BreakerStyles.overlayText}>Press to Start</Text>
   </TouchableOpacity>
 )}
 
