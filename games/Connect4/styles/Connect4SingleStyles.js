@@ -8,25 +8,19 @@ export default StyleSheet.create({
     backgroundColor: "rgb(255, 246, 143)", 
   },
   title: {
-    fontSize: 40,
+    fontSize: 60,
     fontWeight: 'bold',
     marginTop: 20,
     marginBottom: 20,
     color: '#3b2a3a',  
-    textShadowColor: '#fff',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+    fontFamily: 'FredokaOne_400Regular',
   },
-player: {
-  fontSize:20,
-marginBottom: 10,
+  player: {
+  fontSize:25,
+  marginBottom: 10,
+  fontFamily: 'FredokaOne_400Regular',
 },
-  winnerText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#3b2a3a', 
-    marginTop: 10,
-  },
+
   board: {
     backgroundColor: "rgb(255, 204, 0)", 
     padding: 10,
@@ -49,10 +43,16 @@ marginBottom: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  
   disc: {
     width: 40,
     height: 40,
-    borderRadius: 22.5,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 2,
+    elevation: 3,
   },
   button: {
     marginTop: 20,
@@ -62,7 +62,8 @@ marginBottom: 10,
   },
   buttonText: {
     color: 'white', 
-    fontSize: 18,
+    fontSize: 25,
+    fontFamily: 'FredokaOne_400Regular',
   },
 // Modal styles
 modalOverlay: {
@@ -96,6 +97,7 @@ modalText: {
   marginBottom: 15,
   textAlign: "center",
   color: "white",
+  fontFamily: 'FredokaOne_400Regular',
 },
 
 modalButton: {
@@ -108,5 +110,6 @@ modalButtonText: {
   color: "white",
   fontSize: 16,
   fontWeight: "bold",
+  fontFamily: 'FredokaOne_400Regular',
 },
 });
