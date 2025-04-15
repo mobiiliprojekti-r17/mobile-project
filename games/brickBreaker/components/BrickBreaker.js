@@ -37,7 +37,8 @@ const setupWorld = (level = 1) => {
 
   const ball = Matter.Bodies.circle(
     200 * scaleFactor,
-    520 * scaleFactor,
+  // 520 * scaleFactor,  //Mailalla
+    350 * scaleFactor, //Ala tiili rivi
     10 * scaleFactor,
     {
       isStatic: true,
@@ -87,10 +88,10 @@ const setupWorld = (level = 1) => {
   const bricks = [];
   const brickCols = 6;
   const brickRows = 7;
-  const brickWidth = 50 * scaleFactor;
+  const brickWidth = 58 * scaleFactor;
   const brickHeight = 30 * scaleFactor;
-  const spacingX = 8 * scaleFactor;
-  const spacingY = 10 * scaleFactor;
+  const spacingX = 5 * scaleFactor;
+  const spacingY = 5 * scaleFactor;
 
   const totalBrickWidth = brickCols * brickWidth + (brickCols - 1) * spacingX;
   const startX = (SCREEN_WIDTH - totalBrickWidth) / 2;
@@ -180,11 +181,7 @@ export default function BrickBreaker() {
     } catch (error) {
       console.error("Error storing result: ", error);
     }
-    navigation.navigate("BreakerResults", {
-      nickname,
-      level: gameState.level,
-      score,
-    });
+    
   };
 
   const nextLevel = () => {
@@ -229,6 +226,7 @@ export default function BrickBreaker() {
     setGameStarted(false);
     setLevelCleared(false);
     gameEngine.current.stop();
+    storeResult()
   };
 
   return (
@@ -304,11 +302,22 @@ export default function BrickBreaker() {
   </View>
 )}
 
-      {!gameOver && !levelCleared && !gameStarted && (
-        <View style={BreakerStyles.overlay}>
-          <Text style={BreakerStyles.overlayText}>Press to Start</Text>
-        </View>
-      )}
+
+{!gameOver && !levelCleared && !gameStarted && (
+  <TouchableOpacity
+    style={styles.overlay}
+    activeOpacity={0.8}
+    onPress={() => {
+      setGameStarted(true);
+      const baseSpeed = 4 * scaleFactor;
+      const fixedSpeed = baseSpeed + gameState.level;
+      //Matter.Body.setVelocity(gameState.ball, { x: 0, y: fixedSpeed });  //Ylös
+      Matter.Body.setVelocity(gameState.ball, { x: 0, y: fixedSpeed });   //Alas
+    }}
+  >
+    <Text style={styles.gameOverText}>Press to Start</Text>
+  </TouchableOpacity>
+)}
 
       <GameEngine
         ref={gameEngine}
