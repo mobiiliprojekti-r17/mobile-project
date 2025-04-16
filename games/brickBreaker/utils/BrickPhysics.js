@@ -9,7 +9,8 @@ const scaleFactor = SCREEN_WIDTH / 400;
 
 export const Physics = (entities, { time, dispatch }) => {
   const engine = entities.physics.engine;
-  Matter.Engine.update(engine, time.delta);
+  const fixedDelta = Math.min(time.delta, 16.000);
+  Matter.Engine.update(engine, fixedDelta);
 
   Object.keys(entities)
     .filter((key) => key.startsWith("ball"))
