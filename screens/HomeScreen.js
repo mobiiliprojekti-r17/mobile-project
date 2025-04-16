@@ -3,8 +3,9 @@ import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView, ImageBackgr
 import { db, collection, addDoc } from '../firebase/Config';
 import styles from "../styles/HomeScreenStyles";
 import { useNickname } from '../context/context';
-import { useFonts, PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
+import { useFonts, PressStart2P_400Regular} from '@expo-google-fonts/press-start-2p';
 import { LinearGradient } from 'expo-linear-gradient';
+import { CuteFont_400Regular } from '@expo-google-fonts/cute-font';
 
 
 const HomeScreen = ({ navigation }) => {
@@ -17,6 +18,7 @@ const HomeScreen = ({ navigation }) => {
 
   const [fontsLoaded] = useFonts({
     PressStart2P_400Regular,
+    CuteFont_400Regular,
   });
 
   if (!fontsLoaded) return null;
@@ -87,13 +89,11 @@ const HomeScreen = ({ navigation }) => {
   <ScrollView
     contentContainerStyle={styles.container}
     showsVerticalScrollIndicator={false}
-    keyboardShouldPersistTaps="handled"
-  >
-               <ImageBackground
+    keyboardShouldPersistTaps="handled">
+    <ImageBackground
     source={require('../assets/HeaderIcon.png')}
     style={styles.logoImage}
-    resizeMode="contain"
-  />
+    resizeMode="contain"/>
         <TextInput
           style={styles.input}
           placeholder="Enter your nickname"
@@ -158,6 +158,12 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Connect4Singleplayer')}>
+          <ImageBackground source={require('../assets/Connect4SingleIcon.jpg')} style={styles.gameButton} 
+          imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
+          </ImageBackground>
+          </TouchableOpacity>
+          
+          <TouchableOpacity onPress={() => navigation.navigate('ColorGame')}>
           <ImageBackground source={require('../assets/Connect4SingleIcon.jpg')} style={styles.gameButton} 
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>

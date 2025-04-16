@@ -1,12 +1,12 @@
 import { Dimensions, StyleSheet } from 'react-native';
-
+ 
 const { width, height } = Dimensions.get("window");
 const buttonsPerRow = 3;
 const containerWidth = width * 0.80;
 const spacing = width * 0.05;
 const totalSpacing = spacing * (buttonsPerRow - 1);
 const buttonWidth = (containerWidth - totalSpacing) / buttonsPerRow;
-
+ 
 export default StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -29,6 +29,9 @@ export default StyleSheet.create({
     marginBottom: height * 0.015,
     backgroundColor: "rgb(204, 159, 254)",
     color: "rgb(127, 0, 255)",
+    marginTop: -100,
+    fontFamily: 'CuteFont_400Regular',
+    fontSize: width * 0.06,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -46,9 +49,10 @@ export default StyleSheet.create({
   },
   buttonText: {
     color: "white",
-    fontSize: width * 0.035,
+    fontSize: width * 0.055,
     fontWeight: "bold",
     textAlign: "center",
+    fontFamily: 'CuteFont_400Regular',
   },
   gameSection: {
     width: width * 0.96,
@@ -60,12 +64,14 @@ export default StyleSheet.create({
     borderRadius: 10,
   },
   sectionTitle: {
-    fontSize: width * 0.05,
+    fontSize: width * 0.10,
     fontWeight: "bold",
     color: "#333",
     marginBottom: height * 0.02,
     marginTop: height * 0.012,
     textAlign: "center",
+    fontFamily: 'CuteFont_400Regular',
+    color: "rgb(127, 0, 255)"
   },
   fullScreen: {
     flex: 1,
@@ -100,7 +106,7 @@ export default StyleSheet.create({
     overflow: 'hidden',
     marginBottom: height * 0.02,
   },
-
+ 
   modalOverlay: {
     position: "absolute",
     top: 0,
@@ -133,6 +139,7 @@ export default StyleSheet.create({
     marginBottom: height * 0.02,
     textAlign: "center",
     color: "rgb(127, 0, 255)",
+    fontFamily: 'CuteFont_400Regular',
   },
   ModalButton: {
     backgroundColor: "rgb(127, 0, 255)",
@@ -144,7 +151,8 @@ export default StyleSheet.create({
     color: "white",
     fontSize: width * 0.04,
     fontWeight: "bold",
-    textAlign: 'center'
+    textAlign: 'center',
+    fontFamily: 'CuteFont_400Regular',
   },
   difficultyModalContent: {
     backgroundColor: "rgb(204, 159, 254)",
@@ -175,5 +183,6 @@ export default StyleSheet.create({
     color: "white",
     fontSize: width * 0.04,
     fontWeight: "bold",
+    fontFamily: 'CuteFont_400Regular',
   },
 });
