@@ -1,57 +1,31 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Button, ScrollView, TouchableOpacity } from "react-native";
-import { db } from "../../../firebase/Config";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
 import styles from "../styles/minesweeperResultsStyles";
 import { useNickname } from "../../../context/context";
+import DifficultySelectorModal from "../Modals/difficultyModals";
+import Icon from "react-native-vector-icons/Feather";
+import ScoreList from "../components/ScoreList";
+import { useFonts, VT323_400Regular } from "@expo-google-fonts/vt323";
+import { formattedTime } from "../utils/Time";
+import useScores from "../hooks/useScores";
 
-export default function SudokuResult({ route, navigation }) {
-  const { nickname } = useNickname()
+const MinesweeperResultScreen = ({ route, navigation }) => {
+  const [fontsLoaded] = useFonts({ VT323_400Regular });
+  const { nickname } = useNickname();
   const { time, difficulty } = route.params;
-  const [scores, setScores] = useState([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
+  const [playAgainModalVisible, setPlayAgainModalVisible] = useState(false);
 
-  useEffect(() => {
-    const fetchScores = async () => {
-      try {
-        const scoresQuery = query(
-          collection(db, "MinesweeperResults"),
-          orderBy("time")
-        );
+  const { scores, loading, error } = useScores();
 
-        const querySnapshot = await getDocs(scoresQuery);
-        const scoresList = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          if (data.time) {
-            const timeParts = data.time.split(":");
-            data.timeInSeconds = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]);
-          } else {
-            data.timeInSeconds = 0;
-          }
-          return data;
-        });
-        setScores(scoresList);
-      } catch (error) {
-        console.error("Virhe tulosten hakemisessa: ", error);
-      }
-    };
+  if (!fontsLoaded) return null;
+  if (loading) return <Text>Loading...</Text>;
+  if (error) return <Text>Error loading scores.</Text>;
 
-    fetchScores();
-  }, [navigation]);
-
-
-  const formattedTime = (timeInSeconds) => {
-    if (timeInSeconds == null) return "N/A";
-    const minutes = Math.floor(timeInSeconds / 60);
-    const secs = timeInSeconds % 60;
-    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+  const handlePlayAgainSelect = (newDifficulty) => {
+    setPlayAgainModalVisible(false);
+    navigation.navigate("Minesweeper", { difficulty: newDifficulty, nickname });
   };
-
-  const groupedScores = scores.reduce((acc, score) => {
-    if (!acc[score.difficulty]) acc[score.difficulty] = [];
-    acc[score.difficulty].push(score);
-    return acc;
-  }, {});
 
   return (
     <View style={styles.container}>
@@ -60,7 +34,18 @@ export default function SudokuResult({ route, navigation }) {
       <View style={styles.resultBox}>
         <Text style={styles.infoText}>Nickname: {nickname}</Text>
         <Text style={styles.infoText}>Difficulty: {difficulty}</Text>
-        <Text style={styles.infoText}>Time: {time ? formattedTime(time) : "N/A"}</Text>
+        <Text style={styles.infoText}>
+          Time: {time ? formattedTime(time) : "N/A"}
+        </Text>
+      </View>
+
+      <View style={styles.resultButtonContainer}>
+        <TouchableOpacity style={styles.Button} onPress={() => setPlayAgainModalVisible(true)}>
+          <Text style={styles.ButtonText}>Play Again</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.Button} onPress={() => navigation.navigate("Home")}>
+          <Icon name="home" size={24} color="rgb(0, 105, 53)" />
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.title2}>Top list:</Text>
@@ -82,40 +67,20 @@ export default function SudokuResult({ route, navigation }) {
         ))}
       </View>
 
-      <ScrollView style={styles.scrollView}>
-        {Object.keys(groupedScores).length > 0 ? (
-          Object.keys(groupedScores)
-            .filter((diffLevel) => !selectedDifficulty || diffLevel === selectedDifficulty)
-            .map((diffLevel) => (
-              <View key={diffLevel} style={styles.difficultySection}>
-                <Text style={styles.difficultyTitle}>
-                  {diffLevel ? diffLevel.toUpperCase() : "ALL"}
-                </Text>
-                {groupedScores[diffLevel]
-                  .sort((a, b) => a.timeInSeconds - b.timeInSeconds)
-                  .map((score, index) => (
-                    <View key={index} style={styles.scoreItem}>
-                      <Text style={styles.rank}>#{index + 1}</Text>
-                      <Text style={styles.scoreText}>
-                        Nickname: {score.Nickname ?? "Unknown"}
-                      </Text>
-                      <Text style={styles.scoreText}>
-                        Difficulty: {score.difficulty ?? "Unknown"}
-                      </Text>
-                      <Text style={styles.scoreText}>
-                        Time: {score.timeInSeconds != null ? formattedTime(score.timeInSeconds) : "N/A"}
-                      </Text>
-                    </View>
-                  ))}
-              </View>
-            ))
-        ) : (
-          <Text style={styles.noScores}>No scores yet!</Text>
-        )}
-      </ScrollView>
-      <TouchableOpacity style={styles.Homebutton} onPress={() => navigation.navigate("Home")}>
-        <Text style={styles.buttonText}>Home</Text>
-      </TouchableOpacity>
+      <ScoreList
+  scores={scores}
+  selectedDifficulty={selectedDifficulty}
+  formattedTime={formattedTime}
+/>
+
+
+      <DifficultySelectorModal
+        visible={playAgainModalVisible}
+        onSelect={handlePlayAgainSelect}
+        onCancel={() => setPlayAgainModalVisible(false)}
+      />
     </View>
   );
-}
+};
+
+export default MinesweeperResultScreen;
