@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, Vibration } from 'react-native';
 import styles from '../styles/Connect4MultiStyles';
 import Connect4Board from '../components/board';
 import FlyingDisc from '../components/FlyingDisc';
@@ -19,7 +19,11 @@ const Connect4Multiplayer = ({ navigation }) => {
   const { BOARD_PADDING, CELL_MARGIN, TOTAL_CELL_WIDTH, CELL_SIZE, X_OFFSET_CORRECTION } = useBoardDimensions(COLS);
   const { board, currentPlayer, winner, modalVisible, winnerCoords, flyingDisc, handlePlayerMove, startNewGame, setModalVisible,
   } = useGameLogicMulti(ROWS, COLS, TOTAL_CELL_WIDTH, BOARD_PADDING, CELL_MARGIN, X_OFFSET_CORRECTION);
-
+  useEffect(() => {
+    if (winner) {
+      Vibration.vibrate(500);
+    }
+  }, [winner]);
   return (
     !fontsLoaded ? (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

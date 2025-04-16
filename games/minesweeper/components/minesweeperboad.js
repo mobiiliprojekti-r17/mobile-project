@@ -1,6 +1,7 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, Vibration } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import ExplosionEmoji from './ExplosionEmoji';
 
 const Board = ({ board, revealTile, flagTile, difficulty }) => {
   const getBoardSize = (difficulty) => {
@@ -15,8 +16,18 @@ const Board = ({ board, revealTile, flagTile, difficulty }) => {
     }
   };
 
-  const size = getBoardSize(difficulty); 
-  const tileSize = 32; 
+  const [explosions, setExplosions] = useState([]);
+
+  const triggerExplosion = (row, col) => {
+    const key = `${row}-${col}`;
+    setExplosions((prev) => [...prev, key]);
+    setTimeout(() => {
+      setExplosions((prev) => prev.filter(k => k !== key));
+    }, 1000);
+  };
+
+  const size = getBoardSize(difficulty);
+  const tileSize = 32;
 
   return (
     <View
@@ -37,7 +48,13 @@ const Board = ({ board, revealTile, flagTile, difficulty }) => {
           {row.map((cell, colIndex) => (
             <TouchableOpacity
               key={`${rowIndex}-${colIndex}`}
-              onPress={() => revealTile(rowIndex, colIndex)}
+              onPress={() => {
+                if (!cell.revealed && cell.mine) {
+                  Vibration.vibrate(300);
+                  triggerExplosion(rowIndex, colIndex);
+                }
+                revealTile(rowIndex, colIndex);
+              }}
               onLongPress={() => flagTile(rowIndex, colIndex)}
               style={{
                 width: tileSize,
@@ -53,15 +70,28 @@ const Board = ({ board, revealTile, flagTile, difficulty }) => {
             >
               {cell.revealed && (
                 <>
-                  {cell.mine ? (
+                  {cell.mine && cell.exploded ? (
+                    explosions.includes(`${rowIndex}-${colIndex}`) ? (
+                      <ExplosionEmoji size={tileSize} />
+                    ) : (
+                      <Text style={{ fontSize: tileSize * 0.9, color: "red" }}>💥</Text>
+                    )
+                  ) : cell.mine ? (
                     <Icon name="bomb" size={tileSize * 0.8} color="black" />
                   ) : cell.number > 0 ? (
-                    <Text style={{ fontWeight: 'bold', fontSize: tileSize * 0.8, color: 'black' }}>
+                    <Text
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: tileSize * 0.8,
+                        color: 'black',
+                      }}
+                    >
                       {cell.number}
                     </Text>
                   ) : null}
                 </>
               )}
+
               {cell.flagged && !cell.revealed && (
                 <Icon name="flag" size={tileSize * 0.8} color="red" />
               )}

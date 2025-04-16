@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, Vibration } from 'react-native';
 import styles from '../styles/Connect4SingleStyles';
 import Connect4Board from '../components/board';
 import FlyingDisc from '../components/FlyingDisc';
@@ -21,7 +21,12 @@ const Connect4Singleplayer = ({ navigation }) => {
 
   const { board, currentPlayer, winner, modalVisible, winnerCoords, flyingDisc, handlePlayerMove, startNewGame, setModalVisible,
   } = useGameLogic(ROWS, COLS, TOTAL_CELL_WIDTH, BOARD_PADDING, CELL_MARGIN, X_OFFSET_CORRECTION);
-
+  useEffect(() => {
+    if (winner) {
+      Vibration.vibrate(500); // 500ms värinä kun peli voitetaan
+    }
+  }, [winner]);
+  
   return (
     !fontsLoaded ? (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
