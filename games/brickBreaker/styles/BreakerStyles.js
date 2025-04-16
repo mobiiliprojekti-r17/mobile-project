@@ -24,7 +24,7 @@ const BreakerStyles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontFamily: "PressStart2P-Regular",
-    fontSize: 18,
+    fontSize: 17,
     textAlign: 'center',
   },
   score: {
@@ -50,7 +50,7 @@ const BreakerStyles = StyleSheet.create({
   overlayText: {
     color: 'white',
     fontFamily: "PressStart2P-Regular",
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
@@ -68,7 +68,7 @@ const BreakerStyles = StyleSheet.create({
   homeButtonText: {
     color: "#black",
     fontFamily: "PressStart2P-Regular",
-    fontSize: 18,
+    fontSize: 17,
   },
   
 });

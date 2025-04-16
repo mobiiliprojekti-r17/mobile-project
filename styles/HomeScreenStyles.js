@@ -1,93 +1,93 @@
 import { Dimensions, StyleSheet } from 'react-native';
 
-const windowWidth = Dimensions.get('window').width;
-const sectionPadding = 10;
-const sectionWidth = windowWidth * 0.9;
-const buttonSpacing = 10;
-const buttonWidth = (sectionWidth - buttonSpacing) / 2;
+const { width, height } = Dimensions.get("window");
+const buttonsPerRow = 3;
+const containerWidth = width * 0.80;
+const spacing = width * 0.05;
+const totalSpacing = spacing * (buttonsPerRow - 1);
+const buttonWidth = (containerWidth - totalSpacing) / buttonsPerRow;
 
 export default StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: "center",
     backgroundColor: "rgb(157, 226, 255)",
-    marginTop: 60,
+    marginTop: height * 0.07,
   },
   logoImage: {
-    width: '100%',
-    height: 243.4,
+    width: width,
+    height: height * 0.29,
+    marginTop: -5,
   },
   input: {
-    width: "70%",
-    height: 42,
+    width: width * 0.7,
+    height: height * 0.045,
     borderColor: "rgb(127, 0, 255)",
-    borderWidth: 5,
+    borderWidth: 2,
     borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 10,
+    paddingHorizontal: width * 0.03,
+    marginBottom: height * 0.015,
     backgroundColor: "rgb(204, 159, 254)",
     color: "rgb(127, 0, 255)",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    width: "90%",
-    marginBottom: 20,
+    width: width * 0.9,
+    marginBottom: height * 0.02,
   },
   button: {
     backgroundColor: "rgb(127, 0, 255)",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingVertical: height * 0.012,
+    paddingHorizontal: width * 0.045,
     borderRadius: 8,
-    marginHorizontal: 5,
+    marginHorizontal: width * 0.04,
     elevation: 3,
-    marginRight: 20,
-    marginLeft: 20,
   },
   buttonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: width * 0.035,
     fontWeight: "bold",
     textAlign: "center",
   },
   gameSection: {
-    width: "96%",
-    backgroundColor: "rgb(252, 130, 239)",
-    borderRadius: 18,
-    padding: sectionPadding,
-    marginBottom: 20,
+    width: width * 0.96,
+    backgroundColor: "rgb(252, 130, 240)",
     borderColor: "rgb(127, 0, 255)",
-    borderWidth: 5,
+    borderWidth: 2,
+    borderRadius: 18,
+    marginBottom: height * 0.025,
     borderRadius: 10,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: width * 0.05,
     fontWeight: "bold",
     color: "#333",
-    marginBottom: 20,
-    marginTop: 10,
+    marginBottom: height * 0.02,
+    marginTop: height * 0.012,
     textAlign: "center",
   },
   fullScreen: {
     flex: 1,
-    width: '100%',
-    height: '100%',
+    width: width,
+    height: height,
   },
   scrollContainer: {
     flex: 1,
   },
   gameButtonsContainer: {
-    width: '100%',
+    width: containerWidth,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    alignSelf: 'center',
   },
   backgroundImage: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    width: '100%',
-    height: '100%',
+    width: width,
+    height: height,
   },
   gameButton: {
     width: buttonWidth,
@@ -95,10 +95,10 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderColor: "rgb(127, 0, 255)",
-    borderWidth: 5,
+    borderWidth: 2,
     borderRadius: 15,
     overflow: 'hidden',
-    marginBottom: buttonSpacing,
+    marginBottom: height * 0.02,
   },
 
   modalOverlay: {
@@ -115,7 +115,7 @@ export default StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "rgb(204, 159, 254)",
-    padding: 20,
+    padding: width * 0.05,
     borderRadius: 12,
     alignItems: "center",
     shadowColor: "#000",
@@ -123,35 +123,35 @@ export default StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    borderColor: "rgb(127, 0, 255)",
-    borderWidth: 5,
+    borderColor: "rgb(128, 0, 255)",
+    borderWidth: 2,
     borderRadius: 10,
   },
   modalText: {
-    fontSize: 20,
+    fontSize: width * 0.045,
     fontWeight: "bold",
-    marginBottom: 15,
+    marginBottom: height * 0.02,
     textAlign: "center",
     color: "rgb(127, 0, 255)",
   },
   ModalButton: {
     backgroundColor: "rgb(127, 0, 255)",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: width * 0.03,
+    paddingVertical: height * 0.01,
     borderRadius: 8,
   },
   ModalButtonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: width * 0.04,
     fontWeight: "bold",
     textAlign: 'center'
   },
   difficultyModalContent: {
     backgroundColor: "rgb(204, 159, 254)",
-    padding: 20,
+    padding: width * 0.05,
     borderRadius: 12,
     alignItems: "stretch",
-    width: "80%",
+    width: width * 0.8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -164,16 +164,16 @@ export default StyleSheet.create({
   },
   difficultyModalButton: {
     backgroundColor: "rgb(127, 0, 255)",
-    paddingVertical: 10,
+    paddingVertical: height * 0.01,
     borderRadius: 8,
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 5,
+    marginVertical: height * 0.007,
   },
   difficultyModalButtonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: width * 0.04,
     fontWeight: "bold",
   },
 });

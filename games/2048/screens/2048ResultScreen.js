@@ -52,7 +52,7 @@ export default function Game2048ResultScreen({ route, navigation }) {
           return a.timeInSeconds - b.timeInSeconds;
         });
 
-        setScores(scoresList.slice(0, 5));
+        setScores(scoresList.slice(0, 10));
       } catch (error) {
         console.error("Virhe tulosten hakemisessa: ", error);
       }
@@ -81,7 +81,7 @@ export default function Game2048ResultScreen({ route, navigation }) {
         <Text style={styles.infoText}>Time: {formattedTime(timeInSeconds)}</Text>
       </View>
   
-      <Text style={styles.subtitle}>Top 5:</Text>
+      <Text style={styles.subtitle}>Top 10:</Text>
       
       <ScrollView style={styles.scrollView}>
   {scores.length > 0 ? (
@@ -94,7 +94,7 @@ export default function Game2048ResultScreen({ route, navigation }) {
 
         {/* Player, Score, Time keskitettynä allekkain */}
         <View style={styles.textContainer}>
-          <Text style={styles.scoreText}>Player: {score.Nickname}</Text>
+          <Text style={styles.scoreText}>Player: {score.nickname}</Text>
           <Text style={styles.scoreText}>Score: {score.score}</Text>
           <Text style={styles.scoreText}>Time: {formattedTime(score.timeInSeconds)}</Text>
         </View>
