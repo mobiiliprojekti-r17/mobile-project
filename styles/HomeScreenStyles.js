@@ -15,7 +15,8 @@ export default StyleSheet.create({
   },
   logoImage: {
     width: '100%',
-    height: 243.4,
+    height: 500,
+    marginTop: -120,
   },
   input: {
     width: "70%",
@@ -27,6 +28,7 @@ export default StyleSheet.create({
     marginBottom: 10,
     backgroundColor: "rgb(204, 159, 254)",
     color: "rgb(127, 0, 255)",
+    marginTop: -100,
   },
   buttonContainer: {
     flexDirection: "row",

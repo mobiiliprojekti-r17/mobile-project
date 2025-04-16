@@ -11,7 +11,7 @@ const shooterStyles = StyleSheet.create({
     elevation: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 40,
+    marginTop: 50,
   },
   face: {
     fontSize: 15,
