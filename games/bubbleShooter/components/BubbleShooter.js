@@ -14,7 +14,7 @@ import {
 } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
 import AnimatedBall from './ShooterBallAnimation';
-import ScorePopUp from './ScorePop'; // Huom: varmista, että komponentin nimi/tiedostonimi ovat oikein
+import ScorePopUp from './ScorePop';
 import { useRoute } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
 import { collection, addDoc } from "firebase/firestore";
