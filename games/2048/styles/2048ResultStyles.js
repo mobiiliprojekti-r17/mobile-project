@@ -12,9 +12,9 @@ const styles = StyleSheet.create({
       },
     ChangaOneText: {
         fontFamily: 'ChangaOne_400Regular',
-        fontSize: width * 0.18,
+        fontSize: width * 0.17,
         textAlign: "center",
-        color: "#faf8ef", // Game Over -otsikko
+        color: "#faf8ef", 
         marginBottom: height * 0.02,
         paddingTop: height * 0.03,
       },
