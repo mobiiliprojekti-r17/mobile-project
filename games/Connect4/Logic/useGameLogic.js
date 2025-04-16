@@ -107,6 +107,7 @@ export const useGameLogic = (ROWS, COLS, TOTAL_CELL_WIDTH, BOARD_PADDING, CELL_M
     flyingDisc,
     handlePlayerMove,
     startNewGame,
-    setFlyingDisc,  
+    setModalVisible,
   };
+  
 };

@@ -74,6 +74,7 @@ const HomeScreen = ({ navigation }) => {
   const startBrickBreaker = () => checkNicknameAndProceed('BrickBreaker');
   const startMinesweeper = () => checkNicknameAndProceed('Minesweeper');
   const startFlappyBird = () => checkNicknameAndProceed('FlappyBird');
+  const startColorSort = () => checkNicknameAndProceed('ColorGame');
 
   const handleDifficultyChange = (level) => {
     startGame(selectedGame, level);
@@ -163,7 +164,7 @@ const HomeScreen = ({ navigation }) => {
           </ImageBackground>
           </TouchableOpacity>
           
-          <TouchableOpacity onPress={() => navigation.navigate('ColorGame')}>
+          <TouchableOpacity onPress={startColorSort}>
           <ImageBackground source={require('../assets/ColorSortIcon.png')} style={styles.gameButton} 
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>

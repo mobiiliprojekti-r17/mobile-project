@@ -12,11 +12,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between", 
     alignItems: "center",      
     width: "100%",
-    paddingHorizontal: 20,
+    paddingHorizontal: 30,
     marginBottom: 10,
   },
   difficultyText: {
-    fontSize: 25,
+    fontSize: 27,
     fontWeight: "bold",
     color: "rgb(63, 210, 136)",
     textShadowColor: 'black',
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     fontFamily: "VT323_400Regular",
   },
   timerText: {
-    fontSize: 25,
+    fontSize: 28,
     fontWeight: "bold",
     color: "rgb(63, 210, 136)",
     textShadowColor: 'black',
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     fontFamily: "VT323_400Regular", 
   },
   mineCountText: {
-    fontSize: 25,
+    fontSize: 28,
     fontWeight: "bold",
     color: "rgb(63, 210, 136)",
     textShadowColor: 'black',
