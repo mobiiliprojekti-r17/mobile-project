@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, TouchableWithoutFeedback, Dimensions, Text, TouchableOpacity } from 'react-native';
+import { View, TouchableWithoutFeedback, Dimensions, Text, TouchableOpacity, Image } from 'react-native';
 import Matter from 'matter-js';
 import {
   createPhysics,
@@ -376,6 +376,18 @@ const BubbleShooter = ({ navigation }) => {
               }}
             />
           ))}
+           <Image 
+            source={require('../assets/image.png')}  // Korvaa oikealla polulla
+            style={{
+              position: 'absolute',
+              bottom: -100,
+              left: 100,
+              right: 0,
+              width: '100%',
+              height: height * 0.2,  // Aseta haluamasi korkeus, esim. 20% näytöstä
+            }}
+            resizeMode="cover"
+          />
         </View>
       </TouchableWithoutFeedback>
     </>

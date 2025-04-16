@@ -1,4 +1,3 @@
-// shooterStyles.js
 import { StyleSheet } from 'react-native';
 
 const shooterStyles = StyleSheet.create({
@@ -39,20 +38,16 @@ const shooterStyles = StyleSheet.create({
   ShooterScreenContainer: {
     flex: 1,
     paddingBottom: 80,
-    backgroundColor: 'rgb(255, 158, 226)',
-    borderWidth: 10, 
-    borderColor: "#6C5DD3",  
-    borderRadius: 50,       
+    backgroundColor: 'rgb(255, 158, 226)',      
     overflow: 'hidden', 
   },
   shooterHomeIcon: {
     fontSize: 32,
     color: '#6C5DD3',
   },
-  // Uusi container, johon laitetaan sekä score että home icon
   headerContainer: {
     position: 'absolute',
-    top: 30,           // Etäisyys yläreunasta – säädä tarpeen mukaan
+    top: 40,          
     left: '25%',
     right: '25%',
     flexDirection: 'row',
