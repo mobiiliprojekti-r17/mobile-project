@@ -5,11 +5,11 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 const Board = ({ board, revealTile, flagTile, difficulty }) => {
   const getBoardSize = (difficulty) => {
     switch (difficulty) {
-      case "medium":
+      case "MEDIUM":
         return 10;
-      case "hard":
+      case "HARD":
         return 12;
-      case "easy":
+      case "EASY":
       default:
         return 8;
     }

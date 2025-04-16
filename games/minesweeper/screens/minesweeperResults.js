@@ -51,7 +51,7 @@ const MinesweeperResultScreen = ({ route, navigation }) => {
       <Text style={styles.title2}>Top list:</Text>
 
       <View style={styles.buttonContainer}>
-        {["", "easy", "medium", "hard"].map((level) => (
+        {["", "EASY", "MEDIUM", "HARD"].map((level) => (
           <TouchableOpacity
             key={level}
             style={[
