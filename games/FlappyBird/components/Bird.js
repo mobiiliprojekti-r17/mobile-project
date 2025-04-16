@@ -1,21 +1,29 @@
 import React from 'react';
 import { Image } from 'react-native';
 
-  const Bird = (props) => {
-  const width = props.body.bounds.max.x - props.body.bounds.min.x;
-  const height = props.body.bounds.max.y - props.body.bounds.min.y;
-  const x = props.body.position.x - width / 2;
-  const y = props.body.position.y - height / 2;
+const Bird = (props) => {
+  const birdWidth = 50;
+  const birdHeight = 50;
+  const x = props.body.position.x - birdWidth / 2;
+  const y = props.body.position.y - birdHeight / 2;
+
+  const velocityY = (props.body.velocity && props.body.velocity.y) || 0;
+  
+
+  let angle = velocityY * 3;
+  if (angle > 30) angle = 30;
+  if (angle < -30) angle = -30;
 
   return (
     <Image 
-        source={require('../../../assets/FlappyBirdIcon.jpg')}
-    style={{
+      source={require('../../../assets/FlappyNoBg.png')}
+      style={{
         position: 'absolute',
         left: x,
         top: y,
-        width: width,
-        height: height,
+        width: birdWidth,
+        height: birdHeight,
+        transform: [{ rotate: `${angle}deg` }],
       }}
       resizeMode="contain"
     />
