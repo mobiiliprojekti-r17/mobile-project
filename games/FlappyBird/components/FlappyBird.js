@@ -9,8 +9,13 @@ import Floor from './floor';
 import { MAX_WIDTH, MAX_HEIGHT, PIPE_WIDTH, GAP_SIZE } from './constants';
 
 let nextPipeId = 1;
+
+const MIN_PIPE_HEIGHT = 120;
+
 const createPipePair = (xPos, world) => {
-  const gapTop = Math.floor(Math.random() * (MAX_HEIGHT - GAP_SIZE - 100)) + 50;
+  const maxGapTop = MAX_HEIGHT - GAP_SIZE - MIN_PIPE_HEIGHT;
+  const gapTop = Math.floor(Math.random() * (maxGapTop - MIN_PIPE_HEIGHT + 1)) + MIN_PIPE_HEIGHT;
+
   const pipeTopHeight = gapTop;
   const pipeBottomY = gapTop + GAP_SIZE;
   const pipeBottomHeight = MAX_HEIGHT - pipeBottomY;
@@ -65,27 +70,27 @@ export default function FlappyBird() {
 
   const engine = Matter.Engine.create({ enableSleeping: false });
   const world = engine.world;
-  world.gravity.y = 1.2; 
+  world.gravity.y = 1.2;
 
   Matter.Events.on(engine, 'collisionStart', event => {
     event.pairs.forEach(pair => {
-      if(pair.bodyA.label === "Bird" || pair.bodyB.label === "Bird"){
+      if (pair.bodyA.label === "Bird" || pair.bodyB.label === "Bird") {
         setRunning(false);
       }
     });
   });
 
-  const birdWidth = 50;
-  const birdHeight = 50;
-  const bird = Matter.Bodies.rectangle(MAX_WIDTH / 4, MAX_HEIGHT / 2, birdWidth, birdHeight);
+  const bird = Matter.Bodies.rectangle(MAX_WIDTH / 4, MAX_HEIGHT / 2, 50, 50);
   bird.label = "Bird";
   Matter.World.add(world, bird);
 
   const floorHeight = 50;
-  const floorBody = Matter.Bodies.rectangle(MAX_WIDTH / 2, MAX_HEIGHT - floorHeight/2, MAX_WIDTH, floorHeight, { isStatic: true });
+  const floorBody = Matter.Bodies.rectangle(MAX_WIDTH / 2, MAX_HEIGHT - floorHeight / 2, MAX_WIDTH, floorHeight, { isStatic: true });
   floorBody.label = "Floor";
-  const ceilingBody = Matter.Bodies.rectangle(MAX_WIDTH / 2, floorHeight/2, MAX_WIDTH, floorHeight, { isStatic: true });
+
+  const ceilingBody = Matter.Bodies.rectangle(MAX_WIDTH / 2, floorHeight / 2, MAX_WIDTH, floorHeight, { isStatic: true });
   ceilingBody.label = "Ceiling";
+
   Matter.World.add(world, [floorBody, ceilingBody]);
 
   const initialPipes = resetPipes({}, world);
@@ -98,25 +103,21 @@ export default function FlappyBird() {
     ...initialPipes
   };
 
-
-const Physics = (entities, { touches, time, dispatch }) => {
+  const Physics = (entities, { touches, time, dispatch }) => {
     const engine = entities.physics.engine;
-    const world = entities.physics.world;
     const bird = entities.bird.body;
-  
+
     touches.filter(t => t.type === "press").forEach(() => {
       Matter.Body.setVelocity(bird, { x: 0, y: -10 });
     });
-  
+
     Matter.Engine.update(engine, time.delta);
-  
+
     const pipePairs = {};
     Object.keys(entities)
       .filter(key => key.startsWith("pipe"))
       .forEach(key => {
-        const pairId = key.includes("Top")
-          ? key.replace("Top", "")
-          : key.replace("Bottom", "");
+        const pairId = key.includes("Top") ? key.replace("Top", "") : key.replace("Bottom", "");
         pipePairs[pairId] = pipePairs[pairId] || {};
         if (key.includes("Top")) {
           pipePairs[pairId].top = entities[key];
@@ -124,50 +125,48 @@ const Physics = (entities, { touches, time, dispatch }) => {
           pipePairs[pairId].bottom = entities[key];
         }
       });
-  
+
     Object.keys(pipePairs).forEach(pairId => {
       const pair = pipePairs[pairId];
       Matter.Body.translate(pair.top.body, { x: -2, y: 0 });
       Matter.Body.translate(pair.bottom.body, { x: -2, y: 0 });
-  
-      if (
-        pair.top.body.position.x < bird.position.x &&
-        !pair.top.scored
-      ) {
+
+      if (pair.top.body.position.x < bird.position.x && !pair.top.scored) {
         pair.top.scored = true;
         dispatch({ type: "score" });
       }
-  
+
       if (pair.top.body.position.x < -PIPE_WIDTH) {
-        const MIN_PIPE_HEIGHT = 100;
-        const gapTop = Math.floor(
-          Math.random() * (MAX_HEIGHT - GAP_SIZE - MIN_PIPE_HEIGHT * 2)
-        ) + MIN_PIPE_HEIGHT;
+        const maxGapTop = MAX_HEIGHT - GAP_SIZE - MIN_PIPE_HEIGHT;
+        const gapTop = Math.floor(Math.random() * (maxGapTop - MIN_PIPE_HEIGHT + 1)) + MIN_PIPE_HEIGHT;
+
         const pipeTopHeight = gapTop;
         const pipeBottomY = gapTop + GAP_SIZE;
         const pipeBottomHeight = MAX_HEIGHT - pipeBottomY;
-      
+
         Matter.Body.setPosition(pair.top.body, {
           x: MAX_WIDTH * 1.5,
           y: pipeTopHeight / 2,
         });
-      
+
         Matter.Body.setPosition(pair.bottom.body, {
           x: MAX_WIDTH * 1.5,
           y: pipeBottomY + pipeBottomHeight / 2,
         });
-      
+
+        Matter.Body.setVertices(pair.top.body, Matter.Vertices.fromPath(`0 0 ${PIPE_WIDTH} 0 ${PIPE_WIDTH} ${pipeTopHeight} 0 ${pipeTopHeight}`));
+        Matter.Body.setVertices(pair.bottom.body, Matter.Vertices.fromPath(`0 0 ${PIPE_WIDTH} 0 ${PIPE_WIDTH} ${pipeBottomHeight} 0 ${pipeBottomHeight}`));
+
         pair.top.scored = false;
       }
     });
-  
+
     if (bird.position.y > MAX_HEIGHT || bird.position.y < 0) {
       dispatch({ type: "game-over" });
     }
-  
+
     return entities;
   };
-  
 
   const onEvent = (e) => {
     if (e.type === "score") {
@@ -184,7 +183,7 @@ const Physics = (entities, { touches, time, dispatch }) => {
 
     Matter.Events.on(engine, 'collisionStart', event => {
       event.pairs.forEach(pair => {
-        if(pair.bodyA.label === "Bird" || pair.bodyB.label === "Bird"){
+        if (pair.bodyA.label === "Bird" || pair.bodyB.label === "Bird") {
           setRunning(false);
         }
       });
@@ -194,11 +193,12 @@ const Physics = (entities, { touches, time, dispatch }) => {
     bird.label = "Bird";
     Matter.World.add(world, bird);
 
-    const floorHeight = 50;
-    const floorBody = Matter.Bodies.rectangle(MAX_WIDTH / 2, MAX_HEIGHT - floorHeight/2, MAX_WIDTH, floorHeight, { isStatic: true });
+    const floorBody = Matter.Bodies.rectangle(MAX_WIDTH / 2, MAX_HEIGHT - 25, MAX_WIDTH, 50, { isStatic: true });
     floorBody.label = "Floor";
-    const ceilingBody = Matter.Bodies.rectangle(MAX_WIDTH / 2, floorHeight/2, MAX_WIDTH, floorHeight, { isStatic: true });
+
+    const ceilingBody = Matter.Bodies.rectangle(MAX_WIDTH / 2, 25, MAX_WIDTH, 50, { isStatic: true });
     ceilingBody.label = "Ceiling";
+
     Matter.World.add(world, [floorBody, ceilingBody]);
 
     const newPipes = resetPipes({}, world);
@@ -225,8 +225,7 @@ const Physics = (entities, { touches, time, dispatch }) => {
         entities={entities}
         running={running}
         onEvent={onEvent}
-      >
-      </GameEngine>
+      />
       <Text style={styles.scoreText}>{score}</Text>
       {!running && (
         <TouchableOpacity style={styles.fullScreenButton} onPress={resetGame}>
@@ -238,13 +237,10 @@ const Physics = (entities, { touches, time, dispatch }) => {
 }
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  gameContainer: {
-    flex: 1,
-    backgroundColor: 'skyblue',
+    backgroundColor: "#71C5CF",
   },
   scoreText: {
     position: 'absolute',

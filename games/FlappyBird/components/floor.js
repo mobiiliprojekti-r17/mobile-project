@@ -14,7 +14,7 @@ const Floor = (props) => {
       top: y,
       width: width,
       height: height,
-      backgroundColor: 'black',
+      backgroundColor: '#71C5CF',
     }}/>
   );
 };

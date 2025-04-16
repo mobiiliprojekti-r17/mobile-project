@@ -60,7 +60,7 @@ const Game2048Screen = ({ route }) => {
       try {
         const gameResultsRef = collection(db, "2048Results");
         await addDoc(gameResultsRef, {
-          nickname: nickname || "Unknown",
+          Nickname: nickname || "Unknown",
           score: score,
           time: formatTime(time),
         });
@@ -70,6 +70,7 @@ const Game2048Screen = ({ route }) => {
       }
 
       navigation.replace("Game2048ResultScreen", {
+        nickname,
         score,
         time: formatTime(time),
       });

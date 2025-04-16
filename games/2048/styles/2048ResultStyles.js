@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
       },
     ChangaOneText: {
         fontFamily: 'ChangaOne_400Regular',
-        fontSize: width * 0.17,
+        fontSize: width * 0.16,
         textAlign: "center",
         color: "#faf8ef", 
         marginBottom: height * 0.02,
@@ -51,11 +51,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgb(180, 160, 255)",
     paddingVertical: height * 0.01,
-    paddingHorizontal: width * 0.07,
+    paddingHorizontal: width * 0.08,
     marginBottom: height * 0.015,
   },
   rankContainer: {
-    width: width * 0.18, 
+    width: width * 0.27, 
     alignItems: "center",
     justifyContent: "center",
   },
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     fontSize: width * 0.04,
     fontWeight: "bold",
     color: "#FFFFFF",
-    marginBottom: 4,
+    marginBottom: 1,
     textAlign: "center", // Varmistaa keskityksen
   },
   noScores: {
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: height * 0.03,
+    marginTop: height * 0.02,
     marginHorizontal: width * 0.05,
     marginBottom: height * 0.03,
   },

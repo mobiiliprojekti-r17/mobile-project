@@ -60,10 +60,10 @@ const HomeScreen = ({ navigation }) => {
       setSelectedGame(game);
       if (game === 'Sudoku' || game === 'Minesweeper') {
         setRestartModalVisible(true);
-        setModalMessage('Choose difficulty');
+        setModalMessage('CHOOSE DIFFICULTY');
         setModalType('difficulty');
       } else {
-        startGame(game, 'easy');
+        startGame(game, 'EASY');
       }
     }
   };
@@ -112,7 +112,7 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.gameSection}>
-          <Text style={styles.sectionTitle}>Singleplayer games</Text>
+          <Text style={styles.sectionTitle}>SINGLEPLAYER GAMES</Text>
           <View style={styles.gameButtonsContainer}>
 
           <TouchableOpacity onPress={new2048Game}>
@@ -162,11 +162,18 @@ const HomeScreen = ({ navigation }) => {
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
+          
+          <TouchableOpacity onPress={() => navigation.navigate('ColorGame')}>
+          <ImageBackground source={require('../assets/ColorSortIcon.png')} style={styles.gameButton} 
+          imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
+          </ImageBackground>
+          </TouchableOpacity>
+
           </View>
         </View>
 
         <View style={styles.gameSection}>
-          <Text style={styles.sectionTitle}>Multiplayer games</Text>
+          <Text style={styles.sectionTitle}>MULTIPLAYER GAMES</Text>
           <View style={styles.gameButtonsContainer}>
           <TouchableOpacity onPress={() => navigation.navigate('TictactoeMultiplayer')}>
           <ImageBackground source={require('../assets/TTTMIcon.jpg')} style={styles.gameButton} 
@@ -195,13 +202,13 @@ const HomeScreen = ({ navigation }) => {
 
             {modalType === 'difficulty' && (
               <>
-                {["easy", "medium", "hard"].map(level => (
+                {["EASY", "MEDIUM", "HARD"].map(level => (
                   <TouchableOpacity key={level} onPress={() => handleDifficultyChange(level)} style={styles.difficultyModalButton}>
                     <Text style={styles.difficultyModalButtonText}>{level}</Text>
                   </TouchableOpacity>
                 ))}
                 <TouchableOpacity onPress={() => setRestartModalVisible(false)} style={styles.difficultyModalButton}>
-                  <Text style={styles.difficultyModalButtonText}>Cancel</Text>
+                  <Text style={styles.difficultyModalButtonText}>CANCEL</Text>
                 </TouchableOpacity>
               </>
             )}

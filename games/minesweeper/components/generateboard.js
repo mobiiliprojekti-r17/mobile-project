@@ -1,5 +1,5 @@
 export const generateBoard = (size, minesCount, safeRow, safeCol) => {
-  // Luodaan tyhjä pelilauta
+
   let board = Array(size).fill().map(() =>
     Array(size).fill().map(() => ({
       mine: false,
@@ -13,7 +13,6 @@ export const generateBoard = (size, minesCount, safeRow, safeCol) => {
   while (placedMines < minesCount) {
     let row = Math.floor(Math.random() * size);
     let col = Math.floor(Math.random() * size);
-    // Tarkistetaan, että solu ei kuulu turva-alueeseen
     if (Math.abs(row - safeRow) <= 1 && Math.abs(col - safeCol) <= 1) {
       continue;
     }
@@ -23,7 +22,6 @@ export const generateBoard = (size, minesCount, safeRow, safeCol) => {
     }
   }
 
-  // Päivitetään kunkin ruudun miinojen määrä naapureissa
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       if (board[r][c].mine) continue;
