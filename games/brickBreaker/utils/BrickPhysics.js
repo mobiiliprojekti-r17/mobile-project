@@ -173,7 +173,7 @@ export const Physics = (entities, { time, dispatch }) => {
         });
       }
 
-      const minSpeed = 3;
+      const minSpeed = 4;
       const currentSpeed = Math.sqrt(
         ball.velocity.x ** 2 + ball.velocity.y ** 2
       );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 
-const Pipe = (props) => {
+const Floor = (props) => {
   const width = props.body.bounds.max.x - props.body.bounds.min.x;
   const height = props.body.bounds.max.y - props.body.bounds.min.y;
   const x = props.body.position.x - width / 2;
@@ -14,9 +14,9 @@ const Pipe = (props) => {
       top: y,
       width: width,
       height: height,
-      backgroundColor: 'green',
+      backgroundColor: 'black',
     }}/>
   );
 };
 
-export default Pipe;
+export default Floor;
