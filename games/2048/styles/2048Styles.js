@@ -97,7 +97,7 @@ export const getTileStyle = (value) => {
     512: { backgroundColor: "rgb(168, 223, 255)", color: "#776e65" }, 
     1024: { backgroundColor: "rgb(137, 197, 253)", color: "#776e65" }, 
     2048: { backgroundColor: "rgb(176, 154, 255)", color: "#776e65" },
-    default: { backgroundColor: "rgb(210, 175, 255)", color: "#776e65" },
+    default: { backgroundColor: "rgb(176, 154, 255)", color: "#776e65" },
   };
 
   return tileColors[value] || tileColors.default;

@@ -70,6 +70,7 @@ const Game2048Screen = ({ route }) => {
       }
 
       navigation.replace("Game2048ResultScreen", {
+        nickname,
         score,
         time: formatTime(time),
       });
