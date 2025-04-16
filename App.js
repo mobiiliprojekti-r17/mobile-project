@@ -19,6 +19,7 @@ import BreakerResult from './games/brickBreaker/screens/BrickResultScreen';
 import MinesweeperScreen from './games/minesweeper/screens/minesweeperscreen';
 import MinesweeperResults from './games/minesweeper/screens/minesweeperResults';
 import FlappyBirdScreen from './games/FlappyBird/screens/FlappyBirdScreen';
+import ColorGame from './games/ColorSort/screens/ColorScreen';
 import { useFonts, CuteFont_400Regular } from '@expo-google-fonts/cute-font';
 import { ChangaOne_400Regular } from '@expo-google-fonts/changa-one';
 import { PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
@@ -64,6 +65,7 @@ const App = () => {
           <Stack.Screen name="TictactoeSingleplayer" component={TictactoeSingleplayer} />
           <Stack.Screen name="Connect4Multiplayer" component={Connect4Multiplayer} />
           <Stack.Screen name="Connect4Singleplayer" component={Connect4Singleplayer} />
+          <Stack.Screen name="ColorGame" component={ColorGame} />
         </Stack.Navigator>
       </NavigationContainer>
     </NicknameProvider>
