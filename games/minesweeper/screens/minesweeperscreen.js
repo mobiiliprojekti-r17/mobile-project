@@ -20,7 +20,7 @@ const MinesweeperScreen = () => {
 
   const route = useRoute();
   const navigation = useNavigation();
-  const { difficulty: initialDifficulty } = route.params || { difficulty: "easy" };
+  const { difficulty: initialDifficulty } = route.params || { difficulty: "EASY" };
   const [showResultButton, setShowResultButton] = useState(false);
   const [nickname, setNickname] = useState("");
   const [resultModalVisible, setResultModalVisible] = useState(false);
