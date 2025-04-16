@@ -9,17 +9,16 @@ const ScorePopUp = ({ score, x, y, onAnimationEnd }) => {
   useEffect(() => {
     Animated.parallel([
       Animated.timing(translateY, {
-        toValue: -30, // liikutetaan 30 pikseliä ylöspäin
-        duration: 60000, // animaation kesto millisekunteina
+        toValue: -30, 
+        duration: 100000, 
         useNativeDriver: true,
       }),
       Animated.timing(opacity, {
-        toValue: 0, // opacity häivyy nollaan
-        duration: 800000,
+        toValue: 0, 
+        duration: 1000000,
         useNativeDriver: true,
       }),
     ]).start(() => {
-      // Kun animaatio on valmis, kutsutaan callback-toimintoa, jotta komponentti voidaan poistaa
       if (onAnimationEnd) {
         onAnimationEnd();
       }
@@ -31,8 +30,8 @@ const ScorePopUp = ({ score, x, y, onAnimationEnd }) => {
       style={[
         styles.popUp,
         {
-          left: x, // x-koordinaatti, mistä popup tulee
-          top: y,  // y-koordinaatti, mistä popup tulee
+          left: x, 
+          top: y, 
           transform: [{ translateY }],
           opacity,
         },
@@ -50,10 +49,12 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#000',
-    fontFamily: 'Kavoon_400Regular', // <-- tämä lisättiin
-    color: '',
-  },
+    fontFamily: 'Kavoon_400Regular', 
+    color: '#FFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.6)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+  },  
 });
 
 export default ScorePopUp;

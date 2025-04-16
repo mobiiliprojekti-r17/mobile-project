@@ -60,7 +60,7 @@ const shooterStyles = StyleSheet.create({
     borderWidth: 3,
     borderColor: "#6C5DD3", 
     elevation: 4,              // Varjostus
-    zIndex: 100,               // Näkyy muiden elementtien päällä
+    zIndex: 100,              
   },
 });
 

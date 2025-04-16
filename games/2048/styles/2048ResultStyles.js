@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
         fontFamily: 'ChangaOne_400Regular',
         fontSize: width * 0.16,
         textAlign: "center",
-        color: "#faf8ef", // Game Over -otsikko
+        color: "#faf8ef", 
         marginBottom: height * 0.02,
         paddingTop: height * 0.03,
       },

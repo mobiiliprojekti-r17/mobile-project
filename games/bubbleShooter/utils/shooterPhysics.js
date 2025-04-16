@@ -158,3 +158,16 @@ export const snapToGrid = (body, screenWidth, numCols) => {
   const snappedY = topOffset + row * verticalSpacing;
   return { x: snappedX, y: snappedY };
 };
+
+export const getGridCoordsFromPosition = (x, y, screenWidth, numCols) => {
+  const topOffset = 80;
+  const horizontalSpacing = BALL_RADIUS * 2;
+  const verticalSpacing = BALL_RADIUS * Math.sqrt(3);
+  let offsetX = (screenWidth - (numCols * horizontalSpacing)) / 2;
+  const row = Math.round((y - topOffset) / verticalSpacing);
+  if (row % 2 !== 0) {
+    offsetX += horizontalSpacing / 2;
+  }
+  const col = Math.round((x - offsetX) / horizontalSpacing);
+  return { row, col };
+};
