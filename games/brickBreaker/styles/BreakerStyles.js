@@ -70,6 +70,9 @@ const BreakerStyles = StyleSheet.create({
     fontFamily: "PressStart2P-Regular",
     fontSize: 17,
   },
+  gameOverText: {
+
+  },
   
 });
 

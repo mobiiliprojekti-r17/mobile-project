@@ -1,50 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Button } from 'react-native';
 
-// Configurable settings
-const COLORS = ["rgb(255, 158, 226)", "rgb(255, 246, 143)", "rgb(137, 197, 253)", "rgb(194, 255, 154)"]; 
-
-const LAYERS_PER_BOTTLE = 4;
-const EMPTY_BOTTLES = 2;
-
-function generateRandomBottles() {
-  const colorPool = [];
-
-  // Add each color 4 times to the pool
-  COLORS.forEach((color) => {
-    for (let i = 0; i < LAYERS_PER_BOTTLE; i++) {
-      colorPool.push(color);
-    }
-  });
-
-  // Shuffle colors
-  for (let i = colorPool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [colorPool[i], colorPool[j]] = [colorPool[j], colorPool[i]];
-  }
-
-  // Split into bottles
-  const bottles = [];
-  const totalFilledBottles = colorPool.length / LAYERS_PER_BOTTLE;
-  for (let i = 0; i < totalFilledBottles; i++) {
-    bottles.push(colorPool.slice(i * LAYERS_PER_BOTTLE, (i + 1) * LAYERS_PER_BOTTLE));
-  }
-
-  // Add empty bottles
-  for (let i = 0; i < EMPTY_BOTTLES; i++) {
-    bottles.push([]);
-  }
-
-  return bottles;
-}
+const LEVEL_CONFIGS = [
+  { numColors: 4, layersPerBottle: 4, emptyBottles: 2 },  // Taso 1
+  { numColors: 5, layersPerBottle: 4, emptyBottles: 2 },  // Taso 2
+  { numColors: 6, layersPerBottle: 5, emptyBottles: 3 },  // Taso 3
+];
 
 export default function ColorSortGame() {
+  // Aloitetaan tasosta 0 (Taso 1)
+  const [level, setLevel] = useState(0);
   const [bottles, setBottles] = useState([]);
   const [selectedBottle, setSelectedBottle] = useState(null);
+  const [lastMove, setLastMove] = useState(null); // Undo-toimintoa varten
 
+  // Ladataan tason asetukset ja generoidaan pullojen sisältö
   useEffect(() => {
-    setBottles(generateRandomBottles());
-  }, []);
+    const config = LEVEL_CONFIGS[level];
+    setBottles(generateRandomBottles(config));
+  }, [level]);
 
   const handleBottlePress = (index) => {
     if (selectedBottle === null) {
@@ -63,77 +37,96 @@ export default function ColorSortGame() {
   const pour = (from, to) => {
     const fromBottle = [...bottles[from]];
     const toBottle = [...bottles[to]];
-
-    if (toBottle.length >= LAYERS_PER_BOTTLE) return;
-
+    
+    if (toBottle.length >= LEVEL_CONFIGS[level].layersPerBottle) return;
     const colorToPour = fromBottle[fromBottle.length - 1];
-    let amount = 0;
-
-    // Check pour compatibility
-    if (
-      toBottle.length > 0 &&
-      toBottle[toBottle.length - 1] !== colorToPour
-    ) {
+    if (toBottle.length > 0 && toBottle[toBottle.length - 1] !== colorToPour) {
       return;
     }
-
+    
+    // Tallenna nykyinen tila ennen siirtoa undo-toimintoa varten
+    setLastMove(bottles.map(bottle => [...bottle]));
+    
+    let amount = 0;
     while (
       fromBottle.length &&
       fromBottle[fromBottle.length - 1] === colorToPour &&
-      toBottle.length + amount < LAYERS_PER_BOTTLE
+      toBottle.length + amount < LEVEL_CONFIGS[level].layersPerBottle
     ) {
       fromBottle.pop();
       amount++;
     }
-
+    
     for (let i = 0; i < amount; i++) {
       toBottle.push(colorToPour);
     }
-
+    
     const newBottles = [...bottles];
     newBottles[from] = fromBottle;
     newBottles[to] = toBottle;
-
+    
     setBottles(newBottles);
     checkWin(newBottles);
   };
 
+  const handleUndo = () => {
+    if (lastMove) {
+      setBottles(lastMove);
+      setLastMove(null);
+    }
+  };
+
   const checkWin = (bottles) => {
+    const config = LEVEL_CONFIGS[level];
     const isWin = bottles.every(
-      (b) => b.length === 0 || (new Set(b).size === 1 && b.length === LAYERS_PER_BOTTLE)
+      (b) => b.length === 0 || (new Set(b).size === 1 && b.length === config.layersPerBottle)
     );
     if (isWin) {
-      Alert.alert('🎉 You win!', 'All bottles sorted!');
+      Alert.alert('🎉 You win!', `Level ${level + 1} completed!`, [
+        { text: 'Next Level', onPress: () => setLevel(prev => Math.min(prev + 1, LEVEL_CONFIGS.length - 1)) }
+      ]);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>💧 Water Sort Puzzle</Text>
+      <Text style={styles.title}>💧 Water Sort Puzzle - Level {level + 1}</Text>
+      
+      {/* Undo-nappi */}
+      <Button 
+        title="Undo"
+        onPress={handleUndo}
+        disabled={!lastMove}
+      />
+      
       <View style={styles.bottleContainer}>
         {bottles.map((bottle, index) => (
           <TouchableOpacity
             key={index}
-            style={[
-              styles.bottle,
-              selectedBottle === index && { borderColor: 'gold', borderWidth: 3 },
-            ]}
             onPress={() => handleBottlePress(index)}
+            style={styles.bottleWrapper}
           >
-            {Array.from({ length: LAYERS_PER_BOTTLE }).map((_, i) => {
-              const color = bottle[LAYERS_PER_BOTTLE - 1 - i]; // from bottom to top
-              return (
-                <View
-                  key={i}
-                  style={[
-                    styles.layer,
-                    {
-                      backgroundColor: color || 'lightgray',
-                    },
-                  ]}
-                />
-              );
-            })}
+            <View style={styles.bottleInner}>
+              {Array.from({ length: LEVEL_CONFIGS[level].layersPerBottle }).map((_, i) => {
+                const color = bottle[LEVEL_CONFIGS[level].layersPerBottle - 1 - i];
+                return (
+                  <View
+                    key={i}
+                    style={[
+                      styles.layer,
+                      { backgroundColor: color || 'lightgray' },
+                    ]}
+                  />
+                );
+              })}
+            </View>
+            <View 
+              style={[
+                styles.bottleBorder,
+                selectedBottle === index && { borderColor: 'gold', borderWidth: 3 },
+              ]}
+              pointerEvents="none"
+            />
           </TouchableOpacity>
         ))}
       </View>
@@ -148,25 +141,50 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     backgroundColor:'#B09AFF'
-   },
+  },
   title: {
     fontSize: 24, 
-    marginBottom: 20 },
+    marginBottom: 20 
+  },
   bottleContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor:'ggg'
+    backgroundColor:'transparent'
   },
-  bottle: {
-    width: 60,
+  bottleWrapper: {
+    width: 70,
     height: 160,
+    margin: 10,
+    position: 'relative',
+  },
+  bottleInner: {
+    flex: 1,
+    backgroundColor: '#B09AFF',
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 18,
+    borderBottomRightRadius: 18,
+    overflow: 'hidden',
+  },
+  bottleBorder: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     borderWidth: 2,
     borderColor: '#000',
-    margin: 10,
-    justifyContent: 'flex-start',
-    backgroundColor:'B09AFF'
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 18,
+    borderBottomRightRadius: 18,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
   layer: {
     height: 40,

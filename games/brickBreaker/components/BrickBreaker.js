@@ -1,5 +1,13 @@
 import React, { useRef, useState, useMemo } from "react";
-import { View, StyleSheet, PanResponder, Text, Button, TouchableOpacity, Dimensions } from "react-native";
+import {
+  View,
+  StyleSheet,
+  PanResponder,
+  Text,
+  Button,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 import { GameEngine } from "react-native-game-engine";
 import Matter from "matter-js";
 import { Paddle, Ball, Brick } from "./BrickBreakRender";
@@ -8,7 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
 import { collection, addDoc } from "firebase/firestore";
 import { useNickname } from "../../../context/context";
-import BreakerStyles from "../styles/BreakerStyles";
+import  BreakerStyles from "../styles/BreakerStyles";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const BASE_WIDTH = 400; 
@@ -178,11 +186,6 @@ export default function BrickBreaker() {
         score: score,
       });
       console.log("Result stored in Firestore.");
-      navigation.navigate("BreakerResults", {
-        Nickname: nickname,
-        level: gameState.level,
-        score: score,
-      });
     } catch (error) {
       console.error("Error storing result: ", error);
     }
@@ -231,24 +234,16 @@ export default function BrickBreaker() {
     setGameStarted(false);
     setLevelCleared(false);
     gameEngine.current.stop();
+    storeResult()
   };
 
   return (
-    <View style={BreakerStyles.container} {...panResponder.panHandlers}
-    onStartShouldSetResponder={() => {
-      if (!gameStarted && !gameOver && !levelCleared) {
-        setGameStarted(true);
-        const baseSpeed = 3 * scaleFactor;
-        const fixedSpeed = baseSpeed + gameState.level;
-        Matter.Body.setVelocity(gameState.ball, { x: 0, y: -fixedSpeed });
-      }
-      return false;
-    }}
-    >
+    <View style={BreakerStyles.container} {...panResponder.panHandlers}>
       <Text style={BreakerStyles.score}>
-        Score:{score}  Level:{gameState.level}
+        Pisteet: {score} | Taso: {gameState.level}
       </Text>
 
+ 
       {gameOver && (
   <View style={BreakerStyles.overlay}>
     <Text style={BreakerStyles.overlayText}>Game Over!</Text>
@@ -291,13 +286,11 @@ export default function BrickBreaker() {
     </TouchableOpacity>
 
     <TouchableOpacity style={BreakerStyles.button} onPress={() => {
-  storeResult().then(() => {
     navigation.navigate("BreakerResults", {
       Nickname: nickname,
       level: gameState.level,
       score: score,
     });
-  });
 }}>
   <Text style={BreakerStyles.buttonText}>Results</Text>
 </TouchableOpacity>
@@ -333,7 +326,7 @@ export default function BrickBreaker() {
 
       <GameEngine
         ref={gameEngine}
-        style={BreakerStyles.container}
+        style={BreakerStyles.gameContainer}
         systems={[Physics]}
         running={gameStarted}
         entities={{
