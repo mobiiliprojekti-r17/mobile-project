@@ -1,18 +1,25 @@
+
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 import FlappyBird from '../components/FlappyBird';
-const FlappyBirdScreen = () => {
-  return (
-    <View style={styles.container}>
-      <FlappyBird />
-    </View>
-  );
-};
+import FlappyStyles from '../FlappyStyles/FlappyStyles';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+const styles = FlappyStyles;
 
-export default FlappyBirdScreen;
+
+const FlappyBirdScreen = ({ navigation }) => {
+    return (
+      <View style={styles.container}>
+        <View style={styles.gameContainer}>
+          <FlappyBird navigation={navigation} />
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
+            <Text style={styles.buttonText}>Home</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  export default FlappyBirdScreen;
