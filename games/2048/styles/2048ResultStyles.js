@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.015,
   },
   rankContainer: {
-    width: width * 0.27,
+    width: width * 0.27, 
     alignItems: "center",
     justifyContent: "center",
   },

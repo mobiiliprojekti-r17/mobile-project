@@ -29,9 +29,9 @@ export default StyleSheet.create({
     marginBottom: height * 0.015,
     backgroundColor: "rgb(204, 159, 254)",
     color: "rgb(127, 0, 255)",
+    marginTop: -100,
     fontFamily: 'CuteFont_400Regular',
     fontSize: width * 0.06,
-    marginTop: 20,
   },
   buttonContainer: {
     flexDirection: "row",
