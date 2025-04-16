@@ -89,13 +89,11 @@ const HomeScreen = ({ navigation }) => {
   <ScrollView
     contentContainerStyle={styles.container}
     showsVerticalScrollIndicator={false}
-    keyboardShouldPersistTaps="handled"
-  >
-               <ImageBackground
+    keyboardShouldPersistTaps="handled">
+    <ImageBackground
     source={require('../assets/HeaderIcon.png')}
     style={styles.logoImage}
-    resizeMode="contain"
-  />
+    resizeMode="contain"/>
         <TextInput
           style={styles.input}
           placeholder="Enter your nickname"
@@ -160,6 +158,12 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Connect4Singleplayer')}>
+          <ImageBackground source={require('../assets/Connect4SingleIcon.jpg')} style={styles.gameButton} 
+          imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
+          </ImageBackground>
+          </TouchableOpacity>
+          
+          <TouchableOpacity onPress={() => navigation.navigate('ColorGame')}>
           <ImageBackground source={require('../assets/Connect4SingleIcon.jpg')} style={styles.gameButton} 
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
