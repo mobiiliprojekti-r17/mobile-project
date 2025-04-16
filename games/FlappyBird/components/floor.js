@@ -1,21 +1,33 @@
 import React from 'react';
 import { View } from 'react-native';
+import { MAX_WIDTH, MAX_HEIGHT } from './constants';
 
-const Floor = (props) => {
-  const width = props.body.bounds.max.x - props.body.bounds.min.x;
-  const height = props.body.bounds.max.y - props.body.bounds.min.y;
-  const x = props.body.position.x - width / 2;
-  const y = props.body.position.y - height / 2;
+const FLOOR_HEIGHT = 50; 
 
+const Floor = () => {
   return (
-    <View style={{
-      position: 'absolute',
-      left: x,
-      top: y,
-      width: width,
-      height: height,
-      backgroundColor: '#71C5CF',
-    }}/>
+    <View
+      style={{
+        position: 'absolute',
+        top: MAX_HEIGHT - FLOOR_HEIGHT,
+        left: 0,
+        width: MAX_WIDTH,
+        height: FLOOR_HEIGHT,
+        zIndex: 2,
+      }}
+    >
+      <View style={{ flex: 1, backgroundColor: '#8B4513' }} />
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: FLOOR_HEIGHT * 0.3,
+          backgroundColor: '#228B22',
+        }}
+      />
+    </View>
   );
 };
 

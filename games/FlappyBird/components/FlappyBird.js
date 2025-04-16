@@ -1,12 +1,16 @@
-import React, { useState, useRef } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { GameEngine } from 'react-native-game-engine';
 import Matter from 'matter-js';
-
 import Bird from './Bird';
 import Pipe from './Pipe';
 import Floor from './floor';
 import { MAX_WIDTH, MAX_HEIGHT, PIPE_WIDTH, GAP_SIZE } from './constants';
+import { db } from "../../../firebase/Config";
+import { collection, addDoc } from "firebase/firestore";
+import { useNickname } from "../../../context/context";
+
 
 let nextPipeId = 1;
 
@@ -63,10 +67,27 @@ const resetPipes = (entities, world) => {
   return pipes;
 };
 
-export default function FlappyBird() {
+export default function FlappyBird({navigation}) {
+  const { nickname } = useNickname();
   const [running, setRunning] = useState(true);
   const [score, setScore] = useState(0);
   const gameEngineRef = useRef(null);
+
+  const storeResult = async () => {
+    try {
+      await addDoc(collection(db, "FlappyBirdResults"), {
+        Nickname: nickname,
+        score: score,
+      });
+      console.log("Result stored in Firestore.");
+      navigation.navigate("FlappyBirdResult", {
+        Nickname: nickname,
+        score: score,
+      });
+    } catch (error) {
+      console.error("Error storing result: ", error);
+    }
+  };
 
   const engine = Matter.Engine.create({ enableSleeping: false });
   const world = engine.world;
@@ -79,11 +100,39 @@ export default function FlappyBird() {
       }
     });
   });
+  //-----------------------------------------------------------------------------
 
+  const birdVertices = [
+    { x: -20, y: -5 },  // left wing / tail top
+    { x: -10, y: -12 }, // upper-left
+    { x: 0,   y: -14 }, // top-center
+    { x: 12,  y: -10 }, // top-right
+    { x: 18,  y: -4 },  // beak (top)
+    { x: 18,  y: 2 },   // beak (bottom)
+    { x: 12,  y: 10 },  // lower-right
+    { x: 0,   y: 16 },  // bottom-center
+    { x: -14, y: 12 },  // lower-left
+    { x: -20, y: 7 }    // tail bottom
+  ];
+  
+  const bird = Matter.Bodies.fromVertices(
+    MAX_WIDTH / 4,  // x-position of bird center
+    MAX_HEIGHT / 2, // y-position of bird center
+    [birdVertices], // Wrap your vertex array in another array
+    {
+      label: "Bird", 
+    },
+    true 
+  );
+  Matter.World.add(world, bird);
+
+  //-----------------------------------------------------------------------------
+/*
   const bird = Matter.Bodies.rectangle(MAX_WIDTH / 4, MAX_HEIGHT / 2, 50, 50);
   bird.label = "Bird";
   Matter.World.add(world, bird);
-
+*/
+//--------------------------------------------------------------------------------
   const floorHeight = 50;
   const floorBody = Matter.Bodies.rectangle(MAX_WIDTH / 2, MAX_HEIGHT - floorHeight / 2, MAX_WIDTH, floorHeight, { isStatic: true });
   floorBody.label = "Floor";
@@ -111,7 +160,8 @@ export default function FlappyBird() {
       Matter.Body.setVelocity(bird, { x: 0, y: -10 });
     });
 
-    Matter.Engine.update(engine, time.delta);
+      const fixedDelta = Math.min(time.delta, 16.000);
+      Matter.Engine.update(engine, fixedDelta);
 
     const pipePairs = {};
     Object.keys(entities)
@@ -188,11 +238,37 @@ export default function FlappyBird() {
         }
       });
     });
-
+    //------------------------------------------
+/*
     const bird = Matter.Bodies.rectangle(MAX_WIDTH / 4, MAX_HEIGHT / 2, 50, 50);
     bird.label = "Bird";
     Matter.World.add(world, bird);
+*/
 
+const birdVertices = [
+    { x: -20, y: -5 },  // left wing / tail top
+    { x: -10, y: -12 }, // upper-left
+    { x: 0,   y: -14 }, // top-center
+    { x: 12,  y: -10 }, // top-right
+    { x: 18,  y: -4 },  // beak (top)
+    { x: 18,  y: 2 },   // beak (bottom)
+    { x: 12,  y: 10 },  // lower-right
+    { x: 0,   y: 16 },  // bottom-center
+    { x: -14, y: 12 },  // lower-left
+    { x: -20, y: 7 }    // tail bottom
+  ];
+  
+  const bird = Matter.Bodies.fromVertices(
+    MAX_WIDTH / 4,  // x-position of bird center
+    MAX_HEIGHT / 2, // y-position of bird center
+    [birdVertices], // Wrap your vertex array in another array
+    {
+      label: "Bird", 
+    },
+    true 
+  );
+  Matter.World.add(world, bird);
+  //--------------------------------------------
     const floorBody = Matter.Bodies.rectangle(MAX_WIDTH / 2, MAX_HEIGHT - 25, MAX_WIDTH, 50, { isStatic: true });
     floorBody.label = "Floor";
 
@@ -216,6 +292,7 @@ export default function FlappyBird() {
     setRunning(true);
   };
 
+
   return (
     <View style={styles.container}>
       <GameEngine
@@ -228,44 +305,78 @@ export default function FlappyBird() {
       />
       <Text style={styles.scoreText}>{score}</Text>
       {!running && (
-        <TouchableOpacity style={styles.fullScreenButton} onPress={resetGame}>
-          <Text style={styles.gameOverText}>Game Over. Tap to Restart</Text>
-        </TouchableOpacity>
+        <View style={styles.overlay}>
+          <Text style={styles.gameOverText}>Game Over!</Text>
+          <TouchableOpacity style={styles.button} onPress={resetGame}>
+            <Text style={styles.buttonText}>Try Again</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              storeResult().then(() => {
+                navigation.navigate("FlappyBirdResult", {
+                  Nickname: nickname,
+                  score: score,
+                });
+              });
+            }}
+          >
+            <Text style={styles.buttonText}>Results</Text>
+          </TouchableOpacity>
+        </View>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
-  container: {
-    flex: 1,
-    backgroundColor: "#71C5CF",
-  },
-  scoreText: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: 'white',
-    textShadowColor: 'black',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 2,
-  },
-  fullScreenButton: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
-  gameOverText: {
-    fontSize: 30,
-    color: 'white',
-    fontWeight: 'bold',
-  },
-});
+    container: {
+      flex: 1,
+      // backgroundColor: "#71C5CF",
+    },
+    scoreText: {
+      position: 'absolute',
+      top: 50,
+      left: 20,
+      fontSize: 48,
+      fontWeight: 'bold',
+      color: 'white',
+      textShadowColor: 'black',
+      textShadowOffset: { width: 2, height: 2 },
+      textShadowRadius: 2,
+    },
+    overlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.4)',
+    },
+    gameOverText: {
+      fontSize: 30,
+      color: 'white',
+      fontWeight: 'bold',
+      marginBottom: 20,
+      textAlign: 'center',
+    },
+    button: {
+      backgroundColor: "rgb(159, 228, 70)",
+      width: 150,
+      height: 45,
+      borderRadius: 8,
+      elevation: 3,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginVertical: 10,
+    },
+    buttonText: {
+      color: '#fff',
+      fontSize: 18,
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
+  });
+  

@@ -8,7 +8,7 @@ const DifficultySelectorModal = ({ visible, onSelect, onCancel }) => {
       <View style={ModalStyles.modalOverlay}>
         <View style={ModalStyles.difficultyModalContent}>
           <Text style={ModalStyles.modalText}>Choose difficulty</Text>
-          {["easy", "medium", "hard"].map((level) => (
+          {["EASY", "MEDIUM", "HARD"].map((level) => (
             <TouchableOpacity
               key={level}
               onPress={() => onSelect(level)}

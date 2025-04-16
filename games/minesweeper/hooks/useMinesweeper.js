@@ -2,12 +2,12 @@ import { useState } from "react";
 import { generateBoard } from "../components/generateboard";
 
 const DIFFICULTY_LEVELS = {
-  easy: { size: 8, mines: 10 },
-  medium: { size: 10, mines: 20 },
-  hard: { size: 12, mines: 30 },
+  EASY: { size: 8, mines: 10 },
+  MEDIUM: { size: 10, mines: 20 },
+  HARD: { size: 12, mines: 30 },
 };
 
-const useMinesweeper = (initialDifficulty = "easy") => {
+const useMinesweeper = (initialDifficulty = "EASY") => {
   const [difficulty, setDifficulty] = useState(initialDifficulty);
   const [board, setBoard] = useState([]);
   const [gameOver, setGameOver] = useState(false);

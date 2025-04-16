@@ -3,9 +3,8 @@ import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView, ImageBackgr
 import { db, collection, addDoc } from '../firebase/Config';
 import styles from "../styles/HomeScreenStyles";
 import { useNickname } from '../context/context';
-import { useFonts, PressStart2P_400Regular} from '@expo-google-fonts/press-start-2p';
+import { useFonts, PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
 import { LinearGradient } from 'expo-linear-gradient';
-import { CuteFont_400Regular } from '@expo-google-fonts/cute-font';
 
 
 const HomeScreen = ({ navigation }) => {
@@ -18,7 +17,6 @@ const HomeScreen = ({ navigation }) => {
 
   const [fontsLoaded] = useFonts({
     PressStart2P_400Regular,
-    CuteFont_400Regular,
   });
 
   if (!fontsLoaded) return null;
@@ -62,10 +60,10 @@ const HomeScreen = ({ navigation }) => {
       setSelectedGame(game);
       if (game === 'Sudoku' || game === 'Minesweeper') {
         setRestartModalVisible(true);
-        setModalMessage('Choose difficulty');
+        setModalMessage('CHOOSE DIFFICULTY');
         setModalType('difficulty');
       } else {
-        startGame(game, 'easy');
+        startGame(game, 'EASY');
       }
     }
   };
@@ -89,11 +87,13 @@ const HomeScreen = ({ navigation }) => {
   <ScrollView
     contentContainerStyle={styles.container}
     showsVerticalScrollIndicator={false}
-    keyboardShouldPersistTaps="handled">
-    <ImageBackground
+    keyboardShouldPersistTaps="handled"
+  >
+               <ImageBackground
     source={require('../assets/HeaderIcon.png')}
     style={styles.logoImage}
-    resizeMode="contain"/>
+    resizeMode="contain"
+  />
         <TextInput
           style={styles.input}
           placeholder="Enter your nickname"
@@ -112,7 +112,7 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.gameSection}>
-          <Text style={styles.sectionTitle}>Singleplayer games</Text>
+          <Text style={styles.sectionTitle}>SINGLEPLAYER GAMES</Text>
           <View style={styles.gameButtonsContainer}>
 
           <TouchableOpacity onPress={new2048Game}>
@@ -168,11 +168,12 @@ const HomeScreen = ({ navigation }) => {
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
+
           </View>
         </View>
 
         <View style={styles.gameSection}>
-          <Text style={styles.sectionTitle}>Multiplayer games</Text>
+          <Text style={styles.sectionTitle}>MULTIPLAYER GAMES</Text>
           <View style={styles.gameButtonsContainer}>
           <TouchableOpacity onPress={() => navigation.navigate('TictactoeMultiplayer')}>
           <ImageBackground source={require('../assets/TTTMIcon.jpg')} style={styles.gameButton} 
@@ -201,13 +202,13 @@ const HomeScreen = ({ navigation }) => {
 
             {modalType === 'difficulty' && (
               <>
-                {["easy", "medium", "hard"].map(level => (
+                {["EASY", "MEDIUM", "HARD"].map(level => (
                   <TouchableOpacity key={level} onPress={() => handleDifficultyChange(level)} style={styles.difficultyModalButton}>
                     <Text style={styles.difficultyModalButtonText}>{level}</Text>
                   </TouchableOpacity>
                 ))}
                 <TouchableOpacity onPress={() => setRestartModalVisible(false)} style={styles.difficultyModalButton}>
-                  <Text style={styles.difficultyModalButtonText}>Cancel</Text>
+                  <Text style={styles.difficultyModalButtonText}>CANCEL</Text>
                 </TouchableOpacity>
               </>
             )}

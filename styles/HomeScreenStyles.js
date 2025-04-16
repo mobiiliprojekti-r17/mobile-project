@@ -132,7 +132,7 @@ export default StyleSheet.create({
     borderRadius: 10,
   },
   modalText: {
-    fontSize: width * 0.08,
+    fontSize: width * 0.1,
     fontWeight: "bold",
     marginBottom: height * 0.02,
     textAlign: "center",
@@ -147,7 +147,7 @@ export default StyleSheet.create({
   },
   ModalButtonText: {
     color: "white",
-    fontSize: width * 0.04,
+    fontSize: width * 0.06,
     fontWeight: "bold",
     textAlign: 'center',
     fontFamily: 'CuteFont_400Regular',
@@ -179,7 +179,7 @@ export default StyleSheet.create({
   },
   difficultyModalButtonText: {
     color: "white",
-    fontSize: width * 0.06,
+    fontSize: width * 0.07,
     fontWeight: "bold",
     fontFamily: 'CuteFont_400Regular',
   },
