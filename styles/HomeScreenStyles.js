@@ -12,7 +12,6 @@ export default StyleSheet.create({
     flexGrow: 1,
     alignItems: "center",
     backgroundColor: "rgb(157, 226, 255)",
-    
   },
   logoImage: {
     width: width,
