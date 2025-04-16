@@ -164,7 +164,7 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
           
           <TouchableOpacity onPress={() => navigation.navigate('ColorGame')}>
-          <ImageBackground source={require('../assets/Connect4SingleIcon.jpg')} style={styles.gameButton} 
+          <ImageBackground source={require('../assets/ColorSortIcon.png')} style={styles.gameButton} 
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>

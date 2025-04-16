@@ -12,7 +12,6 @@ export default StyleSheet.create({
     flexGrow: 1,
     alignItems: "center",
     backgroundColor: "rgb(157, 226, 255)",
-    marginTop: height * 0.07,
   },
   logoImage: {
     width: width,
@@ -29,7 +28,6 @@ export default StyleSheet.create({
     marginBottom: height * 0.015,
     backgroundColor: "rgb(204, 159, 254)",
     color: "rgb(127, 0, 255)",
-    marginTop: -100,
     fontFamily: 'CuteFont_400Regular',
     fontSize: width * 0.06,
   },
@@ -134,7 +132,7 @@ export default StyleSheet.create({
     borderRadius: 10,
   },
   modalText: {
-    fontSize: width * 0.045,
+    fontSize: width * 0.08,
     fontWeight: "bold",
     marginBottom: height * 0.02,
     textAlign: "center",
@@ -181,7 +179,7 @@ export default StyleSheet.create({
   },
   difficultyModalButtonText: {
     color: "white",
-    fontSize: width * 0.04,
+    fontSize: width * 0.06,
     fontWeight: "bold",
     fontFamily: 'CuteFont_400Regular',
   },
