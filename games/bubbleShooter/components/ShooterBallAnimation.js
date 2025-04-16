@@ -7,7 +7,6 @@ const AnimatedBall = ({ x, y, size, color, onAnimationEnd }) => {
   const opacityAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // Animaatio: pallo kasvaa 1 -> 1.5-kertaiseksi ja häipyy 1 -> 0:aan
     Animated.parallel([
       Animated.timing(scaleAnim, {
         toValue: 1.5,

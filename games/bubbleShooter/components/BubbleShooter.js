@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, TouchableWithoutFeedback, Dimensions, Text, TouchableOpacity } from 'react-native';
+import { View, TouchableWithoutFeedback, Dimensions, Text, TouchableOpacity, Image } from 'react-native';
 import Matter from 'matter-js';
 import {
   createPhysics,
@@ -14,6 +14,7 @@ import {
 } from '../utils/shooterPhysics';
 import Ball from './ShooterBall';
 import AnimatedBall from './ShooterBallAnimation';
+import ScorePopUp from './ScorePop'; // Huom: varmista, että komponentin nimi/tiedostonimi ovat oikein
 import { useRoute } from "@react-navigation/native";
 import { db } from "../../../firebase/Config";
 import { collection, addDoc } from "firebase/firestore";
@@ -34,7 +35,7 @@ const numCols = 9;
 const BubbleShooter = ({ navigation }) => {
   const { engine, world, ceiling } = createPhysics(width, height);
   const shooterBall = useRef(null);
-  // Laukaisulaskuri kasvatetaan, kun laukaus ei tuota poistuvaa klusteria.
+  // Laukaisulaskuri, jota kasvatetaan, kun laukaus ei tuota poistuvaa klusteria.
   const shotCounterRef = useRef(0);
   const [ballPosition, setBallPosition] = useState({ x: width / 2, y: SHOOTER_BALL_Y });
   const [staticBalls, setStaticBalls] = useState([]);
@@ -49,6 +50,32 @@ const BubbleShooter = ({ navigation }) => {
   const { nickname } = useNickname();
   const rafIdRef = useRef(null);
   const [poppedBalls, setPoppedBalls] = useState([]);
+  
+  // Uusi tila yhdistetylle score pop-upille
+  const [aggregatedPopup, setAggregatedPopup] = useState(null);
+  const aggregatedTimeoutRef = useRef(null);
+
+  // Funktio, joka päivittää tai luo uuden aggregatedPopupin.
+  const addAggregatedPopup = (points, x, y) => {
+    setAggregatedPopup(prev => {
+      if (prev) {
+        // Päivitetään olemassaolevaa: yhdistetään pisteet ja lasketaan uusi keskiarvo.
+        const newPoints = prev.points + points;
+        const avgX = (prev.x * prev.points + x * points) / newPoints;
+        const avgY = (prev.y * prev.points + y * points) / newPoints;
+        return { ...prev, points: newPoints, x: avgX, y: avgY };
+      } else {
+        return { id: `${Date.now()}-${Math.random()}`, points, x, y };
+      }
+    });
+    // Nollataan aikakatkaisu, jolloin aggregatedPopup pysyy näkyvissä 1000 ms uusien päivitysten jälkeen.
+    if (aggregatedTimeoutRef.current) {
+      clearTimeout(aggregatedTimeoutRef.current);
+    }
+    aggregatedTimeoutRef.current = setTimeout(() => {
+      setAggregatedPopup(null);
+    }, 1000); // Voit säätää näkyvyysaikaa (1000 ms = 1 sekunti)
+  };
 
   // Muunnetaan ruudukko kordinaateiksi
   const gridToPosition = (row, col) => {
@@ -67,13 +94,12 @@ const BubbleShooter = ({ navigation }) => {
     staticBallsRef.current = staticBalls;
   }, [staticBalls]);
 
-  // addRow: repositionoi olemassa olevat pallot ja lisää uuden yläreunan.
-  // Lisäksi poistaa "leijuvat" pallot.
+  // Lisää riviä: repositionoi olemassa olevat pallot ja lisää uuden yläreunan.
+  // Poistaa myös "leijuvat" pallot.
   const addRows = (numRows = 1) => {
     setStaticBalls(prevBalls => {
       let combinedBalls = prevBalls;
       for (let i = 0; i < numRows; i++) {
-        // Siirretään olemassa olevia palloja alaspäin
         combinedBalls = combinedBalls.map(ball => {
           if (typeof ball.gridRow !== 'number' || typeof ball.gridCol !== 'number') {
             const snappedCoords = snapToGrid(ball, width, numCols);
@@ -120,7 +146,7 @@ const BubbleShooter = ({ navigation }) => {
     });
   };
 
-  // Törmäystapahtumien hallinta: sekä osuma staattiseen palloon että kattoon
+  // Törmäystapahtumien hallinta: osuma staattiseen palloon ja kattoon
   useEffect(() => {
     initShooterBall();
     const initialStaticBalls = createStaticBalls(world, 9, numCols, width);
@@ -152,14 +178,21 @@ const BubbleShooter = ({ navigation }) => {
             const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
 
             if (cluster.length > 0) {
-              // Lisätään poistettujen pallojen tiedot animaatiota varten
+              // Klusterin pisteet: 10 pistettä per pallo.
+              const totalClusterPoints = cluster.length * 10;
+              // Lasketaan klusterin keskiarvosijainti
+              const averageX = cluster.reduce((sum, ball) => sum + ball.position.x, 0) / cluster.length;
+              const averageY = cluster.reduce((sum, ball) => sum + ball.position.y, 0) / cluster.length;
+              // Kutsutaan aggregated-popup päivitystä
+              addAggregatedPopup(totalClusterPoints, averageX, averageY);
+              
               cluster.forEach(ball => {
                 setPoppedBalls(prev => [...prev, { id: ball.id, x: ball.position.x, y: ball.position.y, color: ball.color }]);
                 Matter.World.remove(world, ball);
               });
               setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
               setScore(prev => {
-                const newScore = prev + cluster.length * 10;
+                const newScore = prev + totalClusterPoints;
                 scoreRef.current = newScore;
                 return newScore;
               });
@@ -174,13 +207,16 @@ const BubbleShooter = ({ navigation }) => {
               }
             }
 
+            // Käsitellään leijuvat pallot (pudotukset), joista saa 15 pistettä per pallo.
             const updatedBalls = staticBallsRef.current.filter(ball => !cluster.includes(ball));
             const floatingBalls = findFloatingBalls(updatedBalls);
             if (floatingBalls.length > 0) {
-              floatingBalls.forEach(ball => Matter.World.remove(world, ball));
-              setStaticBalls(prev =>
-                prev.filter(ball => !floatingBalls.includes(ball))
-              );
+              floatingBalls.forEach(ball => {
+                addAggregatedPopup(15, ball.position.x, ball.position.y);
+                setPoppedBalls(prev => [...prev, { id: ball.id, x: ball.position.x, y: ball.position.y, color: ball.color }]);
+                Matter.World.remove(world, ball);
+              });
+              setStaticBalls(prev => prev.filter(ball => !floatingBalls.includes(ball)));
               setScore(prev => {
                 const newScore = prev + floatingBalls.length * 15;
                 scoreRef.current = newScore;
@@ -209,13 +245,17 @@ const BubbleShooter = ({ navigation }) => {
 
           const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
           if (cluster.length > 0) {
+            const totalClusterPoints = cluster.length * 10;
+            const averageX = cluster.reduce((sum, ball) => sum + ball.position.x, 0) / cluster.length;
+            const averageY = cluster.reduce((sum, ball) => sum + ball.position.y, 0) / cluster.length;
+            addAggregatedPopup(totalClusterPoints, averageX, averageY);
             cluster.forEach(ball => {
               setPoppedBalls(prev => [...prev, { id: ball.id, x: ball.position.x, y: ball.position.y, color: ball.color }]);
               Matter.World.remove(world, ball);
             });
             setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
             setScore(prev => {
-              const newScore = prev + cluster.length * 10;
+              const newScore = prev + totalClusterPoints;
               scoreRef.current = newScore;
               return newScore;
             });
@@ -231,7 +271,11 @@ const BubbleShooter = ({ navigation }) => {
           const updatedBalls = staticBallsRef.current.filter(ball => !cluster.includes(ball));
           const floatingBalls = findFloatingBalls(updatedBalls);
           if (floatingBalls.length > 0) {
-            floatingBalls.forEach(ball => Matter.World.remove(world, ball));
+            floatingBalls.forEach(ball => {
+              addAggregatedPopup(15, ball.position.x, ball.position.y);
+              setPoppedBalls(prev => [...prev, { id: ball.id, x: ball.position.x, y: ball.position.y, color: ball.color }]);
+              Matter.World.remove(world, ball);
+            });
             setStaticBalls(prev => prev.filter(ball => !floatingBalls.includes(ball)));
             setScore(prev => {
               const newScore = prev + floatingBalls.length * 15;
@@ -350,20 +394,19 @@ const BubbleShooter = ({ navigation }) => {
     <>
       <TouchableWithoutFeedback onPress={handleTouch}>
         <View style={shooterStyles.shooterGameContainer}>
-          {/* Header container sisältää score-tekstin ja home-ikonin */}
+          {/* Header: score-teksti ja home-ikoni */}
           <View style={shooterStyles.headerContainer}>
-          <TouchableOpacity onPress={() => navigation.replace('Home')}>
+            <TouchableOpacity onPress={() => navigation.replace('Home')}>
               <Ionicons name="home" style={shooterStyles.shooterHomeIcon} />
             </TouchableOpacity>
             <Text style={shooterStyles.shooterScoreText}>Score: {score}</Text>
           </View>
   
-          {/* Pelin elementit */}
           {staticBalls.map(ball => (
             <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
           ))}
           <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
-          {/* Pop-animaatiot */}
+          
           {poppedBalls.map(pop => (
             <AnimatedBall
               key={pop.id}
@@ -376,6 +419,29 @@ const BubbleShooter = ({ navigation }) => {
               }}
             />
           ))}
+
+          {/* Renderöidään yhdistetty score pop-up, jos se on aktiivinen */}
+          {aggregatedPopup && (
+            <ScorePopUp
+              key={aggregatedPopup.id}
+              score={aggregatedPopup.points}
+              x={aggregatedPopup.x}
+              y={aggregatedPopup.y}
+              onAnimationEnd={() => setAggregatedPopup(null)}
+            />
+          )}
+
+          <Image 
+            source={require('../assets/image.png')}  
+            style={{
+              position: 'absolute',
+              bottom: -170,   
+              right: -100,     
+              width: 300,   
+              height: 300, 
+            }}
+            resizeMode="contain"  
+          />
         </View>
       </TouchableWithoutFeedback>
     </>
