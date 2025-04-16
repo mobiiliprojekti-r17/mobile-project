@@ -162,6 +162,13 @@ const HomeScreen = ({ navigation }) => {
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
+          
+          <TouchableOpacity onPress={() => navigation.navigate('ColorGame')}>
+          <ImageBackground source={require('../assets/ColorSortIcon.png')} style={styles.gameButton} 
+          imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
+          </ImageBackground>
+          </TouchableOpacity>
+
           </View>
         </View>
 
