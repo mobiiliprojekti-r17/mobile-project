@@ -218,7 +218,8 @@ const BubbleShooter = ({ navigation }) => {
       }
       if (!gameOverTriggered.current) {
         for (let ball of staticBallsRef.current) {
-          if (getGridRow(ball.position.y) >= MAX_ROW) {
+          const bottomOfBall = ball.position.y + BALL_RADIUS;
+          if (bottomOfBall >= height - 220) {  // ampumispallon yläreuna
             gameOverTriggered.current = true;
             setGameOver(true);
             storeShooterResults();
@@ -226,6 +227,7 @@ const BubbleShooter = ({ navigation }) => {
           }
         }
       }
+      
       rafIdRef.current = requestAnimationFrame(update);
     };
 
