@@ -240,7 +240,7 @@ export default function BrickBreaker() {
   return (
     <View style={BreakerStyles.container} {...panResponder.panHandlers}>
       <Text style={BreakerStyles.score}>
-        Pisteet: {score} | Taso: {gameState.level}
+        Points: {score} Level: {gameState.level}
       </Text>
 
  
