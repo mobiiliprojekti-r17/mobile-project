@@ -36,51 +36,50 @@ const numCols = 9;
 const BubbleShooter = ({ navigation }) => {
   const soundRef = useRef(null);
   const lastPopSoundTime = useRef(0);
-  const { engine, world, ceiling } = createPhysics(width, height);
   const shooterBall = useRef(null);
+  const staticBallsRef = useRef([]);
+  const scoreRef = useRef(0);
   const shotCounterRef = useRef(0);
+  const gameOverTriggered = useRef(false);
+  const rafIdRef = useRef(null);
+  const aggregatedTimeoutRef = useRef(null);
+
+  const engineRef = useRef(null);
+  const worldRef = useRef(null);
+  const ceilingRef = useRef(null);
+
   const [ballPosition, setBallPosition] = useState({ x: width / 2, y: SHOOTER_BALL_Y });
   const [staticBalls, setStaticBalls] = useState([]);
-  const staticBallsRef = useRef([]);
   const [ballsInitialized, setBallsInitialized] = useState(false);
   const [isBallAtCenter, setIsBallAtCenter] = useState(true);
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
-  const scoreRef = useRef(0);
-  const gameOverTriggered = useRef(false);
-  const route = useRoute();
-  const { nickname } = useNickname();
-  const rafIdRef = useRef(null);
   const [poppedBalls, setPoppedBalls] = useState([]);
   const [aggregatedPopup, setAggregatedPopup] = useState(null);
-  const aggregatedTimeoutRef = useRef(null);
+
+  const route = useRoute();
+  const { nickname } = useNickname();
 
   useEffect(() => {
     const loadSound = async () => {
       try {
-        const { sound } = await Audio.Sound.createAsync(
-          require('../assets/bubbleSound.mp3')
-        );
+        const { sound } = await Audio.Sound.createAsync(require('../assets/bubbleSound.mp3'));
         soundRef.current = sound;
       } catch (error) {
         console.error('Error loading sound:', error);
       }
     };
-
     loadSound();
 
     return () => {
-      if (soundRef.current) {
-        soundRef.current.unloadAsync();
-      }
+      if (soundRef.current) soundRef.current.unloadAsync();
     };
   }, []);
 
   const playPopSound = async () => {
     const now = Date.now();
-    if (now - lastPopSoundTime.current < 100) return; // väli väh. 100ms
+    if (now - lastPopSoundTime.current < 100) return;
     lastPopSoundTime.current = now;
-  
     try {
       if (soundRef.current) {
         await soundRef.current.replayAsync();
@@ -89,7 +88,6 @@ const BubbleShooter = ({ navigation }) => {
       console.error('Error playing sound:', error);
     }
   };
-  
 
   const addAggregatedPopup = (points, x, y) => {
     setAggregatedPopup(prev => {
@@ -102,33 +100,88 @@ const BubbleShooter = ({ navigation }) => {
         return { id: `${Date.now()}-${Math.random()}`, points, x, y };
       }
     });
-    if (aggregatedTimeoutRef.current) {
-      clearTimeout(aggregatedTimeoutRef.current);
-    }
-    aggregatedTimeoutRef.current = setTimeout(() => {
-      setAggregatedPopup(null);
-    }, 1000);
+    if (aggregatedTimeoutRef.current) clearTimeout(aggregatedTimeoutRef.current);
+    aggregatedTimeoutRef.current = setTimeout(() => setAggregatedPopup(null), 1000);
   };
 
   useEffect(() => {
     staticBallsRef.current = staticBalls;
   }, [staticBalls]);
 
+  const initShooterBall = () => {
+    const availableColors = getAvailableColors(staticBallsRef.current);
+    const color = availableColors.length > 0
+      ? availableColors[Math.floor(Math.random() * availableColors.length)]
+      : getRandomPastelColor();
+
+    shooterBall.current = createShooterBall(worldRef.current, width / 2, SHOOTER_BALL_Y, BALL_RADIUS, color);
+    Matter.Body.setStatic(shooterBall.current, true);
+    setBallPosition({ x: shooterBall.current.position.x, y: shooterBall.current.position.y });
+  };
+
+  const resetShooterBall = () => {
+    const availableColors = getAvailableColors(staticBallsRef.current);
+    const color = availableColors.length > 0
+      ? availableColors[Math.floor(Math.random() * availableColors.length)]
+      : getRandomPastelColor();
+
+    const newBall = createShooterBall(worldRef.current, width / 2, SHOOTER_BALL_Y, BALL_RADIUS, color);
+    Matter.Body.setStatic(newBall, true);
+    shooterBall.current = newBall;
+    setBallPosition({ x: newBall.position.x, y: newBall.position.y });
+    setIsBallAtCenter(true);
+  };
+
   const addRows = (numRows = 1) => {
     setStaticBalls(prevBalls => {
       return addRowsToGrid({
         staticBalls: prevBalls,
         numRows,
-        world,
+        world: worldRef.current,
         numCols,
         width,
       });
     });
   };
 
-  const MAX_ROW = Math.floor((SHOOTER_BALL_Y - topOffset - BALL_RADIUS) / (BALL_RADIUS * Math.sqrt(3)));
+  const handleTouch = (event) => {
+    if (!isBallAtCenter || gameOver) return;
+    const touchX = event.nativeEvent.pageX;
+    const touchY = event.nativeEvent.pageY;
+    const directionX = touchX - shooterBall.current.position.x;
+    const directionY = touchY - shooterBall.current.position.y;
+    const angle = Math.atan2(directionY, directionX);
+    const speed = 15;
+    const normalizedX = Math.cos(angle) * speed;
+    const normalizedY = Math.sin(angle) * speed;
+
+    Matter.Body.setStatic(shooterBall.current, false);
+    Matter.Body.set(shooterBall.current, { restitution: 1, friction: 0, frictionAir: 0 });
+    Matter.Body.setVelocity(shooterBall.current, { x: normalizedX, y: normalizedY });
+    setIsBallAtCenter(false);
+  };
+
+  const storeShooterResults = async () => {
+    try {
+      await addDoc(collection(db, "ShooterResults"), {
+        Nickname: nickname,
+        score: scoreRef.current,
+      });
+    } catch (error) {
+      console.error("Error storing result: ", error);
+    }
+    navigation.replace("ShooterGameOver", {
+      nickname,
+      finalScore: scoreRef.current,
+    });
+  };
 
   useEffect(() => {
+    const { engine, world, ceiling } = createPhysics(width, height);
+    engineRef.current = engine;
+    worldRef.current = world;
+    ceilingRef.current = ceiling;
+
     initShooterBall();
     const initialStaticBalls = createStaticBalls(world, 9, numCols, width);
     setStaticBalls(initialStaticBalls);
@@ -157,10 +210,10 @@ const BubbleShooter = ({ navigation }) => {
 
             const cluster = findClusterAndRemove(staticBallsRef.current, shooter);
             if (cluster.length > 0) {
-              const totalClusterPoints = cluster.length * 10;
-              const averageX = cluster.reduce((sum, b) => sum + b.position.x, 0) / cluster.length;
-              const averageY = cluster.reduce((sum, b) => sum + b.position.y, 0) / cluster.length;
-              addAggregatedPopup(totalClusterPoints, averageX, averageY);
+              const totalPoints = cluster.length * 10;
+              const avgX = cluster.reduce((sum, b) => sum + b.position.x, 0) / cluster.length;
+              const avgY = cluster.reduce((sum, b) => sum + b.position.y, 0) / cluster.length;
+              addAggregatedPopup(totalPoints, avgX, avgY);
               cluster.forEach(ball => {
                 playPopSound();
                 setPoppedBalls(prev => [...prev, { id: ball.id, x: ball.position.x, y: ball.position.y, color: ball.color }]);
@@ -168,7 +221,7 @@ const BubbleShooter = ({ navigation }) => {
               });
               setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
               setScore(prev => {
-                const newScore = prev + totalClusterPoints;
+                const newScore = prev + totalPoints;
                 scoreRef.current = newScore;
                 return newScore;
               });
@@ -216,10 +269,10 @@ const BubbleShooter = ({ navigation }) => {
         const { x, y } = shooterBall.current.position;
         setBallPosition({ x, y });
       }
+
       if (!gameOverTriggered.current) {
         for (let ball of staticBallsRef.current) {
-          const bottomOfBall = ball.position.y + BALL_RADIUS;
-          if (bottomOfBall >= height - 220) {  // ampumispallon yläreuna
+          if (ball.position.y + BALL_RADIUS >= height - 220) {
             gameOverTriggered.current = true;
             setGameOver(true);
             storeShooterResults();
@@ -227,10 +280,11 @@ const BubbleShooter = ({ navigation }) => {
           }
         }
       }
-      
+
       rafIdRef.current = requestAnimationFrame(update);
     };
 
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
     update();
 
     return () => {
@@ -238,6 +292,10 @@ const BubbleShooter = ({ navigation }) => {
       Matter.Events.off(engine, 'collisionStart', collisionHandler);
       Matter.World.clear(world, false);
       Matter.Engine.clear(engine);
+      shooterBall.current = null;
+      staticBallsRef.current = [];
+      rafIdRef.current = null;
+      gameOverTriggered.current = false;
     };
   }, []);
 
@@ -249,71 +307,12 @@ const BubbleShooter = ({ navigation }) => {
     }
   }, [staticBalls, ballsInitialized]);
 
-  const initShooterBall = () => {
-    const availableColors = getAvailableColors(staticBallsRef.current);
-    const color = availableColors.length > 0 
-      ? availableColors[Math.floor(Math.random() * availableColors.length)]
-      : getRandomPastelColor();
-
-    shooterBall.current = createShooterBall(world, width / 2, SHOOTER_BALL_Y, BALL_RADIUS, color);
-    Matter.Body.setStatic(shooterBall.current, true);
-  };
-
-  const resetShooterBall = () => {
-    const availableColors = getAvailableColors(staticBallsRef.current);
-    const color = availableColors.length > 0 
-      ? availableColors[Math.floor(Math.random() * availableColors.length)]
-      : getRandomPastelColor();
-
-    const newBall = createShooterBall(world, width / 2, SHOOTER_BALL_Y, BALL_RADIUS, color);
-    Matter.Body.setStatic(newBall, true);
-    shooterBall.current = newBall;
-    setBallPosition({ x: newBall.position.x, y: newBall.position.y });
-    setIsBallAtCenter(true);
-  };
-
-  const handleTouch = (event) => {
-    if (!isBallAtCenter || gameOver) return;
-    const touchX = event.nativeEvent.pageX;
-    const touchY = event.nativeEvent.pageY;
-    const directionX = touchX - shooterBall.current.position.x;
-    const directionY = touchY - shooterBall.current.position.y;
-    const angle = Math.atan2(directionY, directionX);
-    const speed = 15;
-    const normalizedX = Math.cos(angle) * speed;
-    const normalizedY = Math.sin(angle) * speed;
-
-    Matter.Body.setStatic(shooterBall.current, false);
-    Matter.Body.set(shooterBall.current, { restitution: 1, friction: 0, frictionAir: 0 });
-    Matter.Body.setVelocity(shooterBall.current, { x: normalizedX, y: normalizedY });
-    setIsBallAtCenter(false);
-  };
-
-  const storeShooterResults = async () => {
-    try {
-      await addDoc(collection(db, "ShooterResults"), {
-        Nickname: nickname,
-        score: scoreRef.current,
-      });
-      console.log("Result stored in Firestore.");
-    } catch (error) {
-      console.error("Error storing result: ", error);
-    }
-    navigation.navigate("ShooterGameOver", {
-      nickname,
-      finalScore: scoreRef.current,
-    });
-  };
-
   return (
     <TouchableWithoutFeedback onPress={handleTouch}>
-      <LinearGradient
-        colors={['rgb(255, 158, 226)', '#fac3e9']} 
-          style={shooterStyles.shooterGameContainer}
-      >
-      <View style={shooterStyles.homeBox}>
-      <TouchableOpacity onPress={() => navigation.replace('Home')}>
-        <Ionicons name="home" style={shooterStyles.shooterHomeIcon} />
+      <LinearGradient colors={['rgb(255, 158, 226)', '#fac3e9']} style={shooterStyles.shooterGameContainer}>
+        <View style={shooterStyles.homeBox}>
+          <TouchableOpacity onPress={() => navigation.replace('Home')}>
+            <Ionicons name="home" style={shooterStyles.shooterHomeIcon} />
           </TouchableOpacity>
         </View>
 
@@ -324,8 +323,10 @@ const BubbleShooter = ({ navigation }) => {
         {staticBalls.map(ball => (
           <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
         ))}
-        <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
-        
+        {shooterBall.current && (
+          <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
+        )}
+
         {poppedBalls.map(pop => (
           <AnimatedBall
             key={pop.id}
@@ -349,16 +350,10 @@ const BubbleShooter = ({ navigation }) => {
           />
         )}
 
-        <Image 
-          source={require('../assets/image.png')}  
-          style={{
-            position: 'absolute',
-            bottom: -90,   
-            right: -100,     
-            width: 300,   
-            height: 300, 
-          }}
-          resizeMode="contain"  
+        <Image
+          source={require('../assets/image.png')}
+          style={{ position: 'absolute', bottom: -90, right: -100, width: 300, height: 300 }}
+          resizeMode="contain"
         />
       </LinearGradient>
     </TouchableWithoutFeedback>
