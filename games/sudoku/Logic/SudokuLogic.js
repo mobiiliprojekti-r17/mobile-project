@@ -2,7 +2,7 @@ import sudoku from 'sudoku';
 
 export function generateBoard(level) {
   const lvl = level.toUpperCase();
-  const filledCells = lvl === 'EASY' ? 80 : lvl === 'HARD' ? 30 : 40;
+  const filledCells = lvl === 'EASY' ? 60 : lvl === 'HARD' ? 30 : 40;
   const solved = sudoku.solvepuzzle(sudoku.makepuzzle());
 
   const board = Array.from({ length: 9 }, (_, i) =>
