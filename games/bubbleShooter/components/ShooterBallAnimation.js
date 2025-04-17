@@ -9,7 +9,7 @@ const AnimatedBall = ({ x, y, size, color, onAnimationEnd }) => {
   useEffect(() => {
     Animated.parallel([
       Animated.timing(scaleAnim, {
-        toValue: 1.5,
+        toValue: 2.2,
         duration: 250,
         useNativeDriver: true,
       }),
@@ -28,14 +28,19 @@ const AnimatedBall = ({ x, y, size, color, onAnimationEnd }) => {
       style={[
         styles.ball,
         {
-          left: x - size / 2,
-          top: y - size / 2,
-          width: size,
-          height: size,
+          left: x - size,
+          top: y - size,
+          width: size * 2,
+          height: size * 2,
           backgroundColor: color,
-          borderRadius: size / 2,
+          borderRadius: size,
           transform: [{ scale: scaleAnim }],
           opacity: opacityAnim,
+          shadowColor: '#fff',
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.9,
+          shadowRadius: 10,
+          elevation: 10,
         },
       ]}
     />

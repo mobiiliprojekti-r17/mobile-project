@@ -13,11 +13,25 @@ const shooterStyles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 50,
   },
+  shineEffect: {
+    position: 'absolute',
+    top: '10%',
+    left: '15%',
+    width: 30, // tai suhteessa kokoon
+    height: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    transform: [{ rotate: '-20deg' }], 
+  },
+  
   face: {
     fontSize: 15,
     color: '#FFF',
     fontWeight: 'bold',
     textAlign: 'center',
+    textShadowColor: '#424040',
+    textShadowOffset: { width: 0.5, height: 0.5 },
+    textShadowRadius: 3,
+
     
   },
   shooterGameContainer: {
@@ -27,6 +41,7 @@ const shooterStyles = StyleSheet.create({
     justifyContent: 'center', 
     position: 'relative',
   },
+  
   shooterScoreText: {
     fontSize: 30,
     color: '#6C5DD3',
