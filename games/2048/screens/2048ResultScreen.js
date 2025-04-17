@@ -94,7 +94,7 @@ export default function Game2048ResultScreen({ route, navigation }) {
 
         {/* Player, Score, Time keskitettynä allekkain */}
         <View style={styles.textContainer}>
-          <Text style={styles.scoreText}>Player: {score.nickname}</Text>
+          <Text style={styles.scoreText}>Player: {score.Nickname}</Text>
           <Text style={styles.scoreText}>Score: {score.score}</Text>
           <Text style={styles.scoreText}>Time: {formattedTime(score.timeInSeconds)}</Text>
         </View>

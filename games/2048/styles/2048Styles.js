@@ -1,69 +1,64 @@
 import { StyleSheet, Dimensions} from "react-native";
 
-const screenWidth = Dimensions.get("window").width;
-const gridPadding = 60; // marginaalia sivuilta
-const tileMargin = 5;
-const tilesPerRow = 4;
-const baseWidth = 390;
-const scale = screenWidth / baseWidth;
+const { width, height } = Dimensions.get("window");
 
-const tileSize = (screenWidth - gridPadding - tileMargin * 2 * tilesPerRow) / tilesPerRow;
-const scaleSize = (size) => Math.round(size * scale);
+const tileSize = width * 0.2;
+const tileMargin = width * 0.008;
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgb(211, 181, 255)", //"#faf8ef"
+    backgroundColor: "rgb(211, 181, 255)",
   },
   ChangaOneText: {
     fontFamily: 'ChangaOne_400Regular',
-    fontSize: scaleSize(80),
+    fontSize: width * 0.25,
     fontWeight: "bold",
     color: "rgb(255, 255, 255)",
-    marginBottom: scaleSize(50),
+    marginBottom: height * 0.06,
   },
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "89%",
-    marginTop: scaleSize(25),
-    marginBottom: scaleSize(5),
+    width: width * 0.89,
+    marginTop: height * 0.044,
+    marginBottom: height * 0.005,
   },
   scoreText: {
-    fontSize: scaleSize(18),
+    fontSize: width * 0.045,
     fontWeight: "bold",
     color: "#333",
   },
   timerText: {
-    fontSize: scaleSize(18),
+    fontSize: width * 0.045,
     fontWeight: "bold",
     color: "#333",
   },
   topButtonsContainer: {
     position: "absolute",
-    top: scaleSize(260),
-    right: scaleSize(25),
+    top: height * 0.317,
+    right: width * 0.055,
     flexDirection: "row",
   },
   
   iconButton: {
     backgroundColor: "rgb(106, 106, 106)",
-    padding: scaleSize(5),
-    borderRadius: scaleSize(5),
+    padding: width * 0.014,
+    borderRadius: width * 0.015,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: scaleSize(8),
+    marginLeft: width * 0.02,
   },
   
 gridContainer: {
   backgroundColor: "#faf8ef",
-  padding: 8,
-  borderRadius: 10,
+  padding: width * 0.02,
+  borderRadius: width * 0.025,
   borderWidth: 3,
   borderColor: "#fff", // vaalea reunaväri
-  marginTop: 10,
+  marginTop: height * 0.01,
 },
 
   row: {
@@ -75,10 +70,10 @@ gridContainer: {
     margin: tileMargin,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 5,
+    borderRadius: width * 0.01,
   },
   tileText: {
-    fontSize: tileSize * 0.3,
+    fontSize: tileSize * 0.29,
     fontWeight: "bold",
   },
 });

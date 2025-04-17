@@ -5,6 +5,7 @@ import modalStyles from '../styles/modalStyles';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNickname } from "../../../context/context";
 import { db, collection, addDoc } from "../../../firebase/Config";
+import { serverTimestamp } from 'firebase/firestore';
 import { useNavigation } from "@react-navigation/native";
 
 const LEVEL_CONFIGS = [
@@ -72,21 +73,27 @@ const isUsefulMove = (bottles, config, fromIdx, toIdx) => {
 
   let cnt = 0;
   while (from.length && from[from.length - 1] === color && to.length + cnt < config.layersPerBottle) {
-    from.pop();
-    cnt++;
+    from.pop(); cnt++;
   }
   for (let k = 0; k < cnt; k++) to.push(color);
 
   const fromTopAfter = from.length ? from[from.length - 1] : null;
   const toTopAfter = to[to.length - 1];
-  const fromEmptied = from.length === 0;
 
-  return fromEmptied || fromTopAfter !== fromTopBefore || toTopAfter !== toTopBefore;
+  return fromTopAfter !== fromTopBefore || toTopAfter !== toTopBefore || from.length === 0;
 };
 
 const saveColorSortResult = async (nickname, time, moves) => {
   try {
-    await addDoc(collection(db, "ColorSortResults"), { nickname, time, moves });
+    await addDoc(
+      collection(db, "ColorSortResults"),
+      {
+        nickname,
+        time: Number(time),
+        moves: Number(moves),
+        createdAt: serverTimestamp()
+      }
+    );
   } catch (e) {
     console.error(e);
   }
@@ -99,10 +106,11 @@ export default function ColorSortGame() {
   const [level, setLevel] = useState(0);
   const [bottles, setBottles] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [lastMove, setLastMove] = useState(null);
+  const [history, setHistory] = useState([]);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [running, setRunning] = useState(false);
   const [moves, setMoves] = useState(0);
+
   const [shakeIndex, setShakeIndex] = useState(null);
   const shakeAnim = useRef(new Animated.Value(0)).current;
   const [confettiBottle, setConfettiBottle] = useState(null);
@@ -114,13 +122,13 @@ export default function ColorSortGame() {
   const [modalMessage, setModalMessage] = useState("");
   const [modalButtonText, setModalButtonText] = useState("");
   const [modalButtonAction, setModalButtonAction] = useState(() => {});
-
   const modalShown = useRef(false);
 
   useEffect(() => {
     const cfg = LEVEL_CONFIGS[level];
     setBottles(generateRandomBottles(cfg));
-    setLastMove(null);
+    setHistory([]);
+    modalShown.current = false;
   }, [level]);
 
   useEffect(() => {
@@ -134,7 +142,7 @@ export default function ColorSortGame() {
     return `${m}:${sec < 10 ? "0" : ""}${sec}`;
   };
 
-  const triggerShake = (index) => {
+  const triggerShake = index => {
     setShakeIndex(index);
     shakeAnim.setValue(0);
     Animated.sequence([
@@ -145,19 +153,13 @@ export default function ColorSortGame() {
     ]).start(() => setShakeIndex(null));
   };
 
-  const triggerConfetti = (index) => {
+  const triggerConfetti = index => {
     setConfettiBottle(index);
     confettiAnim.setValue(0);
-
     Vibration.vibrate([0, 100, 50, 100]);
-
-    Animated.timing(confettiAnim, {
-      toValue: 1,
-      duration: 800,
-      useNativeDriver: true,
-    }).start(() => setConfettiBottle(null));
+    Animated.timing(confettiAnim, { toValue: 1, duration: 800, useNativeDriver: true })
+      .start(() => setConfettiBottle(null));
   };
-
 
   const showLevelModal = (t, msg, btn, action) => {
     setModalType("LEVEL");
@@ -195,7 +197,7 @@ export default function ColorSortGame() {
         `Level ${level + 1} complete!`,
         `Time: ${formatTime(elapsedTime)}\nMoves: ${mv}`,
         "Next Level",
-        () => { setLastMove(null); setLevel(l => l + 1); setRunning(true); }
+        () => { setLevel(l => l + 1); setRunning(true); }
       );
     }
   };
@@ -206,15 +208,12 @@ export default function ColorSortGame() {
     const to = [...bottles[j]];
     if (!from.length) return;
     const color = from[from.length - 1];
-    if (to.length >= cfg.layersPerBottle) {
-      triggerShake(j); // j on kohdepullon indeksi
+    if (to.length >= cfg.layersPerBottle || (to.length && to[to.length - 1] !== color)) {
+      triggerShake(j);
       return;
     }
-    if (to.length && to[to.length - 1] !== color) {
-      triggerShake(j); // j on kohdepullon indeksi
-      return;
-    }    
-    setLastMove(bottles.map(b => [...b]));
+
+    setHistory(prev => [...prev, bottles].slice(-2));
 
     let cnt = 0;
     while (from.length && from[from.length - 1] === color && to.length + cnt < cfg.layersPerBottle) {
@@ -222,67 +221,55 @@ export default function ColorSortGame() {
     }
     for (let k = 0; k < cnt; k++) to.push(color);
 
-    const newMoves = moves + 1;
-    setMoves(newMoves);
-
+    setMoves(prev => prev + 1);
     const newBottles = [...bottles];
     newBottles[i] = from;
     newBottles[j] = to;
     setBottles(newBottles);
+
     if (to.length === cfg.layersPerBottle && new Set(to).size === 1) {
-      triggerConfetti(j); // j on kohdepullon indeksi
+      triggerConfetti(j);
     }
 
-    checkWin(newBottles, newMoves);
+    checkWin(newBottles, moves + 1);
 
-    // tsekkaa hyödyllisiä siirtoja
     const valid = getValidMoves(newBottles, cfg);
-const useful = valid.filter(m => isUsefulMove(newBottles, cfg, m.from, m.to));
-
-if (!useful.length && !modalShown.current) {
-  modalShown.current = true;
-  setRunning(false);
-  // Viivästetään modaalin näyttöä 500 ms:
-  setTimeout(() => {
-    showNoMovesModal(
-      "No More Moves",
-      "No meaningful moves remain—top colors won't change nor bottles empty."
-    );
-  }, 1000);
-}
+    const useful = valid.filter(m => isUsefulMove(newBottles, cfg, m.from, m.to));
+    if (!useful.length && !modalShown.current) {
+      modalShown.current = true;
+      setRunning(false);
+      setTimeout(() => showNoMovesModal(
+        "No More Moves",
+        "No meaningful moves remain—top colors won't change nor bottles empty."
+      ), 500);
+    }
   };
 
   const handlePress = idx => {
     if (selected === null) {
       if (bottles[idx].length) setSelected(idx);
     } else {
-      if (idx === selected) setSelected(null);
-      else { pour(selected, idx); setSelected(null); }
+      if (idx !== selected) pour(selected, idx);
+      setSelected(null);
     }
   };
 
   const handleUndo = () => {
-    if (lastMove) {
-      setBottles(lastMove);
-      setLastMove(null);
-      setMoves(prev => Math.max(0, prev - 1)); // vähennetään siirtoja, mutta ei alle 0
-    }
+    if (!history.length) return;
+    const last = history[history.length - 1];
+    setBottles(last);
+    setHistory(prev => prev.slice(0, -1));
+    setMoves(prev => Math.max(0, prev - 1));
   };
-  
 
-  const restart = () => {
-    setLevel(0);
-    setElapsedTime(0);
-    setMoves(0);
-    setRunning(false);
-    setLastMove(null);
-    modalShown.current = false;
-  };
+  const restart = () => { setLevel(0); setRunning(false); };
+
+  useEffect(() => { navigation.setOptions({ headerLeft: () => null, gestureEnabled: false }); }, [navigation]);
 
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
-        <Text style={styles.title}>💧 Level {level+1}</Text>
+        <Text style={styles.title}>💧 Level {level + 1}</Text>
         <View style={styles.statusContainer}>
           <Text style={styles.statusText}>Time: {formatTime(elapsedTime)}</Text>
           <Text style={styles.statusText}>Moves: {moves}</Text>
@@ -290,84 +277,33 @@ if (!useful.length && !modalShown.current) {
         <View style={styles.bottleContainer}>
           {bottles.map((b, i) => (
             <Animated.View
-            key={i}
-            style={{
-              transform: [
-                {
-                  translateX: shakeIndex === i
-                    ? shakeAnim.interpolate({
-                        inputRange: [-1, 1],
-                        outputRange: [-5, 5],
-                      })
-                    : 0,
-                },
-              ],
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => handlePress(i)}
-              style={styles.bottleWrapper}
+              key={i}
+              style={{ transform: [{ translateX: shakeIndex === i ? shakeAnim.interpolate({
+                inputRange: [-1, 1], outputRange: [-5, 5]
+              }) : 0 }] }}
             >
-              <View style={styles.bottleInner}>
-                {Array.from({ length: LEVEL_CONFIGS[level].layersPerBottle }).map((_, k) => {
-                  const c = b[LEVEL_CONFIGS[level].layersPerBottle - 1 - k];
-                  return (
-                    <View
-                      key={k}
-                      style={[styles.layer, { backgroundColor: c || "lightgray" }]}
-                    />
-                  );
-                })}
-              </View>
-              <View
-                style={[
-                  styles.bottleBorder,
-                  selected === i && { borderColor: "gold", borderWidth: 3 },
-                ]}
-                pointerEvents="none"
-              />
-            </TouchableOpacity>
-            {confettiBottle === i && (
-  <Animated.Text
-    style={{
-      position: "absolute",
-      top: -20,
-      alignSelf: "center",
-      opacity: confettiAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [1, 0],
-      }),
-      transform: [
-        {
-          translateY: confettiAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0, -50],
-          }),
-        },
-      ],
-      fontSize: 24,
-    }}
-  >
-    🎉🎊
-  </Animated.Text>
-)}
-
-          </Animated.View>
-          
+              <TouchableOpacity onPress={() => handlePress(i)} style={styles.bottleWrapper}>
+                <View style={styles.bottleInner}>
+                  {Array.from({ length: LEVEL_CONFIGS[level].layersPerBottle }).map((_, k) => (
+                    <View key={k} style={[styles.layer, { backgroundColor: b[LEVEL_CONFIGS[level].layersPerBottle - 1 - k] || 'lightgray' }]} />
+                  ))}
+                </View>
+                <View style={[styles.bottleBorder, selected === i && { borderColor: 'gold', borderWidth: 3 }]} pointerEvents="none" />
+              </TouchableOpacity>
+              {confettiBottle === i && (
+                <Animated.Text style={{ position: 'absolute', top: -20, alignSelf: 'center', opacity: confettiAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }), transform: [{ translateY: confettiAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -50] }) }], fontSize: 24 }}>
+                  🎉🎊
+                </Animated.Text>
+              )}
+            </Animated.View>
           ))}
         </View>
         <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            onPress={handleUndo}
-            disabled={!lastMove}
-            style={[styles.actionButton, !lastMove && { backgroundColor: "gray" }]}
-          >
+          <TouchableOpacity onPress={handleUndo} disabled={!history.length} style={[styles.actionButton, !history.length && { backgroundColor: 'gray' }]}>
             <MaterialCommunityIcons name="undo" size={25} color="#fff" />
-            <Text style={[styles.actionButtonText, !lastMove && { color: "lightgray" }]}>
-              Undo
-            </Text>
+            <Text style={[styles.actionButtonText, !history.length && { color: 'lightgray' }]}>Undo</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Home")} style={styles.actionButton}>
+          <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.actionButton}>
             <MaterialCommunityIcons name="home" size={25} color="#fff" />
             <Text style={styles.actionButtonText}>Home</Text>
           </TouchableOpacity>
@@ -392,57 +328,25 @@ if (!useful.length && !modalShown.current) {
             <Text style={modalStyles.modalTitle}>{modalTitle}</Text>
             <Text style={modalStyles.modalMessage}>{modalMessage}</Text>
             <View style={modalStyles.buttonContainer}>
-              {modalType === "LEVEL" && (
-                <TouchableOpacity
-                  style={modalStyles.modalButton}
-                  onPress={() => {
-                    modalButtonAction(); setModalVisible(false); modalShown.current = false;
-                  }}
-                >
+              {modalType === 'LEVEL' && (
+                <TouchableOpacity style={modalStyles.modalButton} onPress={() => { modalButtonAction(); setModalVisible(false); modalShown.current = false; }}>
                   <Text style={modalStyles.modalButtonText}>{modalButtonText}</Text>
                 </TouchableOpacity>
               )}
-              {modalType === "GAME_OVER" && (
+              {modalType === 'GAME_OVER' && (
                 <>
-                  <TouchableOpacity
-                    style={modalStyles.modalButton}
-                    onPress={() => {
-                      setModalVisible(false); modalShown.current = false;
-                      navigation.navigate("ColorSortResultScreen", {
-                        nickname, moves, time: elapsedTime
-                      });
-                    }}
-                  >
+                  <TouchableOpacity style={modalStyles.modalButton} onPress={() => { setModalVisible(false); modalShown.current = false; navigation.navigate('ColorSortResultScreen', { nickname, moves, time: elapsedTime }); }}>
                     <Text style={modalStyles.modalButtonText}>Results</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    style={modalStyles.modalButton}
-                    onPress={() => {
-                      setModalVisible(false); modalShown.current = false; restart();
-                    }}
-                  >
+                  <TouchableOpacity style={modalStyles.modalButton} onPress={() => { setModalVisible(false); modalShown.current = false; restart(); }}>
                     <Text style={modalStyles.modalButtonText}>Play Again</Text>
                   </TouchableOpacity>
                 </>
               )}
-              {modalType === "NO_MOVES" && (
+              {modalType === 'NO_MOVES' && (
                 <>
-                  {lastMove && (
-                    <TouchableOpacity
-                      style={modalStyles.modalButton}
-                      onPress={() => {
-                        handleUndo(); setModalVisible(false); modalShown.current = false;
-                      }}
-                    >
-                      <Text style={modalStyles.modalButtonText}>Undo Last Move</Text>
-                    </TouchableOpacity>
-                  )}
-                  <TouchableOpacity
-                    style={modalStyles.modalButton}
-                    onPress={() => {
-                      setModalVisible(false); modalShown.current = false; restart();
-                    }}
-                  >
+                  {!!history.length && <TouchableOpacity style={modalStyles.modalButton} onPress={() => { handleUndo(); setModalVisible(false); modalShown.current = false; }}><Text style={modalStyles.modalButtonText}>Undo Last Move</Text></TouchableOpacity>}
+                  <TouchableOpacity style={modalStyles.modalButton} onPress={() => { setModalVisible(false); modalShown.current = false; restart(); }}>
                     <Text style={modalStyles.modalButtonText}>Play Again</Text>
                   </TouchableOpacity>
                 </>

@@ -1,4 +1,11 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from 'react-native';
+ 
+const { width, height } = Dimensions.get("window");
+const buttonsPerRow = 3;
+const containerWidth = width * 0.80;
+const spacing = width * 0.05;
+const totalSpacing = spacing * (buttonsPerRow - 1);
+const buttonWidth = (containerWidth - totalSpacing) / buttonsPerRow;
 
 const styles = StyleSheet.create({
     container: {
@@ -20,6 +27,7 @@ const styles = StyleSheet.create({
         width: "100%",
         paddingHorizontal: 20,
         marginBottom: 10,
+        marginTop: 20,
       },
       difficultyText: {
         fontSize: 18,
@@ -78,9 +86,8 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "center",
-      marginTop: 20,
-      marginRight: 20,
-      marginLeft: 10,
+      marginTop: 10,
+      marginBottom: 10,
     },
     numberButton: {
         width: 70,
@@ -88,18 +95,35 @@ const styles = StyleSheet.create({
       justifyContent: "center",
       alignItems: "center",
       backgroundColor: "rgb(188, 231, 255)" ,
-      margin: 5,
+      margin: 2,
       borderRadius: 5,
-      marginLeft: 20,
-      marginRight: 10,
+      borderColor: "rgb(0, 0, 0)",
+      borderWidth: 2,
+      marginLeft: 5,
+      marginRight: 5,
     },
+    numberButtonText: {
+      color: "black",
+    },
+    numberButtonDisabled: {
+      backgroundColor: '#ccc',
+      borderColor:   '#888',
+    },    
 
-      numberPadContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        marginVertical: 10,
-      },
+    numberPadBox: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    flexDirection: 'column',      /* sisällä sekä numero‑rivi että toggle */
+    alignItems: 'center',
+    marginVertical: 10,
+    width: "70%",
+   },
+
+  noteToggleBox: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  marginTop: 10,
+  },
 
       clearButton: {
         width: 70,
@@ -109,35 +133,88 @@ const styles = StyleSheet.create({
         backgroundColor: "rgb(188, 231, 255)" ,
         margin: 5,
         borderRadius: 5,
-        marginLeft: 20,
-        marginRight: 10,
+        marginLeft: 5,
+        marginRight: 5,
+        borderRadius: 5,
+        borderColor: "rgb(0, 0, 0)",
+        borderWidth: 2,
       },
 
       CheckButton:{
-        width: 170,
+        width: 150,
         height: 40,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "rgb(188, 231, 255)" ,
-      margin: 5,
-      borderRadius: 5,
-      marginLeft: 20,
-      marginRight: 10,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgb(188, 231, 255)" ,
+        margin: 5,
+        borderRadius: 5,
+        marginLeft: 5,
+        marginRight: 5,
+        borderRadius: 5,
+        borderColor: "rgb(0, 0, 0)",
+        borderWidth: 2,
       },
+      InfoButton: {
+        width: 70,
+        height: 40,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgb(188, 231, 255)" ,
+        margin: 5,
+        borderRadius: 5,
+        marginLeft: 5,
+        marginRight: 5,
+        borderRadius: 5,
+        borderColor: "rgb(0, 0, 0)",
+        borderWidth: 2,
+      },
+      ModalInfoText:{
+        fontSize: width * 0.045,
+        fontWeight: "bold",
+        marginBottom: height * 0.02,
+        textAlign: "center",
+        color: "rgb(33, 131, 184)",
+      },
+  ModeButton: {
+    minWidth: 150,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgb(188, 231, 255)",
+    margin: 5,
+    borderRadius: 5,
+    borderColor: "#000",
+    borderWidth: 2,
+  },
+  ModeButtonText: {
+    color: "black",    // pienellä c!
+  },
+  // uusi tyyli aktiiviselle napille
+  ModeButtonActive: {
+    backgroundColor: "rgb(33, 131, 184)",  // tummansininen
+  },
+  ModeButtonTextActive: {
+    color: "white",    // jos haluat vaalean tekstin
+  },
+ 
 
     cellError: {
         backgroundColor: "rgb(33, 131, 184)",
       },
+      ButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        width: '100%',
+      },
       Homebutton: {
-        backgroundColor: "rgb(188, 231, 255)", 
+        backgroundColor: "rgb(33, 131, 184)", 
         width: 100,
-        height: 40,
+        height: 50,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: "rgb(188, 231, 255)" ,
       margin: 5,
       borderRadius: 5,
-      marginLeft: 20,
+      marginLeft: 10,
       marginRight: 10,
       },
       
@@ -146,6 +223,75 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
         fontWeight: 'bold',
-      }
+      },
+
+      Restartbutton: {
+        backgroundColor: "rgb(33, 131, 184)", 
+        width: 100,
+        height: 50,
+      justifyContent: "center",
+      alignItems: "center",
+      margin: 5,
+      borderRadius: 5,
+      marginLeft: 10,
+      marginRight: 10,
+      },
+      
+      RestartbuttonText: {
+        color: '#fff', // White text on buttons for contrast
+        fontSize: 18,
+        textAlign: 'center',
+        fontWeight: 'bold',
+      },
+        // Modaalin taustalla oleva läpinäkyvä overlay
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  // Modaalin varsinainen laatikko
+  modalView: {
+    margin: 20,
+    backgroundColor: "rgb(160, 220, 255)",
+    padding: width * 0.05,
+    borderRadius: 12,
+    alignItems: "stretch",
+    width: width * 0.7,
+    elevation: 5,
+  },
+  // Modaalin tekstiviesti
+
+  // Yleinen nappityyli modaalin napille
+  button: {
+    backgroundColor: "rgb(33, 131, 184)",
+    paddingVertical: height * 0.01,
+    borderRadius: 8,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: height * 0.007,
+  },
+  // Sulje‑nappi modaalissa (vaaleansininen tausta)
+  buttonClose: {
+    backgroundColor: "rgb(33, 131, 184)",
+  },
+  // Nappitekstin tyyli modaalissa
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+
+  modalText: {
+    fontSize: width * 0.07,
+    fontWeight: "bold",
+    marginBottom: height * 0.02,
+    textAlign: "center",
+    color: "rgb(33, 131, 184)",
+  },
+
+ 
+
   });
   export default styles;

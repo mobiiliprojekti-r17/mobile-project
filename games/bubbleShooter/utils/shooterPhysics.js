@@ -1,3 +1,4 @@
+
 import Matter from 'matter-js';
 
 const BALL_RADIUS = 20;
@@ -71,8 +72,11 @@ export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
       });
       staticBall.color = getRandomPastelColor();
       staticBall.id = Matter.Common.nextId();
+      staticBall.gridRow = row;       // <-- lisää rivit
+      staticBall.gridCol = col;
       Matter.World.add(world, staticBall);
       staticBallsArray.push(staticBall);
+
     }
   }
   return staticBallsArray;
@@ -170,4 +174,72 @@ export const getGridCoordsFromPosition = (x, y, screenWidth, numCols) => {
   }
   const col = Math.round((x - offsetX) / horizontalSpacing);
   return { row, col };
+};
+
+export const gridToPosition = (row, col, screenWidth, numCols) => {
+  const BALL_RADIUS = 20;
+  const horizontalSpacing = BALL_RADIUS * 2;
+  const verticalSpacing = BALL_RADIUS * Math.sqrt(3);
+  let baseOffset = (screenWidth - (numCols * horizontalSpacing)) / 2;
+  if (row % 2 !== 0) {
+    baseOffset += horizontalSpacing / 2;
+  }
+  return { x: baseOffset + col * horizontalSpacing, y: 80 + row * verticalSpacing };
+};
+
+export const getGridRow = (y) => {
+  const BALL_RADIUS = 20;
+  const topOffset = 80;
+  const verticalSpacing = BALL_RADIUS * Math.sqrt(3);
+  return Math.round((y - topOffset) / verticalSpacing);
+};
+
+export const addRowsToGrid = ({
+  staticBalls,
+  numRows = 1,
+  world,
+  numCols,
+  width,
+}) => {
+  const BALL_RADIUS = 20;
+  const topOffset = 80;
+  const horizontalSpacing = BALL_RADIUS * 2;
+  const verticalSpacing = BALL_RADIUS * Math.sqrt(3);
+  let combinedBalls = staticBalls;
+
+  for (let i = 0; i < numRows; i++) {
+    combinedBalls = combinedBalls.map(ball => {
+      ball.gridRow += 1;
+      const newPos = gridToPosition(ball.gridRow, ball.gridCol, width, numCols);
+      Matter.Body.setPosition(ball, newPos);
+      return ball;
+    });    
+
+    const availableColors = getAvailableColors(combinedBalls);
+
+    const newRowBalls = [];
+    for (let col = 0; col < numCols; col++) {
+      const pos = gridToPosition(0, col, width, numCols);
+      const newBall = Matter.Bodies.circle(pos.x, pos.y, BALL_RADIUS, {
+        isStatic: true,
+        restitution: 0,
+        collisionFilter: { category: 0x0001, mask: 0x0002 },
+      });
+      newBall.color = availableColors.length > 0 
+        ? availableColors[Math.floor(Math.random() * availableColors.length)]
+        : getRandomPastelColor();
+      newBall.id = Matter.Common.nextId();
+      newBall.gridRow = 0;
+      newBall.gridCol = col;
+      Matter.World.add(world, newBall);
+      newRowBalls.push(newBall);
+    }
+
+    combinedBalls = [...newRowBalls, ...combinedBalls];
+    const floating = findFloatingBalls(combinedBalls);
+    floating.forEach(ball => Matter.World.remove(world, ball));
+    combinedBalls = combinedBalls.filter(ball => !floating.includes(ball));
+  }
+
+  return combinedBalls;
 };
