@@ -44,57 +44,50 @@ const shooterStyles = StyleSheet.create({
   },
   
   shooterScoreText: {
-    fontSize: 27,
-    color: '#6C5DD3',
-    textShadowColor: '#8EA7E9',
-    textShadowOffset: { width: 1, height: 1 },
+    fontSize: 40,
+    color: '#FF70C0',
+    marginBottom: 35,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    textShadowColor: '#ffffff',
+    textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 10,
+    letterSpacing: 2,
     fontFamily: 'Kavoon_400Regular',
   },
+  
   ShooterScreenContainer: {
     flex: 1,
     paddingBottom: 0,      
     overflow: 'hidden', 
   },
   shooterHomeIcon: {
-    fontSize: 32,
-    color: '#6C5DD3',
+    fontSize: 41,
+    color: '#FF70C0',
+    textShadowColor: '#ffffff',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 15,
   },
+  
+  
   homeBox: {
     position: 'absolute',
     top: 50,
     left: 20,
-    backgroundColor: '#76e3df',
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderRadius: 20,
-    //borderWidth: 2,
-    borderColor: '#6C5DD3',
-    shadowColor: '#CBA8F5',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 5,
-    zIndex: 100,
   },
   
   scoreBox: {
     position: 'absolute',
-    top: 50,
+    top: 54, 
     alignItems: 'center',
-    backgroundColor: '#76e3df',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-    //borderWidth: 2,
-    borderColor: '#6C5DD3',
-    shadowColor: '#CBA8F5',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 5,
-    zIndex: 100,
-  },
+    justifyContent: 'center',
+    paddingVertical: 4,
+    paddingHorizontal: 14, 
+    },
+  
+  
   
 });
 

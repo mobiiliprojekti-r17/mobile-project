@@ -72,8 +72,11 @@ export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
       });
       staticBall.color = getRandomPastelColor();
       staticBall.id = Matter.Common.nextId();
+      staticBall.gridRow = row;       // <-- lisää rivit
+      staticBall.gridCol = col;
       Matter.World.add(world, staticBall);
       staticBallsArray.push(staticBall);
+
     }
   }
   return staticBallsArray;
@@ -206,21 +209,11 @@ export const addRowsToGrid = ({
 
   for (let i = 0; i < numRows; i++) {
     combinedBalls = combinedBalls.map(ball => {
-      if (typeof ball.gridRow !== 'number' || typeof ball.gridCol !== 'number') {
-        const snappedCoords = snapToGrid(ball, width, numCols);
-        Matter.Body.setPosition(ball, { x: snappedCoords.x, y: snappedCoords.y });
-        const row = Math.round((snappedCoords.y - topOffset) / verticalSpacing);
-        let baseOffset = (width - (numCols * horizontalSpacing)) / 2;
-        if (row % 2 !== 0) baseOffset += horizontalSpacing / 2;
-        const col = Math.round((snappedCoords.x - baseOffset) / horizontalSpacing);
-        ball.gridRow = row;
-        ball.gridCol = col;
-      }
       ball.gridRow += 1;
       const newPos = gridToPosition(ball.gridRow, ball.gridCol, width, numCols);
       Matter.Body.setPosition(ball, newPos);
       return ball;
-    });
+    });    
 
     const availableColors = getAvailableColors(combinedBalls);
 
