@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Audio } from 'expo-av';
 import { View, TouchableWithoutFeedback, Dimensions, Text, TouchableOpacity, Image } from 'react-native';
 import Matter from 'matter-js';
@@ -96,13 +96,13 @@ const BubbleShooter = ({ navigation }) => {
         const avgX = (prev.x * prev.points + x * points) / newPoints;
         const avgY = (prev.y * prev.points + y * points) / newPoints;
         return { ...prev, points: newPoints, x: avgX, y: avgY };
-      } else {
-        return { id: `${Date.now()}-${Math.random()}`, points, x, y };
       }
+      return { id: `${Date.now()}-${Math.random()}`, points, x, y };
     });
     if (aggregatedTimeoutRef.current) clearTimeout(aggregatedTimeoutRef.current);
     aggregatedTimeoutRef.current = setTimeout(() => setAggregatedPopup(null), 1000);
   };
+  
 
   useEffect(() => {
     staticBallsRef.current = staticBalls;
@@ -144,7 +144,7 @@ const BubbleShooter = ({ navigation }) => {
     });
   };
 
-  const handleTouch = (event) => {
+  const handleTouch = useCallback((event) => {
     if (!isBallAtCenter || gameOver) return;
     const touchX = event.nativeEvent.pageX;
     const touchY = event.nativeEvent.pageY;
@@ -154,12 +154,13 @@ const BubbleShooter = ({ navigation }) => {
     const speed = 15;
     const normalizedX = Math.cos(angle) * speed;
     const normalizedY = Math.sin(angle) * speed;
-
+  
     Matter.Body.setStatic(shooterBall.current, false);
     Matter.Body.set(shooterBall.current, { restitution: 1, friction: 0, frictionAir: 0 });
     Matter.Body.setVelocity(shooterBall.current, { x: normalizedX, y: normalizedY });
     setIsBallAtCenter(false);
-  };
+  }, [isBallAtCenter, gameOver]);
+  
 
   const storeShooterResults = async () => {
     try {
