@@ -16,6 +16,17 @@ const Ball = ({ x, y, size, color }) => {
         },
       ]}
     >
+      {/* Kiiltoefekti */}
+      <View
+        style={[
+          shooterStyles.shineEffect,
+          {
+            width: size * 0.4,
+            height: size * 0.4,
+            borderRadius: size * 0.2,
+          },
+        ]}
+      />
       <Text style={shooterStyles.face}>{'₍꒢  ̣̮꒢₎'}</Text>
     </View>
   );
