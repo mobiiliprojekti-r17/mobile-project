@@ -9,13 +9,13 @@ const AnimatedBall = ({ x, y, size, color, onAnimationEnd }) => {
   useEffect(() => {
     Animated.parallel([
       Animated.timing(scaleAnim, {
-        toValue: 2.2,
-        duration: 250,
+        toValue: 1.5,
+        duration: 200,
         useNativeDriver: true,
       }),
       Animated.timing(opacityAnim, {
         toValue: 0,
-        duration: 250,
+        duration: 200,
         useNativeDriver: true,
       }),
     ]).start(() => {

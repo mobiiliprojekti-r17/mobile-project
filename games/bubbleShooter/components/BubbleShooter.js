@@ -33,21 +33,8 @@ const topOffset = 80;
 const numCols = 9;
 
 const BubbleShooter = ({ navigation }) => {
-  const playPopSound = async () => {
-    try {
-      const { sound } = await Audio.Sound.createAsync(
-        require('../assets/bubbleSound.mp3')
-      );
-      await sound.playAsync();
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.didJustFinish) {
-          sound.unloadAsync();
-        }
-      });
-    } catch (error) {
-      console.error('Error playing sound:', error);
-    }
-  };
+  const soundRef = useRef(null);
+  const lastPopSoundTime = useRef(0);
   const { engine, world, ceiling } = createPhysics(width, height);
   const shooterBall = useRef(null);
   const shotCounterRef = useRef(0);
@@ -66,6 +53,42 @@ const BubbleShooter = ({ navigation }) => {
   const [poppedBalls, setPoppedBalls] = useState([]);
   const [aggregatedPopup, setAggregatedPopup] = useState(null);
   const aggregatedTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    const loadSound = async () => {
+      try {
+        const { sound } = await Audio.Sound.createAsync(
+          require('../assets/bubbleSound.mp3')
+        );
+        soundRef.current = sound;
+      } catch (error) {
+        console.error('Error loading sound:', error);
+      }
+    };
+
+    loadSound();
+
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.unloadAsync();
+      }
+    };
+  }, []);
+
+  const playPopSound = async () => {
+    const now = Date.now();
+    if (now - lastPopSoundTime.current < 100) return; // väli väh. 100ms
+    lastPopSoundTime.current = now;
+  
+    try {
+      if (soundRef.current) {
+        await soundRef.current.replayAsync();
+      }
+    } catch (error) {
+      console.error('Error playing sound:', error);
+    }
+  };
+  
 
   const addAggregatedPopup = (points, x, y) => {
     setAggregatedPopup(prev => {
@@ -138,7 +161,7 @@ const BubbleShooter = ({ navigation }) => {
               const averageY = cluster.reduce((sum, b) => sum + b.position.y, 0) / cluster.length;
               addAggregatedPopup(totalClusterPoints, averageX, averageY);
               cluster.forEach(ball => {
-              playPopSound();
+                playPopSound();
                 setPoppedBalls(prev => [...prev, { id: ball.id, x: ball.position.x, y: ball.position.y, color: ball.color }]);
                 Matter.World.remove(world, ball);
               });
@@ -163,7 +186,7 @@ const BubbleShooter = ({ navigation }) => {
             const floatingBalls = findFloatingBalls(updatedBalls);
             if (floatingBalls.length > 0) {
               floatingBalls.forEach(ball => {
-              playPopSound();
+                playPopSound();
                 addAggregatedPopup(15, ball.position.x, ball.position.y);
                 setPoppedBalls(prev => [...prev, { id: ball.id, x: ball.position.x, y: ball.position.y, color: ball.color }]);
                 Matter.World.remove(world, ball);
