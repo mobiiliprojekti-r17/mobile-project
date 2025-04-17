@@ -26,6 +26,7 @@ import shooterStyles from '../styles/shooterStyles';
 import { useNickname } from '../../../context/context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import ShooterArrow from './ShooterArrow';
 
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
@@ -56,6 +57,16 @@ const BubbleShooter = ({ navigation }) => {
   const [score, setScore] = useState(0);
   const [poppedBalls, setPoppedBalls] = useState([]);
   const [aggregatedPopup, setAggregatedPopup] = useState(null);
+
+  const [aimAngle, setAimAngle] = useState(0);
+  const [isAiming, setIsAiming] = useState(false);
+  const [touchPosition, setTouchPosition] = useState(null);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchCurrent, setTouchCurrent] = useState(null);
+  const [canShoot, setCanShoot] = useState(true);
+
+
+
 
   const route = useRoute();
   const { nickname } = useNickname();
@@ -130,6 +141,7 @@ const BubbleShooter = ({ navigation }) => {
     shooterBall.current = newBall;
     setBallPosition({ x: newBall.position.x, y: newBall.position.y });
     setIsBallAtCenter(true);
+    setCanShoot(true);
   };
 
   const addRows = (numRows = 1) => {
@@ -145,23 +157,44 @@ const BubbleShooter = ({ navigation }) => {
   };
 
   const handleTouch = useCallback((event) => {
-    if (!isBallAtCenter || gameOver) return;
+    if (
+      gameOver ||
+      !canShoot || // << uusi ehto
+      !shooterBall.current ||
+      !shooterBall.current.isStatic
+    ) {
+      return;
+    }
+  
+    setCanShoot(false); // estetään uudet laukaukset ennen resettiä
+  
     const touchX = event.nativeEvent.pageX;
     const touchY = event.nativeEvent.pageY;
     const directionX = touchX - shooterBall.current.position.x;
-    const directionY = touchY - shooterBall.current.position.y;
+    const directionY = touchY - (shooterBall.current.position.y + BALL_RADIUS);
     const angle = Math.atan2(directionY, directionX);
+    setAimAngle(angle);
+  
     const speed = 15;
-    const normalizedX = Math.cos(angle) * speed;
-    const normalizedY = Math.sin(angle) * speed;
+    const velocity = {
+      x: Math.cos(angle) * speed,
+      y: Math.sin(angle) * speed,
+    };
   
     Matter.Body.setStatic(shooterBall.current, false);
-    Matter.Body.set(shooterBall.current, { restitution: 1, friction: 0, frictionAir: 0 });
-    Matter.Body.setVelocity(shooterBall.current, { x: normalizedX, y: normalizedY });
+    Matter.Body.set(shooterBall.current, {
+      restitution: 1,
+      friction: 0,
+      frictionAir: 0,
+    });
+    Matter.Body.setVelocity(shooterBall.current, velocity);
+  
     setIsBallAtCenter(false);
-  }, [isBallAtCenter, gameOver]);
+  }, [canShoot, gameOver]);
   
 
+
+  
   const storeShooterResults = async () => {
     try {
       await addDoc(collection(db, "ShooterResults"), {
@@ -309,25 +342,67 @@ const BubbleShooter = ({ navigation }) => {
   }, [staticBalls, ballsInitialized]);
 
   return (
-    <TouchableWithoutFeedback onPress={handleTouch}>
+    <View
+      style={{ flex: 1, position: 'relative' }}
+      onStartShouldSetResponder={() => canShoot}
+      onResponderGrant={(e) => {
+        const { pageX, pageY } = e.nativeEvent;
+        setTouchStart({ x: pageX, y: pageY });
+        setTouchCurrent({ x: pageX, y: pageY });
+      }}
+      onResponderMove={(e) => {
+        const { pageX, pageY } = e.nativeEvent;
+        setTouchCurrent({ x: pageX, y: pageY });
+      }}
+      onResponderRelease={(e) => {
+        const { pageX, pageY } = e.nativeEvent;
+        handleTouch({ nativeEvent: { pageX, pageY } });
+        setTouchStart(null);
+        setTouchCurrent(null);
+      }}
+    >
       <LinearGradient colors={['rgb(255, 158, 226)', '#fac3e9']} style={shooterStyles.shooterGameContainer}>
+  
+        {/* Yläpalkki */}
         <View style={shooterStyles.homeBox}>
           <TouchableOpacity onPress={() => navigation.replace('Home')}>
             <Ionicons name="home" style={shooterStyles.shooterHomeIcon} />
           </TouchableOpacity>
         </View>
-
+  
         <View style={shooterStyles.scoreBox}>
           <Text style={shooterStyles.shooterScoreText}>Score: {score}</Text>
         </View>
-
+  
+        {/* Nuoli piirretään ensin → jää pallon alle */}
+        {shooterBall.current && (
+          <ShooterArrow
+            shooterPosition={shooterBall.current.position}
+            touchStart={touchStart}
+            touchCurrent={touchCurrent}
+            staticBalls={staticBallsRef.current}
+            width={width}
+            numCols={numCols}
+            ballRadius={BALL_RADIUS}
+          />
+        )}
+  
+        {/* Staattiset pallot */}
         {staticBalls.map(ball => (
           <Ball key={ball.id} x={ball.position.x} y={ball.position.y} size={40} color={ball.color} />
         ))}
+  
+        {/* Ampumispallo piirretään myöhemmin → jää nuolen päälle */}
         {shooterBall.current && (
-          <Ball x={ballPosition.x} y={ballPosition.y} size={40} color={shooterBall.current?.color || 'blue'} />
+          <Ball
+            x={ballPosition.x}
+            y={ballPosition.y}
+            size={40}
+            color={shooterBall.current?.color || 'blue'}
+          />
         )}
-
+  
+        {/* Animaatiopallot (pop) */}
         {poppedBalls.map(pop => (
           <AnimatedBall
             key={pop.id}
@@ -340,7 +415,8 @@ const BubbleShooter = ({ navigation }) => {
             }}
           />
         ))}
-
+  
+        {/* Yhteenvetopisteet */}
         {aggregatedPopup && (
           <ScorePopUp
             key={aggregatedPopup.id}
@@ -350,15 +426,17 @@ const BubbleShooter = ({ navigation }) => {
             onAnimationEnd={() => setAggregatedPopup(null)}
           />
         )}
-
+  
+        {/* Taustakuva */}
         <Image
           source={require('../assets/image.png')}
           style={{ position: 'absolute', bottom: -90, right: -100, width: 300, height: 300 }}
           resizeMode="contain"
         />
       </LinearGradient>
-    </TouchableWithoutFeedback>
-  );
+    </View>
+  );  
+  
 };
 
 export default BubbleShooter;

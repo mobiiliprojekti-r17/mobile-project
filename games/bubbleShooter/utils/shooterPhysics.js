@@ -31,21 +31,23 @@ export const createPhysics = (screenWidth, screenHeight) => {
 
 export const createShooterBall = (world, x, y, radius, color) => {
   const ball = Matter.Bodies.circle(x, y, radius, {
-    restitution: 0,
-    frictionAir: 0.01,
-    density: 0.001,
+    restitution: 0,  // Ei pomppia lainkaan
+    friction: 0.1,    // Lisää kitkaa, jotta pallo hidastuu
+    density: 0.001,   // Normaali tiheys
     inertia: Infinity,
-    friction: 0,
     collisionFilter: {
       category: 0x0002,
       mask: 0x0001 | 0x0002,
     },
   });
+  
   ball.color = color;
   ball.id = Matter.Common.nextId();
   Matter.World.add(world, ball);
   return ball;
 };
+
+
 
 export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
   const staticBallsArray = [];

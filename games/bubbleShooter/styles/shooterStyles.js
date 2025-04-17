@@ -86,9 +86,20 @@ const shooterStyles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 14, 
     },
+
+    arrowLine: {
+      color: '#FF70C0',
+      position: 'absolute', // Asetetaan absoluuttinen sijainti
+      top: 45,
+      left: 0,
+      width: '100%', // Esimerkki, voi asettaa muuksi, kuten '50%'
+      height: '100%', // Esimerkki, voi asettaa muuksi
+      zIndex: 0
+    },
   
   
   
 });
+
 
 export default shooterStyles;
