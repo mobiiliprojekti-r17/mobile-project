@@ -1,40 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, ScrollView, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity
+} from "react-native";
 import { db } from "../../../firebase/Config";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy
+} from "firebase/firestore";
 import { useNickname } from "../../../context/context";
 import styles from "../styles/ResultsStyles";
 
 export default function ColorSortResultScreen({ route, navigation }) {
   const { nickname } = useNickname();
-  const { moves, time } = route.params; // time tässä on kokonaisaika sekunteina
+  const { moves, time } = route.params;
   const [results, setResults] = useState([]);
 
-  // Funktio, joka muuntaa sekunnit minuutteina ja sekunteina
-  const formatTime = (totalSeconds) => {
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  const formatTime = totalSeconds => {
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
-
-  useEffect(() => {
-    const fetchResults = async () => {
-      try {
-        const resultsQuery = query(
-          collection(db, "ColorSortResults"),
-          orderBy("moves", "desc")
-        );
-
-        const querySnapshot = await getDocs(resultsQuery);
-        const resultsList = querySnapshot.docs.map((doc) => doc.data());
-        setResults(resultsList);
-      } catch (error) {
-        console.error("Virhe tulosten hakemisessa: ", error);
-      }
-    };
-
-    fetchResults();
-  }, [navigation]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -43,34 +36,64 @@ export default function ColorSortResultScreen({ route, navigation }) {
     });
   }, [navigation]);
 
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        const q = query(
+          collection(db, "ColorSortResults"),
+          orderBy("moves", "asc"),
+        );
+        const snap = await getDocs(q);
+        const list = snap.docs.map(d => {
+          const r = d.data();
+          return {
+            ...r,
+            // varmistetaan numerotyypit
+            moves: Number(r.moves) || 0,
+            time:  Number(r.time)  || 0
+          };
+        });
+        setResults(list);
+      } catch (e) {
+        console.error("Virhe haettaessa tuloksia:", e);
+      }
+    };
+
+    fetchResults();
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
         <Text style={styles.title}>Game Over!</Text>
-
         <View style={styles.resultBox}>
           <Text style={styles.resultText}>Player: {nickname}</Text>
           <Text style={styles.resultText}>Moves: {moves}</Text>
           <Text style={styles.resultText}>Time: {formatTime(time)}</Text>
         </View>
-
         <Text style={styles.topListTitle}>Top list:</Text>
-
         <ScrollView style={styles.scrollView}>
           {results.length > 0 ? (
-            results.map((result, index) => (
-              <View key={index} style={styles.resultItem}>
-                <Text style={styles.resultItemText}>Player: {result.nickname}</Text>
-                <Text style={styles.resultItemText}>Moves: {result.moves}</Text>
-                <Text style={styles.resultItemText}>Time: {formatTime(result.time)}</Text>
+            results.map((r, i) => (
+              <View key={i} style={styles.resultItem}>
+                <Text style={styles.resultItemText}>Player: {r.nickname}</Text>
+                <Text style={styles.resultItemText}>Moves: {r.moves}</Text>
+                <Text style={styles.resultItemText}>
+                  Time: {formatTime(r.time)}
+                </Text>
               </View>
             ))
           ) : (
             <Text style={styles.resultText}>No scores yet!</Text>
           )}
         </ScrollView>
-
-        <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate("Home")}>
+        <TouchableOpacity
+          style={styles.homeButton}
+          onPress={() => navigation.navigate("Home")}
+        >
           <Text style={styles.homeButtonText}>Home</Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>
