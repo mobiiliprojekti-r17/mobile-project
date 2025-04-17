@@ -239,8 +239,7 @@ export default function ColorSortGame() {
       modalShown.current = true;
       setRunning(false);
       setTimeout(() => showNoMovesModal(
-        "No More Moves",
-        "No meaningful moves remain—top colors won't change nor bottles empty."
+        "No more meaningful moves.",
       ), 500);
     }
   };

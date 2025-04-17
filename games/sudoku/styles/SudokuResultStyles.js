@@ -1,4 +1,6 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from 'react-native';
+ 
+const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
@@ -9,11 +11,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 40,
     fontWeight: "bold",
     color:  "#2162aa",
     marginBottom: 20,
     marginTop: 60,
+    fontFamily: 'RobotoMono_400Regular',
   },  
   title2: {
     fontSize: 28,
@@ -21,6 +24,7 @@ const styles = StyleSheet.create({
     color:  "#2162aa", 
     marginBottom: 10,
     marginTop: 10,
+    fontFamily: 'RobotoMono_400Regular',
   },
   resultBox: {
     backgroundColor: "rgb(188, 231, 255)", 
@@ -29,20 +33,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: "90%",
     alignItems: "center",
+    borderColor: "rgb(127, 203, 244)",
+    borderWidth: 3,
+    borderRadius: 10,
   },
   infoText: {
     fontSize: 18,
     color: "#333", 
     marginBottom: 5,
+    fontFamily: 'RobotoMono_400Regular',
   },
   subtitle: {
     fontSize: 22,
     fontWeight: "bold",
     color: "#2162aa", 
     marginBottom: 10,
+    fontFamily: 'RobotoMono_400Regular',
   },
   scrollView: {
-    width: "90%",
+    width: "95%",
   },
   scoreItem: {
     backgroundColor: "rgb(205, 235, 252)", 
@@ -53,29 +62,44 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    borderColor: "rgb(127, 203, 244)",
+    borderWidth: 3,
+    borderRadius: 10,
   },
   scoreText: {
     fontSize: 16,
     color: "#333", 
     marginBottom: 2,
+    fontFamily: 'RobotoMono_400Regular',
   },
   noScores: {
     fontSize: 16,
     color: "#555", 
     textAlign: "center",
     marginTop: 10,
+    fontFamily: 'RobotoMono_400Regular',
   },
-  difficultySection: {
-    marginBottom: 15,
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-around", 
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  scoresContainer: {
+    marginBottom: 10,
+    marginTop: 10,
     backgroundColor: "rgb(188, 231, 255)", 
     padding: 10,
     borderRadius: 8,
+    borderColor: "rgb(154, 218, 252)",
+    borderWidth: 3,
   },
   difficultyTitle: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#2162aa",
     marginBottom: 5,
+    fontFamily: 'RobotoMono_400Regular',
   },
   picker: {
     width: "80%",
@@ -95,6 +119,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     backgroundColor: "rgb(188, 231, 255)",
     borderRadius: 5,
+    borderColor: "rgb(127, 203, 244)",
+    borderWidth: 3,
+    borderRadius: 10,
   },
   selectedButton: {
     backgroundColor: "rgb(127, 203, 244)",
@@ -102,6 +129,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#000", 
     fontWeight: "bold",
+    fontFamily: 'RobotoMono_400Regular',
   },
   rank: {
     fontSize: 20,
@@ -109,28 +137,98 @@ const styles = StyleSheet.create({
     color: "#2162aa", 
     marginBottom: 5,
   },
-  
   Homebutton: {
     backgroundColor: "rgb(188, 231, 255)", 
-    width: 100,
-    height: 40,
-  justifyContent: "center",
-  alignItems: "center",
-  backgroundColor: "rgb(188, 231, 255)" ,
-  margin: 5,
-  borderRadius: 5,
-  marginLeft: 20,
-  marginRight: 10,
-  marginBottom: 30,
-  marginTop: 10,
+    width: 120,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 5,
+    borderRadius: 5,
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 10,
+    marginTop: 10,
+    borderColor: "rgb(127, 203, 244)",
+    borderWidth: 3,
+    borderRadius: 10,
+    flexDirection: 'row', 
   },
   
   HomebuttonText: {
     color: '#fff', 
-    fontSize: 18,
+    fontSize: 22,
     textAlign: 'center',
     fontWeight: 'bold',
-  }
+    fontFamily: 'RobotoMono_400Regular',
+  },
+  PlayAgainButton: {
+    backgroundColor: "rgb(188, 231, 255)", 
+    width: 120,
+    height: 50,
+  justifyContent: "center",
+  alignItems: "center",
+  margin: 5,
+  borderRadius: 5,
+  marginLeft: 10,
+  marginRight: 10,
+  marginBottom: 10,
+  marginTop: 10,
+  borderColor: "rgb(127, 203, 244)",
+  borderWidth: 3,
+  borderRadius: 10,
+  flexDirection: 'row', 
+  },
+  
+  PlayAgainButtonText: {
+    color: '#fff', 
+    fontSize: 22,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontFamily: 'RobotoMono_400Regular',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "rgb(160, 220, 255)",
+    padding: width * 0.05,
+    borderRadius: 12,
+    alignItems: "stretch",
+    width: width * 0.7,
+    elevation: 5,
+  },
+
+  button: {
+    backgroundColor: "rgb(33, 131, 184)",
+    paddingVertical: height * 0.01,
+    borderRadius: 8,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: height * 0.007,
+  },
+  buttonClose: {
+    backgroundColor: "rgb(33, 131, 184)",
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontFamily: 'RobotoMono_400Regular',
+  },
+  modalText: {
+    fontSize: width * 0.055,
+    fontWeight: "bold",
+    marginBottom: height * 0.02,
+    textAlign: "center",
+    color: "rgb(33, 131, 184)",
+    fontFamily: 'RobotoMono_400Regular',
+  },
 });
 
 export default styles;

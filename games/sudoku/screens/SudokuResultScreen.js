@@ -1,57 +1,38 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Button, ScrollView, TouchableOpacity } from "react-native";
-import { db } from "../../../firebase/Config";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import styles from "../styles/SudokuResultStyles";
-import { useNickname } from "../../../context/context";
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { useFonts, RobotoMono_400Regular } from '@expo-google-fonts/roboto-mono';
+import { useNickname } from '../../../context/context';
+import {DifficultyModal} from '../components/Sudoku/Modals';
+import FilterButtons from '../components/SudokuResult/FilterButtons';
+import ScoreList from '../components/SudokuResult/ScoreList';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import styles from '../styles/SudokuResultStyles';
+import { fetchScores, computePlayerRank, getTopScores } from '../Logic/SudokuResultLogic';
 
 export default function SudokuResult({ route, navigation }) {
-  const { nickname } = useNickname()
+  const [fontsLoaded] = useFonts({ RobotoMono_400Regular });
+  const { nickname } = useNickname();
   const { time, difficulty } = route.params;
+
   const [scores, setScores] = useState([]);
-  const [selectedDifficulty, setSelectedDifficulty] = useState("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState(difficulty);
+  const [showDifficultyModal, setShowDifficultyModal] = useState(false);
 
   useEffect(() => {
-    const fetchScores = async () => {
-      try {
-        const scoresQuery = query(
-          collection(db, "SudokuGameResults"),
-          orderBy("time")
-        );
-
-        const querySnapshot = await getDocs(scoresQuery);
-        const scoresList = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          if (data.time) {
-            const timeParts = data.time.split(":");
-            data.timeInSeconds = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]);
-          } else {
-            data.timeInSeconds = 0;
-          }
-          return data;
-        });
-        setScores(scoresList);
-      } catch (error) {
-        console.error("Virhe tulosten hakemisessa: ", error);
-      }
-    };
-
-    fetchScores();
+    fetchScores().then(setScores).catch(console.error);
   }, [navigation]);
 
-
-  const formattedTime = (timeInSeconds) => {
-    if (timeInSeconds == null) return "N/A";
-    const minutes = Math.floor(timeInSeconds / 60);
-    const secs = timeInSeconds % 60;
-    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+  const formatTime = sec => {
+    const minutes = Math.floor(sec / 60);
+    const seconds = sec % 60;
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
+  
+  const playerRank = useMemo(() =>
+    computePlayerRank(scores, difficulty, nickname, time),
+  [scores, difficulty, nickname, time]);
 
-  const groupedScores = scores.reduce((acc, score) => {
-    if (!acc[score.difficulty]) acc[score.difficulty] = [];
-    acc[score.difficulty].push(score);
-    return acc;
-  }, {});
+  if (!fontsLoaded) return null;
 
   return (
     <View style={styles.container}>
@@ -60,62 +41,50 @@ export default function SudokuResult({ route, navigation }) {
       <View style={styles.resultBox}>
         <Text style={styles.infoText}>Nickname: {nickname}</Text>
         <Text style={styles.infoText}>Difficulty: {difficulty}</Text>
-        <Text style={styles.infoText}>Time: {time ? formattedTime(time) : "N/A"}</Text>
-      </View>
-
-      <Text style={styles.subtitle}>Top list:</Text>
-
-      <View style={styles.buttonContainer}>
-        {["", "easy", "medium", "hard"].map((level) => (
-          <TouchableOpacity
-            key={level}
-            style={[
-              styles.filterButton,
-              selectedDifficulty === level && styles.selectedButton,
-            ]}
-            onPress={() => setSelectedDifficulty(level)}
-          >
-            <Text style={styles.buttonText}>
-              {level === "" ? "Show all" : level.toUpperCase()}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <ScrollView style={styles.scrollView}>
-        {Object.keys(groupedScores).length > 0 ? (
-          Object.keys(groupedScores)
-            .filter((diffLevel) => !selectedDifficulty || diffLevel === selectedDifficulty)
-            .map((diffLevel) => (
-              <View key={diffLevel} style={styles.difficultySection}>
-                <Text style={styles.difficultyTitle}>
-                  {diffLevel ? diffLevel.toUpperCase() : "ALL"}
-                </Text>
-                {groupedScores[diffLevel]
-                  .sort((a, b) => a.timeInSeconds - b.timeInSeconds)
-                  .map((score, index) => (
-                    <View key={index} style={styles.scoreItem}>
-                      <Text style={styles.rank}>#{index + 1}</Text>
-                      <Text style={styles.scoreText}>
-                        Nickname: {score.Nickname ?? "Unknown"}
-                      </Text>
-                      <Text style={styles.scoreText}>
-                        Difficulty: {score.difficulty ?? "Unknown"}
-                      </Text>
-                      <Text style={styles.scoreText}>
-                        Time: {score.timeInSeconds != null ? formattedTime(score.timeInSeconds) : "N/A"}
-                      </Text>
-                    </View>
-                  ))}
-              </View>
-            ))
-        ) : (
-          <Text style={styles.noScores}>No scores yet!</Text>
+        <Text style={styles.infoText}>Time: {time != null ? formatTime(time) : 'N/A'}</Text>
+        {playerRank && (
+          <Text style={styles.infoText}>Ranking: #{playerRank}</Text>
         )}
-      </ScrollView>
-      <TouchableOpacity style={styles.Homebutton} onPress={() => navigation.navigate("Home")}>
-        <Text style={styles.buttonText}>Home</Text>
-      </TouchableOpacity>
+      </View>
+
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={styles.Homebutton}
+          onPress={() => navigation.navigate('Home')}
+        >
+          <MaterialCommunityIcons name="home" size={25} color="#000" />
+          <Text style={styles.buttonText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.PlayAgainButton}
+          onPress={() => setShowDifficultyModal(true)}
+        >
+          <MaterialCommunityIcons name="restart" size={25} color="#000" />
+          <Text style={styles.buttonText}>Play Again</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.subtitle}>Top 10:</Text>
+      <FilterButtons
+        selected={selectedDifficulty}
+        onSelect={setSelectedDifficulty}
+      />
+      <ScoreList
+        scores={scores}
+        difficulty={selectedDifficulty}
+        formatTime={secs =>
+          `${Math.floor(secs/60)}:${secs%60<10?'0':''}${secs%60}`
+        }
+      />
+
+      <DifficultyModal
+        visible={showDifficultyModal}
+        onSelectDifficulty={level => {
+          setShowDifficultyModal(false);
+          navigation.replace('Sudoku', { difficulty: level, nickname });
+        }}
+        onClose={() => setShowDifficultyModal(false)}
+      />
     </View>
   );
 }
