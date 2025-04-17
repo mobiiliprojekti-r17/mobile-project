@@ -25,6 +25,7 @@ import { collection, addDoc } from "firebase/firestore";
 import shooterStyles from '../styles/shooterStyles';
 import { useNickname } from '../../../context/context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 const BALL_RADIUS = 20;
@@ -304,11 +305,17 @@ const BubbleShooter = ({ navigation }) => {
 
   return (
     <TouchableWithoutFeedback onPress={handleTouch}>
-      <View style={shooterStyles.shooterGameContainer}>
-        <View style={shooterStyles.headerContainer}>
-          <TouchableOpacity onPress={() => navigation.replace('Home')}>
-            <Ionicons name="home" style={shooterStyles.shooterHomeIcon} />
+      <LinearGradient
+        colors={['rgb(255, 158, 226)', '#fac3e9']} 
+          style={shooterStyles.shooterGameContainer}
+      >
+      <View style={shooterStyles.homeBox}>
+      <TouchableOpacity onPress={() => navigation.replace('Home')}>
+        <Ionicons name="home" style={shooterStyles.shooterHomeIcon} />
           </TouchableOpacity>
+        </View>
+
+        <View style={shooterStyles.scoreBox}>
           <Text style={shooterStyles.shooterScoreText}>Score: {score}</Text>
         </View>
 
@@ -344,14 +351,14 @@ const BubbleShooter = ({ navigation }) => {
           source={require('../assets/image.png')}  
           style={{
             position: 'absolute',
-            bottom: -170,   
+            bottom: -90,   
             right: -100,     
             width: 300,   
             height: 300, 
           }}
           resizeMode="contain"  
         />
-      </View>
+      </LinearGradient>
     </TouchableWithoutFeedback>
   );
 };

@@ -3,15 +3,15 @@ import { StyleSheet } from 'react-native';
 const shooterGoStyles = StyleSheet.create({
   gameOverContainer: {
     flex: 1,
-    backgroundColor: '#ffc7fd', // Pidetään pinkki teema
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingVertical: 40,
   },
+
   gameOverTitle: {
     fontSize: 45,
-    color: '#FF9EE2',
+    color: '#FF70C0',
     marginBottom: 35,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -21,6 +21,7 @@ const shooterGoStyles = StyleSheet.create({
     letterSpacing: 2,
     fontFamily: 'Kavoon_400Regular',
   },
+
   gameOverText: {
     fontSize: 20,
     color: '#6C5DD3',
@@ -31,6 +32,7 @@ const shooterGoStyles = StyleSheet.create({
     textShadowRadius: 2,
     fontFamily: 'Kavoon_400Regular',
   },
+
   gameOverScore: {
     fontSize: 20,
     color: '#6C5DD3',
@@ -41,6 +43,7 @@ const shooterGoStyles = StyleSheet.create({
     textShadowRadius: 2,
     fontFamily: 'Kavoon_400Regular',
   },
+
   gameOverRank: {
     fontSize: 22,
     color: '#6C5DD3',
@@ -51,6 +54,7 @@ const shooterGoStyles = StyleSheet.create({
     textShadowRadius: 2,
     fontFamily: 'Kavoon_400Regular',
   },
+
   gameOverButtonContainer: {
     marginVertical: 10,
     width: 220,
@@ -65,12 +69,14 @@ const shooterGoStyles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 4,
   },
+
   gameOverButtonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'Kavoon_400Regular',
+    fontFamily: 'FredokaOne_400Regular',
   },
+
   topListTitle: {
     fontSize: 24,
     marginTop: 30,
@@ -82,14 +88,16 @@ const shooterGoStyles = StyleSheet.create({
     textShadowRadius: 2,
     fontFamily: 'Kavoon_400Regular',
   },
+
   topListContainer: {
     marginTop: 10,
     width: '90%',
-    maxHeight: 220,
-    paddingBottom: 10,
+    maxHeight: 265,
+    
   },
+
   topListItem: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#fff',
     borderRadius: 16,
     paddingVertical: 14,
     paddingHorizontal: 24,
@@ -103,16 +111,32 @@ const shooterGoStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FF9EE2',
   },
+
   topListName: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#6C5DD3',
-    fontFamily: 'Kavoon_400Regular',
+    fontFamily: 'FredokaOne_400Regular',
   },
+
   topListScore: {
     fontSize: 16,
     color: '#FF9EE2',
-    fontFamily: 'Kavoon_400Regular',
+    fontFamily: 'FredokaOne_400Regular',
+  },
+
+  glowEffect: {
+    shadowColor: '#fff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: '#fff',
+  },
+
+  sparkleEmoji: {
+    position: 'absolute',
+    fontSize: 28,
   },
 });
 
