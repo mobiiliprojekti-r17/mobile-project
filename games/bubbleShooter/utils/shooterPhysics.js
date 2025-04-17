@@ -1,4 +1,3 @@
-
 import Matter from 'matter-js';
 
 const BALL_RADIUS = 20;
@@ -32,27 +31,28 @@ export const createPhysics = (screenWidth, screenHeight) => {
 
 export const createShooterBall = (world, x, y, radius, color) => {
   const ball = Matter.Bodies.circle(x, y, radius, {
-    restitution: 0,
-    frictionAir: 0.01,
-    density: 0.001,
+    restitution: 0,  // Ei pomppia lainkaan
+    friction: 0.1,    // Lisää kitkaa, jotta pallo hidastuu
+    density: 0.001,   // Normaali tiheys
     inertia: Infinity,
-    friction: 0,
     collisionFilter: {
       category: 0x0002,
       mask: 0x0001 | 0x0002,
     },
   });
+  
   ball.color = color;
   ball.id = Matter.Common.nextId();
   Matter.World.add(world, ball);
   return ball;
 };
 
+
+
 export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
-  const staticBallRadius = BALL_RADIUS;
   const staticBallsArray = [];
-  const horizontalSpacing = staticBallRadius * 2;
-  const verticalSpacing = staticBallRadius * Math.sqrt(3);
+  const horizontalSpacing = BALL_RADIUS * 2;
+  const verticalSpacing = BALL_RADIUS * Math.sqrt(3);
   const offsetX = (screenWidth - (numCols * horizontalSpacing)) / 2;
 
   for (let row = 0; row < numRows; row++) {
@@ -62,7 +62,7 @@ export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
       if (row % 2 !== 0) {
         xPos += horizontalSpacing / 2;
       }
-      const staticBall = Matter.Bodies.circle(xPos, yPos, staticBallRadius, {
+      const staticBall = Matter.Bodies.circle(xPos, yPos, BALL_RADIUS, {
         isStatic: true,
         restitution: 0,
         collisionFilter: {
@@ -72,13 +72,13 @@ export const createStaticBalls = (world, numRows, numCols, screenWidth) => {
       });
       staticBall.color = getRandomPastelColor();
       staticBall.id = Matter.Common.nextId();
-      staticBall.gridRow = row;       // <-- lisää rivit
+      staticBall.gridRow = row;
       staticBall.gridCol = col;
       Matter.World.add(world, staticBall);
       staticBallsArray.push(staticBall);
-
     }
   }
+
   return staticBallsArray;
 };
 
@@ -177,18 +177,19 @@ export const getGridCoordsFromPosition = (x, y, screenWidth, numCols) => {
 };
 
 export const gridToPosition = (row, col, screenWidth, numCols) => {
-  const BALL_RADIUS = 20;
   const horizontalSpacing = BALL_RADIUS * 2;
   const verticalSpacing = BALL_RADIUS * Math.sqrt(3);
   let baseOffset = (screenWidth - (numCols * horizontalSpacing)) / 2;
   if (row % 2 !== 0) {
     baseOffset += horizontalSpacing / 2;
   }
-  return { x: baseOffset + col * horizontalSpacing, y: 80 + row * verticalSpacing };
+  return {
+    x: baseOffset + col * horizontalSpacing,
+    y: 80 + row * verticalSpacing,
+  };
 };
 
 export const getGridRow = (y) => {
-  const BALL_RADIUS = 20;
   const topOffset = 80;
   const verticalSpacing = BALL_RADIUS * Math.sqrt(3);
   return Math.round((y - topOffset) / verticalSpacing);
@@ -201,8 +202,6 @@ export const addRowsToGrid = ({
   numCols,
   width,
 }) => {
-  const BALL_RADIUS = 20;
-  const topOffset = 80;
   const horizontalSpacing = BALL_RADIUS * 2;
   const verticalSpacing = BALL_RADIUS * Math.sqrt(3);
   let combinedBalls = staticBalls;
@@ -213,11 +212,11 @@ export const addRowsToGrid = ({
       const newPos = gridToPosition(ball.gridRow, ball.gridCol, width, numCols);
       Matter.Body.setPosition(ball, newPos);
       return ball;
-    });    
+    });
 
     const availableColors = getAvailableColors(combinedBalls);
-
     const newRowBalls = [];
+
     for (let col = 0; col < numCols; col++) {
       const pos = gridToPosition(0, col, width, numCols);
       const newBall = Matter.Bodies.circle(pos.x, pos.y, BALL_RADIUS, {
@@ -225,7 +224,7 @@ export const addRowsToGrid = ({
         restitution: 0,
         collisionFilter: { category: 0x0001, mask: 0x0002 },
       });
-      newBall.color = availableColors.length > 0 
+      newBall.color = availableColors.length > 0
         ? availableColors[Math.floor(Math.random() * availableColors.length)]
         : getRandomPastelColor();
       newBall.id = Matter.Common.nextId();
