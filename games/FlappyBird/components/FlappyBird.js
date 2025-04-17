@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     position:'absolute', top:0, left:0, right:0, bottom:0,
     justifyContent:'center', alignItems:'center',
     backgroundColor:'rgba(0,0,0,0.4)',
-    zIndex: 20,  //----------------------------------------------
+    zIndex: 20, 
   },
   gameOverText:{
     fontSize:30, color:'white', fontWeight:'bold', marginBottom:20, textAlign:'center',
