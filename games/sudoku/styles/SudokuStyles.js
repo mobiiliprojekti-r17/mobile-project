@@ -1,11 +1,7 @@
 import { Dimensions, StyleSheet } from 'react-native';
  
 const { width, height } = Dimensions.get("window");
-const buttonsPerRow = 3;
-const containerWidth = width * 0.80;
-const spacing = width * 0.05;
-const totalSpacing = spacing * (buttonsPerRow - 1);
-const buttonWidth = (containerWidth - totalSpacing) / buttonsPerRow;
+
 
 const styles = StyleSheet.create({
     container: {
@@ -20,55 +16,56 @@ const styles = StyleSheet.create({
       fontWeight: "bold",
       marginBottom: 20,
       color: "#2162aa",
+      fontFamily: 'RobotoMono_400Regular',
     },
-      header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        width: "100%",
-        paddingHorizontal: 20,
-        marginBottom: 10,
-        marginTop: 20,
-      },
-      difficultyText: {
-        fontSize: 18,
-        fontWeight: "bold",
-         color: "#2162aa",
-      },
-      timerText: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: "#2162aa",
-      },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      width: "105%",
+      paddingHorizontal: 20,
+      marginBottom: 10,
+      marginTop: 20,
+    },
+    difficultyText: {
+      fontSize: 19,
+      fontWeight: "bold",
+      color: "#2162aa",
+      fontFamily: 'RobotoMono_400Regular',
+    },
+    timerText: {
+      fontSize: 19,
+      fontWeight: "bold",
+      color: "#2162aa",
+      fontFamily: 'RobotoMono_400Regular',
+    },
     row: {
       flexDirection: "row",
     },
     preFilledCellText: {
-        color: "back", // Tummemman harmaa väri
-        fontWeight: 'bold' // Lihavoitu
-      },
-      userAddedNumberText: {
-        color: "blue", // Sininen väri
-      },
-    
+      color: "back", 
+      fontWeight: 'bold'
+    },
+    userAddedNumberText: {
+      color: "blue", 
+    },
     cell: {
-        width: 40,
-        height: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        borderWidth: 1, // Ohut reunaviiva
-        borderColor: "black",
-        backgroundColor: "white", // Oletusvalkoinen
-      },
-      boldTop: { borderTopWidth: 3 },
-      boldLeft: { borderLeftWidth: 3 },
-      boldRight: { borderRightWidth: 3 },
-      boldBottom: { borderBottomWidth: 3 },
-      blueCell: { backgroundColor: "rgb(188, 231, 255)" }, 
+      width: 40,
+      height: 40,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 1, 
+      borderColor: "black",
+      backgroundColor: "white", 
+    },
+    boldTop: { borderTopWidth: 3 },
+    boldLeft: { borderLeftWidth: 3 },
+    boldRight: { borderRightWidth: 3 },
+    boldBottom: { borderBottomWidth: 3 },
+    blueCell: { backgroundColor: "rgb(188, 231, 255)" }, 
 
-      selectedCell: {
-        backgroundColor: "rgb(127, 203, 244)",
-      },
-      
+    selectedCell: {
+      backgroundColor: "rgb(127, 203, 244)",
+    },
     cellText: {
       fontSize: 18,
       fontWeight: "bold",
@@ -111,187 +108,216 @@ const styles = StyleSheet.create({
     },    
 
     numberPadBox: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    flexDirection: 'column',      /* sisällä sekä numero‑rivi että toggle */
-    alignItems: 'center',
-    marginVertical: 10,
-    width: "70%",
-   },
-
-  noteToggleBox: {
-  flexDirection: 'row',
-  justifyContent: 'center',
-  marginTop: 10,
-  },
-
-      clearButton: {
-        width: 70,
-        height: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgb(188, 231, 255)" ,
-        margin: 5,
-        borderRadius: 5,
-        marginLeft: 5,
-        marginRight: 5,
-        borderRadius: 5,
-        borderColor: "rgb(0, 0, 0)",
-        borderWidth: 2,
-      },
-
-      CheckButton:{
-        width: 150,
-        height: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgb(188, 231, 255)" ,
-        margin: 5,
-        borderRadius: 5,
-        marginLeft: 5,
-        marginRight: 5,
-        borderRadius: 5,
-        borderColor: "rgb(0, 0, 0)",
-        borderWidth: 2,
-      },
-      InfoButton: {
-        width: 70,
-        height: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgb(188, 231, 255)" ,
-        margin: 5,
-        borderRadius: 5,
-        marginLeft: 5,
-        marginRight: 5,
-        borderRadius: 5,
-        borderColor: "rgb(0, 0, 0)",
-        borderWidth: 2,
-      },
-      ModalInfoText:{
-        fontSize: width * 0.045,
-        fontWeight: "bold",
-        marginBottom: height * 0.02,
-        textAlign: "center",
-        color: "rgb(33, 131, 184)",
-      },
-  ModeButton: {
-    minWidth: 150,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgb(188, 231, 255)",
-    margin: 5,
-    borderRadius: 5,
-    borderColor: "#000",
-    borderWidth: 2,
-  },
-  ModeButtonText: {
-    color: "black",    // pienellä c!
-  },
-  // uusi tyyli aktiiviselle napille
-  ModeButtonActive: {
-    backgroundColor: "rgb(33, 131, 184)",  // tummansininen
-  },
-  ModeButtonTextActive: {
-    color: "white",    // jos haluat vaalean tekstin
-  },
+      backgroundColor: '#fff',
+      borderRadius: 20,
+      flexDirection: 'column',  
+      alignItems: 'center',
+      marginVertical: 10,
+      width: "70%",
+    },
+    clearButton: {
+      width: 70,
+      height: 40,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgb(188, 231, 255)" ,
+      margin: 5,
+      borderRadius: 5,
+      marginLeft: 5,
+      marginRight: 5,
+      borderRadius: 5,
+      borderColor: "rgb(0, 0, 0)",
+      borderWidth: 2,
+    },
+    CheckButton:{
+      width: 150,
+      height: 40,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgb(188, 231, 255)" ,
+      margin: 5,
+      borderRadius: 5,
+      marginLeft: 5,
+      marginRight: 5,
+      borderRadius: 5,
+      borderColor: "rgb(0, 0, 0)",
+      borderWidth: 2,
+    },
+    CheckButtonText: {
+      color: "black", 
+      fontSize: 16, 
+      fontFamily: 'RobotoMono_400Regular',
+    },
+    InfoButton: {
+      width: 70,
+      height: 40,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgb(188, 231, 255)" ,
+      margin: 5,
+      borderRadius: 5,
+      marginLeft: 5,
+      marginRight: 5,
+      borderRadius: 5,
+      borderColor: "rgb(0, 0, 0)",
+      borderWidth: 2,
+    },
  
+    ModeButton: {
+      minWidth: 150,
+      height: 40,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgb(188, 231, 255)",
+      margin: 5,
+      borderRadius: 5,
+      borderColor: "#000",
+      borderWidth: 2,
+    },
+    ModeButtonText: {
+      color: "black", 
+      fontSize: 16, 
+      fontFamily: 'RobotoMono_400Regular',
+    },
 
+    ModeButtonActive: {
+      backgroundColor: "rgb(33, 131, 184)", 
+    },
+    ModeButtonTextActive: {
+      color: "white", 
+      fontFamily: 'RobotoMono_400Regular',
+      fontSize: 16, 
+    },
     cellError: {
         backgroundColor: "rgb(33, 131, 184)",
-      },
-      ButtonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        width: '100%',
-      },
-      Homebutton: {
-        backgroundColor: "rgb(33, 131, 184)", 
-        width: 100,
-        height: 50,
+    },
+    ButtonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      width: '100%',
+    },
+    Homebutton: {
+      backgroundColor: "rgb(33, 131, 184)", 
+      width: 120,
+      height: 50,
       justifyContent: "center",
       alignItems: "center",
       margin: 5,
       borderRadius: 5,
       marginLeft: 10,
       marginRight: 10,
-      },
-      
-      HomebuttonText: {
-        color: '#fff', // White text on buttons for contrast
-        fontSize: 18,
-        textAlign: 'center',
-        fontWeight: 'bold',
-      },
+      flexDirection: 'row', 
+    },
+    HomebuttonText: {
+      color: '#fff', 
+      fontSize: 18,
+      textAlign: 'center',
+      fontWeight: 'bold',
+      fontFamily: 'RobotoMono_400Regular',
+    },
 
-      Restartbutton: {
-        backgroundColor: "rgb(33, 131, 184)", 
-        width: 100,
-        height: 50,
+    Restartbutton: {
+      backgroundColor: "rgb(33, 131, 184)", 
+      width: 120,
+      height: 50,
       justifyContent: "center",
       alignItems: "center",
       margin: 5,
       borderRadius: 5,
       marginLeft: 10,
       marginRight: 10,
-      },
-      
-      RestartbuttonText: {
-        color: '#fff', // White text on buttons for contrast
-        fontSize: 18,
-        textAlign: 'center',
-        fontWeight: 'bold',
-      },
-        // Modaalin taustalla oleva läpinäkyvä overlay
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  // Modaalin varsinainen laatikko
-  modalView: {
-    margin: 20,
-    backgroundColor: "rgb(160, 220, 255)",
-    padding: width * 0.05,
-    borderRadius: 12,
-    alignItems: "stretch",
-    width: width * 0.7,
-    elevation: 5,
-  },
-  // Modaalin tekstiviesti
+      flexDirection: 'row', 
+    },
+    RestartbuttonText: {
+      color: '#fff', 
+      fontSize: 18,
+      textAlign: 'center',
+      fontWeight: 'bold',
+      fontFamily: 'RobotoMono_400Regular',
+    },
 
-  // Yleinen nappityyli modaalin napille
-  button: {
-    backgroundColor: "rgb(33, 131, 184)",
-    paddingVertical: height * 0.01,
-    borderRadius: 8,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: height * 0.007,
-  },
-  // Sulje‑nappi modaalissa (vaaleansininen tausta)
-  buttonClose: {
-    backgroundColor: "rgb(33, 131, 184)",
-  },
-  // Nappitekstin tyyli modaalissa
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
+notesContainer: {
+  flex: 1,
+  width: '100%',
+  height: '100%',
+},
+notesRow: {
+  flex: 1,
+  flexDirection: 'row',
+},
+noteText: {
+  flex: 1,
+  fontSize: 10,
+  textAlign: 'center',
+  lineHeight: 12,
+},
+noteHiddenText: {
+  color: 'transparent',
+},
 
-  modalText: {
-    fontSize: width * 0.07,
-    fontWeight: "bold",
-    marginBottom: height * 0.02,
-    textAlign: "center",
-    color: "rgb(33, 131, 184)",
-  },
-
- 
-
+    modalOverlay: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: "rgb(160, 220, 255)",
+      padding: width * 0.05,
+      borderRadius: 12,
+      alignItems: "stretch",
+      width: width * 0.7,
+      elevation: 5,
+    },
+    button: {
+      backgroundColor: "rgb(33, 131, 184)",
+      paddingVertical: height * 0.01,
+      borderRadius: 8,
+      width: "100%",
+      alignItems: "center",
+      justifyContent: "center",
+      marginVertical: height * 0.007,
+    },
+    buttonClose: {
+      backgroundColor: "rgb(33, 131, 184)",
+    },
+    textStyle: {
+      color: 'white',
+      fontWeight: 'bold',
+      textAlign: 'center',
+      fontFamily: 'RobotoMono_400Regular',
+    },
+    modalText: {
+      fontSize: width * 0.055,
+      fontWeight: "bold",
+      marginBottom: height * 0.02,
+      textAlign: "center",
+      color: "rgb(33, 131, 184)",
+      fontFamily: 'RobotoMono_400Regular',
+    },
+    InfoContainer: { 
+      alignItems: 'flex-start', 
+      backgroundColor: 'rgb(33,131,184)',
+      borderRadius: 8,
+      paddingHorizontal: width * 0.03,
+      paddingVertical: height * 0.015, 
+      marginBottom: height * 0.015,
+    },
+    ModalInfoText:{
+      textAlign: "center",
+      fontSize: width * 0.045,
+      fontWeight: 'bold',
+      color: 'white',
+      fontFamily: 'RobotoMono_400Regular',
+      marginRight: width * 0.02, 
+    },
+    ModalInfo2Text:{
+      fontSize: width * 0.045,
+      fontWeight: 'bold',
+      color: 'white',
+      fontFamily: 'RobotoMono_400Regular',
+      marginRight: width * 0.02, 
+    },
   });
   export default styles;
