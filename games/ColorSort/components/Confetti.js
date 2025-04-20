@@ -18,7 +18,7 @@ const Confetti = ({ x, y, onComplete }) => {
         useNativeDriver: true,
       })
     ]).start(() => {
-      onComplete?.(); // poistetaan partikkeli animoituaan
+      onComplete?.(); 
     });
   }, []);
 

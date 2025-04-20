@@ -28,6 +28,8 @@ import { PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
 import { FredokaOne_400Regular } from '@expo-google-fonts/fredoka-one';
 import { VT323_400Regular } from '@expo-google-fonts/vt323';
 import { Kavoon_400Regular } from '@expo-google-fonts/kavoon';
+import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
+import { Satisfy_400Regular } from '@expo-google-fonts/satisfy';
 
 
 
@@ -42,6 +44,8 @@ const App = () => {
     FredokaOne_400Regular,
     VT323_400Regular,
     Kavoon_400Regular,
+    Pacifico_400Regular,
+    Satisfy_400Regular,
   });
 
   if (!fontsLoaded) {

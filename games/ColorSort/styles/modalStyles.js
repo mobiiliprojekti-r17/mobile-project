@@ -3,40 +3,48 @@ import { StyleSheet } from "react-native";
 const modalStyles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.7)",
+    backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 1000, // Varmistaa, että modal tulee muiden näkymien päälle
+    zIndex: 1000, 
   },
   modalContent: {
     width: "80%",
-    backgroundColor: "#fff",
+    backgroundColor: "#B09AFF",
     borderRadius: 10,
     padding: 20,
     alignItems: "center",
+    borderColor: 'rgb(74, 20, 140)',
+    borderWidth: 4,
+    borderRadius: 10,
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: 35,
     fontWeight: "bold",
     marginBottom: 10,
+    fontFamily: 'Pacifico_400Regular',
+    color: 'rgb(74, 20, 140)',
   },
   modalMessage: {
-    fontSize: 18,
+    fontSize: 21,
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 15,
+    fontFamily: 'Pacifico_400Regular',
+    color: 'rgb(74, 20, 140)',
   },
   modalButton: {
-    backgroundColor: "#B09AFF",
+    backgroundColor: "rgb(74, 20, 140)",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
     marginBottom: 10,
   },
   modalButtonText: {
-    fontSize: 18,
+    fontSize: 22,
     color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
+    fontFamily: 'Pacifico_400Regular',
   },
 });
 

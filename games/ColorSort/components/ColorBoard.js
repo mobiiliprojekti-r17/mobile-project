@@ -5,8 +5,8 @@ import modalStyles from '../styles/modalStyles';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNickname } from "../../../context/context";
 import { db, collection, addDoc } from "../../../firebase/Config";
-import { serverTimestamp } from 'firebase/firestore';
 import { useNavigation } from "@react-navigation/native";
+import { useFonts, Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 
 const LEVEL_CONFIGS = [
   { numColors: 4, layersPerBottle: 4, emptyBottles: 2 },
@@ -83,15 +83,18 @@ const isUsefulMove = (bottles, config, fromIdx, toIdx) => {
   return fromTopAfter !== fromTopBefore || toTopAfter !== toTopBefore || from.length === 0;
 };
 
-const saveColorSortResult = async (nickname, time, moves) => {
+const saveColorSortResult = async (nickname, timeInSeconds, moves) => {
+  const minutes = Math.floor(timeInSeconds / 60);
+  const seconds = timeInSeconds % 60;
+  const formattedTime = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+
   try {
     await addDoc(
       collection(db, "ColorSortResults"),
       {
         nickname,
-        time: Number(time),
+        time: formattedTime,  
         moves: Number(moves),
-        createdAt: serverTimestamp()
       }
     );
   } catch (e) {
@@ -99,7 +102,11 @@ const saveColorSortResult = async (nickname, time, moves) => {
   }
 };
 
+
 export default function ColorSortGame() {
+  const [fontsLoaded] = useFonts({
+    Pacifico_400Regular,
+  });
   const navigation = useNavigation();
   const { nickname } = useNickname();
 
@@ -195,7 +202,7 @@ export default function ColorSortGame() {
     } else {
       showLevelModal(
         `Level ${level + 1} complete!`,
-        `Time: ${formatTime(elapsedTime)}\nMoves: ${mv}`,
+        `Time so far: ${formatTime(elapsedTime)}\nMoves so far: ${mv}`,
         "Next Level",
         () => { setLevel(l => l + 1); setRunning(true); }
       );
@@ -239,7 +246,8 @@ export default function ColorSortGame() {
       modalShown.current = true;
       setRunning(false);
       setTimeout(() => showNoMovesModal(
-        "No more meaningful moves.",
+        "No more moves!",
+        "Undo last move or Play again",
       ), 500);
     }
   };
@@ -261,47 +269,106 @@ export default function ColorSortGame() {
     setMoves(prev => Math.max(0, prev - 1));
   };
 
-  const restart = () => { setLevel(0); setRunning(false); };
+  const restart = () => {
+    const cfg = LEVEL_CONFIGS[0];
+    setBottles(generateRandomBottles(cfg));
+    setLevel(0);
+    setElapsedTime(0);
+    setMoves(0);
+    setHistory([]);
+    setSelected(null);
+    setRunning(false);
+  };
 
   useEffect(() => { navigation.setOptions({ headerLeft: () => null, gestureEnabled: false }); }, [navigation]);
 
-  return (
-    <View style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <Text style={styles.title}>💧 Level {level + 1}</Text>
-        <View style={styles.statusContainer}>
-          <Text style={styles.statusText}>Time: {formatTime(elapsedTime)}</Text>
-          <Text style={styles.statusText}>Moves: {moves}</Text>
-        </View>
-        <View style={styles.bottleContainer}>
-          {bottles.map((b, i) => (
-            <Animated.View
-              key={i}
-              style={{ transform: [{ translateX: shakeIndex === i ? shakeAnim.interpolate({
-                inputRange: [-1, 1], outputRange: [-5, 5]
-              }) : 0 }] }}
-            >
-              <TouchableOpacity onPress={() => handlePress(i)} style={styles.bottleWrapper}>
-                <View style={styles.bottleInner}>
-                  {Array.from({ length: LEVEL_CONFIGS[level].layersPerBottle }).map((_, k) => (
-                    <View key={k} style={[styles.layer, { backgroundColor: b[LEVEL_CONFIGS[level].layersPerBottle - 1 - k] || 'lightgray' }]} />
-                  ))}
-                </View>
-                <View style={[styles.bottleBorder, selected === i && { borderColor: 'gold', borderWidth: 3 }]} pointerEvents="none" />
-              </TouchableOpacity>
-              {confettiBottle === i && (
-                <Animated.Text style={{ position: 'absolute', top: -20, alignSelf: 'center', opacity: confettiAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }), transform: [{ translateY: confettiAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -50] }) }], fontSize: 24 }}>
-                  🎉🎊
-                </Animated.Text>
-              )}
-            </Animated.View>
+  const renderedBottles = bottles.map((b, i) => (
+    <Animated.View
+      key={i}
+      style={{ transform: [{ translateX: shakeIndex === i ? shakeAnim.interpolate({
+        inputRange: [-1, 1], outputRange: [-5, 5]
+      }) : 0 }] }}
+    >
+      <TouchableOpacity onPress={() => handlePress(i)} style={styles.bottleWrapper}>
+        <View style={styles.bottleInner}>
+          {Array.from({ length: LEVEL_CONFIGS[level].layersPerBottle }).map((_, k) => (
+            <View
+              key={k}
+              style={[
+                styles.layer,
+                { backgroundColor: b[LEVEL_CONFIGS[level].layersPerBottle - 1 - k] || 'lightgray' },
+              ]}
+            />
           ))}
         </View>
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity onPress={handleUndo} disabled={!history.length} style={[styles.actionButton, !history.length && { backgroundColor: 'gray' }]}>
-            <MaterialCommunityIcons name="undo" size={25} color="#fff" />
-            <Text style={[styles.actionButtonText, !history.length && { color: 'lightgray' }]}>Undo</Text>
+        <View
+          style={[
+            styles.bottleBorder,
+            selected === i && { borderColor: '#4A148C', borderWidth: 3 },
+          ]}
+          pointerEvents="none"
+        />
+      </TouchableOpacity>
+      {confettiBottle === i && (
+        <Animated.Text
+          style={{
+            position: 'absolute',
+            top: -20,
+            alignSelf: 'center',
+            opacity: confettiAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
+            transform: [
+              {
+                translateY: confettiAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -50] }),
+              },
+            ],
+            fontSize: 24,
+          }}
+        >
+          🎉🎊
+        </Animated.Text>
+      )}
+    </Animated.View>
+  ));
+  if (!fontsLoaded) {
+    return null; 
+  }
+  return (
+    <View style={{ flex: 1, position: 'relative' }}>
+      
+  {!running && elapsedTime === 0 && (
+        <View style={styles.overlay}>
+          <TouchableOpacity style={styles.startButton} onPress={() => setRunning(true)}>
+            <Text style={styles.startButtonText}>START GAME</Text>
           </TouchableOpacity>
+        </View>
+      )}
+      <View style={styles.container}>
+      <Text style={styles.title1}>ColorSort</Text>
+        <Text style={styles.title2}>Level {level + 1}</Text>
+        <View style={styles.statusContainer}>
+      <Text style={styles.statusText}>Time: {formatTime(elapsedTime)}</Text>
+      <Text style={styles.statusText}>Moves: {moves}</Text>
+    </View>
+        <View style={styles.statsBox}>
+    {level === 0 ? (
+  <>
+    <View style={styles.bottleRow}>{renderedBottles.slice(0, 3)}</View>
+    <View style={styles.bottleRow}>{renderedBottles.slice(3, 6)}</View>
+  </>
+) : level === 1 ? (
+  <>
+    <View style={styles.bottleRow}>{renderedBottles.slice(0, 4)}</View>
+    <View style={styles.bottleRow}>{renderedBottles.slice(4, 8)}</View>
+  </>
+) : (
+  <View style={styles.bottleContainer}>{renderedBottles}</View>
+)}
+  </View>
+        <View style={styles.actionsContainer}>
+        <TouchableOpacity onPress={handleUndo} disabled={!history.length} style={[ styles.actionButton, !history.length && { backgroundColor: "rgb(100, 73, 134)" }]}>
+         <MaterialCommunityIcons name="undo" size={25} color={history.length ? "#fff" : "lightgray"}/>
+          <Text style={[styles.actionButtonText, !history.length && { color: "lightgray" }]}>Undo</Text>
+        </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.actionButton}>
             <MaterialCommunityIcons name="home" size={25} color="#fff" />
             <Text style={styles.actionButtonText}>Home</Text>
@@ -313,13 +380,6 @@ export default function ColorSortGame() {
         </View>
       </View>
 
-      {!running && elapsedTime === 0 && (
-        <View style={styles.overlay}>
-          <TouchableOpacity style={styles.startButton} onPress={() => setRunning(true)}>
-            <Text style={styles.startButtonText}>START</Text>
-          </TouchableOpacity>
-        </View>
-      )}
 
       <Modal transparent visible={modalVisible} animationType="fade">
         <View style={modalStyles.modalContainer}>
@@ -344,9 +404,13 @@ export default function ColorSortGame() {
               )}
               {modalType === 'NO_MOVES' && (
                 <>
-                  {!!history.length && <TouchableOpacity style={modalStyles.modalButton} onPress={() => { handleUndo(); setModalVisible(false); modalShown.current = false; }}><Text style={modalStyles.modalButtonText}>Undo Last Move</Text></TouchableOpacity>}
+                  {!!history.length && (
+                    <TouchableOpacity style={modalStyles.modalButton} onPress={() => { handleUndo(); setModalVisible(false); modalShown.current = false; }}>
+                      <Text style={modalStyles.modalButtonText}>Undo last move</Text>
+                    </TouchableOpacity>
+                  )}
                   <TouchableOpacity style={modalStyles.modalButton} onPress={() => { setModalVisible(false); modalShown.current = false; restart(); }}>
-                    <Text style={modalStyles.modalButtonText}>Play Again</Text>
+                    <Text style={modalStyles.modalButtonText}>Play again</Text>
                   </TouchableOpacity>
                 </>
               )}

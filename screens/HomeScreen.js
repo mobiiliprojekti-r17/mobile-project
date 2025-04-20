@@ -9,7 +9,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const HomeScreen = ({ navigation }) => {
   const { nickname, setNickname } = useNickname();
-  const [nicknames, setNicknames] = useState([]);
   const [restartModalVisible, setRestartModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalType, setModalType] = useState('');
@@ -27,14 +26,6 @@ const HomeScreen = ({ navigation }) => {
       return;
     }
 
-    try {
-      const docRef = await addDoc(collection(db, "NicknameList"), { Nickname: nickname });
-      setNicknames((prevNicknames) => [...prevNicknames, { id: docRef.id, Nickname: nickname }]);
-      showModal('Success', 'Nickname saved!', 'success');
-    } catch (error) {
-      showModal('Error', 'Failed to save nickname: ' + error.message, 'error');
-      console.error("Firestore error:", error);
-    }
   };
 
   const showModal = (title, message, type) => {
@@ -55,7 +46,7 @@ const HomeScreen = ({ navigation }) => {
 
   const checkNicknameAndProceed = (game) => {
     if (!nickname.trim()) {
-      showModal('Warning', 'Please enter a nickname first!', 'error');
+      showModal('Warning', 'Please enter your nickname first!', 'error');
     } else {
       setSelectedGame(game);
       if (game === 'Sudoku' || game === 'Minesweeper') {
@@ -95,77 +86,74 @@ const HomeScreen = ({ navigation }) => {
     style={styles.logoImage}
     resizeMode="contain"
   />
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your nickname"
-          placeholderTextColor="rgb(127, 0, 255)"
-          value={nickname}
-          onChangeText={setNickname}
-        />
+ <View style={styles.inputRow}>
+  <TextInput
+    style={styles.input}
+    placeholder="Enter your nickname"
+    placeholderTextColor="rgb(127, 0, 255)"
+    value={nickname}
+    onChangeText={setNickname}
+  />
+  <TouchableOpacity style={styles.button} onPress={() => setNickname('')}>
+    <Text style={styles.buttonText}>Clear</Text>
+  </TouchableOpacity>
+</View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={addNickname}>
-            <Text style={styles.buttonText}>Save</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => setNickname('')}>
-            <Text style={styles.buttonText}>Clear</Text>
-          </TouchableOpacity>
-        </View>
 
         <View style={styles.gameSection}>
           <Text style={styles.sectionTitle}>SINGLEPLAYER GAMES</Text>
-          <View style={styles.gameButtonsContainer}>
+          <View style={styles.gameButtonsContainerSingleplayer}>
 
           <TouchableOpacity onPress={new2048Game}>
-          <ImageBackground source={require('../assets/2048Icon.png')} style={styles.gameButton} 
+          <ImageBackground source={require('../assets/2048Icon.png')} style={styles.gameButtonSingleplayer} 
            imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={startBubbleShooter}>
-          <ImageBackground source={require('../assets/ShooterIcon.jpg')} style={styles.gameButton} 
+          <ImageBackground source={require('../assets/ShooterIcon.jpg')} style={styles.gameButtonSingleplayer} 
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={startBrickBreaker}>
-          <ImageBackground source={require('../assets/BreakerIcon.jpg')} style={styles.gameButton} 
+          <ImageBackground source={require('../assets/BreakerIcon.jpg')} style={styles.gameButtonSingleplayer} 
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('TictactoeSingleplayer')}>
-          <ImageBackground source={require('../assets/TTTSIcon.jpg')} style={styles.gameButton} 
+          <ImageBackground source={require('../assets/TTTSIcon.jpg')} style={styles.gameButtonSingleplayer} 
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={newSudokuGame}>
-          <ImageBackground source={require('../assets/SudokuIcon.jpg')} style={styles.gameButton} 
+          <ImageBackground source={require('../assets/SudokuIcon.jpg')} style={styles.gameButtonSingleplayer} 
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={startMinesweeper}>
-          <ImageBackground source={require('../assets/MinesweeperIcon.jpg')} style={styles.gameButton}
+          <ImageBackground source={require('../assets/MinesweeperIcon.jpg')} style={styles.gameButtonSingleplayer}
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={startFlappyBird}>
-          <ImageBackground source={require('../assets/FlappyBirdIcon.jpg')} style={styles.gameButton}
+          <ImageBackground source={require('../assets/FlappyBirdIcon.jpg')} style={styles.gameButtonSingleplayer}
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Connect4Singleplayer')}>
-          <ImageBackground source={require('../assets/Connect4SingleIcon.jpg')} style={styles.gameButton} 
+          <ImageBackground source={require('../assets/Connect4SingleIcon.jpg')} style={styles.gameButtonSingleplayer} 
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
           
           <TouchableOpacity onPress={startColorSort}>
-          <ImageBackground source={require('../assets/ColorSortIcon.png')} style={styles.gameButton} 
+          <ImageBackground source={require('../assets/ColorSortIcon.png')} style={styles.gameButtonSingleplayer} 
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
@@ -175,15 +163,15 @@ const HomeScreen = ({ navigation }) => {
 
         <View style={styles.gameSection}>
           <Text style={styles.sectionTitle}>MULTIPLAYER GAMES</Text>
-          <View style={styles.gameButtonsContainer}>
+          <View style={styles.gameButtonsContainerMultiplayer}>
           <TouchableOpacity onPress={() => navigation.navigate('TictactoeMultiplayer')}>
-          <ImageBackground source={require('../assets/TTTMIcon.jpg')} style={styles.gameButton} 
+          <ImageBackground source={require('../assets/TTTMIcon.jpg')} style={styles.gameButtonMultiplayer} 
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Connect4Multiplayer')}>
-          <ImageBackground source={require('../assets/Connect4MultiIcon.jpg')} style={styles.gameButton} 
+          <ImageBackground source={require('../assets/Connect4MultiIcon.jpg')} style={styles.gameButtonMultiplayer} 
           imageStyle={{width: '100%', height: '100%', resizeMode: 'cover'}}>
           </ImageBackground>
           </TouchableOpacity>
