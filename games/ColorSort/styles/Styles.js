@@ -9,40 +9,69 @@ export default StyleSheet.create({
     alignItems: 'center',
     backgroundColor:'#B09AFF'
   },
-  title: {
-    fontSize: 24, 
-    marginBottom: 20 
+  title1: {
+    fontSize: 60, 
+    fontFamily: 'Pacifico_400Regular',
+    alignSelf: 'center',
+    color: '#4A148C', 
+  },
+  title2: {
+    fontSize: 35, 
+    marginBottom: 20,
+    fontFamily: 'Pacifico_400Regular',
+    alignSelf: 'center',
+    color: '#4A148C', 
   },
   statusContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: 10
+    alignItems: 'center', 
+    marginBottom: 5,
+  },
+  statsBox: {
+    backgroundColor: "rgba(74, 20, 140, 0.25)",
+    borderRadius: 1,
+    padding: 14,
+    marginBottom: 20,
+    alignItems: 'center',
+    borderColor: "rgb(74, 20, 140)",
+    borderWidth: 2,
+    borderRadius: 10,
+    width: '95%'
   },
   statusText: {
-    fontSize: 18,
-    color: '#333'
+    fontSize: 25,
+    color: '#4A148C', 
+    fontFamily: 'Pacifico_400Regular',
+    marginLeft: 30,
+    marginRight: 30,
+  },
+  bottleRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 5,
   },
   bottleContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 6,
+    gap: 2,
     padding: 10,
   },
   bottleWrapper: {
-    // pienempi koko: noin 15% näytön leveydestä
     width: width * 0.15,
-    // säilytä korkeus/leveys‑suhde ~160/70 ≈ 2.3
     height: (width * 0.15) * 2.3,
-    margin: 5,
+    margin: 1,
     position: 'relative',
+    borderBottomLeftRadius: (width * 0.15) * 0.27,   
+    borderBottomRightRadius: (width * 0.15) * 0.27,  
+    overflow: 'hidden', 
   },
+  
   bottleInner: {
     flex: 1,
     backgroundColor: '#B09AFF',
-    borderBottomLeftRadius: (width * 0.15) * 0.26,
-    borderBottomRightRadius: (width * 0.15) * 0.26,
+    borderBottomLeftRadius: (width * 0.15) * 0.27,
+    borderBottomRightRadius: (width * 0.15) * 0.27,
     overflow: 'hidden',
   },
   bottleBorder: {
@@ -62,7 +91,6 @@ export default StyleSheet.create({
     elevation: 3,
   },
   layer: {
-    // kerroksen korkeus mukautuu nyt korkeuteen
     height: ((width * 0.15) * 2.3) / 4,
     borderBottomWidth: 1,
     borderColor: '#aaa',
@@ -70,24 +98,26 @@ export default StyleSheet.create({
   overlay: {
     position: 'absolute',
     top: 0,
-    left: 0,
+    left: -4,
+    right: -4,
     width: width,
     height: height,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 10,
+    zIndex: 1000,
   },
   startButton: {
-    backgroundColor: '#fff',
+    backgroundColor: "rgb(74, 20, 140)",
     paddingVertical: 20,
-    paddingHorizontal: 40,
+    paddingHorizontal: 20,
     borderRadius: 10
   },
   startButtonText: {
-    fontSize: 24,
+    fontSize: 25,
     fontWeight: 'bold',
-    color: '#000'
+    color: 'white',
+    fontFamily: 'Pacifico_400Regular',
   },
   actionsContainer: {
     flexDirection: 'row',
@@ -98,16 +128,17 @@ export default StyleSheet.create({
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgb(129, 113, 187)',
+    backgroundColor: '#4A148C',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
     marginHorizontal: 5,
   },
   actionButtonText: {
-    fontSize: 12,
+    fontSize: 15,
     fontWeight: 'bold',
     color: '#fff',
     marginLeft: 8,
+    fontFamily: 'Pacifico_400Regular',
   },
 });

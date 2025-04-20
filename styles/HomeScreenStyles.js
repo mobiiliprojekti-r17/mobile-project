@@ -18,42 +18,52 @@ export default StyleSheet.create({
     height: height * 0.29,
     marginTop: -5,
   },
-  input: {
-    width: width * 0.7,
-    height: height * 0.045,
-    borderColor: "rgb(127, 0, 255)",
-    borderWidth: 2,
-    borderRadius: 8,
-    paddingHorizontal: width * 0.03,
-    marginBottom: height * 0.015,
-    backgroundColor: "rgb(204, 159, 254)",
-    color: "rgb(127, 0, 255)",
-    fontFamily: 'CuteFont_400Regular',
-    fontSize: width * 0.06,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    width: width * 0.9,
-    marginBottom: height * 0.02,
-  },
-  button: {
-    backgroundColor: "rgb(127, 0, 255)",
-    paddingVertical: height * 0.012,
-    paddingHorizontal: width * 0.045,
-    borderRadius: 8,
-    marginHorizontal: width * 0.04,
-    elevation: 3,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: width * 0.055,
-    fontWeight: "bold",
-    textAlign: "center",
-    fontFamily: 'CuteFont_400Regular',
-  },
+
+inputRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginVertical: height * 0.015,
+},
+
+input: {
+  flex: 1,
+  height: height * 0.045,
+  borderColor: "rgb(127, 0, 255)",
+  borderWidth: 2,
+  borderRadius: 8,
+  paddingHorizontal: width * 0.03,
+  backgroundColor: "rgb(204, 159, 254)",
+  color: "rgb(127, 0, 255)",
+  fontFamily: 'CuteFont_400Regular',
+  fontSize: width * 0.08,
+  marginBottom: 0,
+  marginLeft: width * 0.05,   
+},
+
+button: {
+  height: height * 0.045,
+  justifyContent: 'center',
+  paddingHorizontal: width * 0.045,
+  backgroundColor: "rgb(127, 0, 255)",
+  borderRadius: 8,
+  borderWidth: 2,
+  borderColor: "rgb(127, 0, 255)",
+  marginLeft: width * 0.03,   
+  marginRight: width * 0.05,   
+  elevation: 3,
+},
+
+
+buttonText: {
+  color: "white",
+  fontSize: width * 0.055,
+  fontWeight: "bold",
+  textAlign: "center",
+  fontFamily: 'CuteFont_400Regular',
+},
+
   gameSection: {
-    width: width * 0.96,
+    width: width * 0.9,
     backgroundColor: "rgb(252, 130, 240)",
     borderColor: "rgb(127, 0, 255)",
     borderWidth: 2,
@@ -79,12 +89,17 @@ export default StyleSheet.create({
   scrollContainer: {
     flex: 1,
   },
-  gameButtonsContainer: {
+  gameButtonsContainerSingleplayer: {
     width: containerWidth,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignSelf: 'center',
+  },
+  gameButtonsContainerMultiplayer: {
+    flexDirection: 'row',
+    justifyContent: 'center',  
+    alignItems: 'center',
   },
   backgroundImage: {
     flex: 1,
@@ -93,7 +108,7 @@ export default StyleSheet.create({
     width: width,
     height: height,
   },
-  gameButton: {
+  gameButtonSingleplayer: {
     width: buttonWidth,
     aspectRatio: 1,
     justifyContent: 'center',
@@ -103,6 +118,18 @@ export default StyleSheet.create({
     borderRadius: 15,
     overflow: 'hidden',
     marginBottom: height * 0.02,
+  },
+  gameButtonMultiplayer: {
+    width: buttonWidth,
+    aspectRatio: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: "rgb(127, 0, 255)",
+    borderWidth: 2,
+    borderRadius: 15,
+    overflow: 'hidden',
+    marginBottom: height * 0.02,
+    marginHorizontal: width * 0.06,
   },
  
   modalOverlay: {
@@ -132,7 +159,7 @@ export default StyleSheet.create({
     borderRadius: 10,
   },
   modalText: {
-    fontSize: width * 0.1,
+    fontSize: width * 0.085,
     fontWeight: "bold",
     marginBottom: height * 0.02,
     textAlign: "center",

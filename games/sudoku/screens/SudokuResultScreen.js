@@ -64,7 +64,7 @@ export default function SudokuResult({ route, navigation }) {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.subtitle}>Top 10:</Text>
+      <Text style={styles.subtitle}>Top 10 list:</Text>
       <FilterButtons
         selected={selectedDifficulty}
         onSelect={setSelectedDifficulty}
