@@ -30,6 +30,7 @@ import { VT323_400Regular } from '@expo-google-fonts/vt323';
 import { Kavoon_400Regular } from '@expo-google-fonts/kavoon';
 import { ConcertOne_400Regular } from '@expo-google-fonts/concert-one';
 import { Silkscreen_400Regular } from '@expo-google-fonts/silkscreen';
+import { Bungee_400Regular } from '@expo-google-fonts/bungee';
 
 
 
@@ -46,6 +47,7 @@ const App = () => {
     Kavoon_400Regular,
     ConcertOne_400Regular,
     Silkscreen_400Regular,
+    Bungee_400Regular,
   });
 
   if (!fontsLoaded) {

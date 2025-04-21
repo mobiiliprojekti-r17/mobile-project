@@ -34,9 +34,6 @@ const ScoreList = ({ scores, selectedDifficulty, formattedTime }) => {
                       Nickname: {score.nickname ?? "Unknown"}
                     </Text>
                     <Text style={styles.scoreText}>
-                      Difficulty: {score.difficulty ?? "Unknown"}
-                    </Text>
-                    <Text style={styles.scoreText}>
                       Time:{" "}
                       {score.timeInSeconds != null
                         ? formattedTime(score.timeInSeconds)

@@ -15,7 +15,7 @@ modalOverlay: {
   },
   modalContent: {
     backgroundColor: "rgb(63, 210, 136)",
-    padding: 20,
+    padding: 10,
     borderRadius: 12,
     alignItems: "center",
     shadowColor: "#000",
@@ -25,12 +25,12 @@ modalOverlay: {
     elevation: 5,
   },
   modalText: {
-    fontSize: 30,
+    fontSize: 22,
     fontWeight: "bold",
     marginBottom: 15,
     textAlign: "center",
     color: "white",
-    fontFamily: "VT323_400Regular",
+    fontFamily: "Bungee_400Regular",
   },
   modalButton: {
     backgroundColor: "rgb(56, 180, 118)",
@@ -40,9 +40,9 @@ modalOverlay: {
   },
   modalButtonText: {
     color: "white",
-    fontSize: 25,
+    fontSize: 18,
     fontWeight: "bold",
-    fontFamily: "VT323_400Regular",
+    fontFamily: "Bungee_400Regular",
   },
   difficultyModalContent: {
     backgroundColor: "rgb(63, 210, 136)",
@@ -65,30 +65,28 @@ modalOverlay: {
     justifyContent: "center", 
     marginVertical: 5, 
   },
-  difficultyModalButtonText: {
-    color: "white",
-    fontSize: 25,
-    fontWeight: "bold",
-    fontFamily: "VT323_400Regular",
-  },
+
   title: {
-    fontSize: 60,
+    fontSize: 30,
     fontWeight: "bold",
     color: "rgb(255, 255, 255)",
     textShadowColor: "black",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 1,
     marginBottom: 20,
-    fontFamily: "VT323_400Regular",
+    fontFamily: "Bungee_400Regular",
+  },
+  instructionContent: {
+backgroundColor: 'white',
+padding: 10,
+borderRadius: 5,
+width: '100%',
   },
   instruction: {
-    fontSize: 25,
+    fontSize: 18,
     fontWeight: "bold",
-    color: "rgb(255, 255, 255)",
-    textShadowColor: "black",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 1,
-    fontFamily: "VT323_400Regular",
+    color: "rgb(52, 168, 110)",
+    fontFamily: "Bungee_400Regular",
     textAlign: "left",
     alignSelf: "flex-start",
   },
@@ -102,9 +100,9 @@ modalOverlay: {
   },
   instructionbuttonText: {
     color: "white",
-    fontSize: 25,
+    fontSize: 18,
     fontWeight: "bold",
-    fontFamily: "VT323_400Regular",
+    fontFamily: "Bungee_400Regular",
   },
 });
 
