@@ -5,18 +5,19 @@ import { db } from "../../../firebase/Config";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { useNickname } from "../../../context/context";
 import styles from "../styles/ResultsStyles";
-import { useFonts, Pacifico_400Regular } from '@expo-google-fonts/pacifico';
+import { useFonts, ConcertOne_400Regular } from '@expo-google-fonts/concert-one';
 
 export default function ColorSortResultScreen({ route, navigation }) {
-    const [fontsLoaded] = useFonts({
-      Pacifico_400Regular,
-    });
+  const [fontsLoaded] = useFonts({
+    ConcertOne_400Regular,
+  });
   const { nickname } = useNickname();
   const { moves, time } = route.params;
 
-  const [results, setResults] = useState([]);     
-  const [ownRank, setOwnRank] = useState(0); 
+  const [results, setResults] = useState([]);
+  const [ownRank, setOwnRank] = useState(0);
 
+  // Helper to format seconds into M:SS
   const formatTime = totalSeconds => {
     const m = Math.floor(totalSeconds / 60);
     const s = totalSeconds % 60;
@@ -29,22 +30,29 @@ export default function ColorSortResultScreen({ route, navigation }) {
       try {
         const q = query(
           collection(db, "ColorSortResults"),
-          orderBy("moves", "asc") 
+          orderBy("moves", "asc")
         );
         const snap = await getDocs(q);
 
-        const fullList = snap.docs.map(d => {
-          const r = d.data();
-          const [min, sec] = r.time.split(':').map(Number);
-          const timeSeconds = min * 60 + sec;
-          return {
-            nickname: r.nickname,
-            moves: Number(r.moves),
-            time: r.time,
-            timeSeconds,
-          };
-        });
+        const fullList = snap.docs
+          .map(d => {
+            const r = d.data();
+            // Only process documents with a valid time string
+            if (!r.time || typeof r.time !== 'string') {
+              return null;
+            }
+            const [min, sec] = r.time.split(':').map(Number);
+            const timeSeconds = min * 60 + sec;
+            return {
+              nickname: r.nickname,
+              moves: Number(r.moves) || 0,
+              time: r.time,
+              timeSeconds,
+            };
+          })
+          .filter(item => item !== null);
 
+        // Sort by moves, then timeSeconds
         fullList.sort((a, b) => {
           if (a.moves !== b.moves) {
             return a.moves - b.moves;
@@ -52,6 +60,7 @@ export default function ColorSortResultScreen({ route, navigation }) {
           return a.timeSeconds - b.timeSeconds;
         });
 
+        // Determine own rank
         const rank = fullList.findIndex(
           r =>
             r.nickname === nickname &&
@@ -60,22 +69,24 @@ export default function ColorSortResultScreen({ route, navigation }) {
         ) + 1;
         setOwnRank(rank > 0 ? rank : fullList.length + 1);
 
+        // Take top 10 for display
         setResults(fullList.slice(0, 10));
       } catch (e) {
         console.error("Virhe haettaessa tuloksia:", e);
       }
     };
-  
+
     fetchAll();
   }, [nickname, moves, formattedOwnTime]);
-  
 
   const restart = () => {
     navigation.replace("ColorGame");
   };
+
   if (!fontsLoaded) {
-    return null; 
+    return null;
   }
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -100,7 +111,8 @@ export default function ColorSortResultScreen({ route, navigation }) {
           </TouchableOpacity>
         </View>
         <Text style={styles.topListTitle}>Top 10 list:</Text>
-        <ScrollView style={styles.scrollView}>
+        <View style={styles.TopresultBox}>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           {results.length > 0 ? (
             results.map((r, i) => (
               <View key={i} style={styles.resultItem}>
@@ -111,9 +123,10 @@ export default function ColorSortResultScreen({ route, navigation }) {
               </View>
             ))
           ) : (
-            <Text style={styles.resultText}>No scores yet!</Text>
+            <Text style={styles.NoresultText}>No scores yet!</Text>
           )}
         </ScrollView>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

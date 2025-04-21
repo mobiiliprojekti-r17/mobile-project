@@ -19,17 +19,17 @@ const modalStyles = StyleSheet.create({
     borderRadius: 10,
   },
   modalTitle: {
-    fontSize: 35,
+    fontSize: 32,
     fontWeight: "bold",
     marginBottom: 10,
-    fontFamily: 'Pacifico_400Regular',
+    fontFamily: 'ConcertOne_400Regular',
     color: 'rgb(74, 20, 140)',
   },
   modalMessage: {
-    fontSize: 21,
+    fontSize: 20,
     textAlign: "center",
     marginBottom: 15,
-    fontFamily: 'Pacifico_400Regular',
+    fontFamily: 'ConcertOne_400Regular',
     color: 'rgb(74, 20, 140)',
   },
   modalButton: {
@@ -40,11 +40,11 @@ const modalStyles = StyleSheet.create({
     marginBottom: 10,
   },
   modalButtonText: {
-    fontSize: 22,
+    fontSize: 25,
     color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
-    fontFamily: 'Pacifico_400Regular',
+    fontFamily: 'ConcertOne_400Regular',
   },
 });
 
