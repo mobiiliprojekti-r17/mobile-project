@@ -11,11 +11,11 @@ import GameHeader from "../components/gameHeader";
 import InstructionsModal from "../Modals/InstructionsModal";
 import GameButtons from "../components/GameButtons";
 import ResultModal from "../Modals/ResultModal";
-import { useFonts, VT323_400Regular } from "@expo-google-fonts/vt323";
+import { useFonts, Bungee_400Regular } from "@expo-google-fonts/bungee";
 
 const MinesweeperScreen = () => {
   const [fontsLoaded] = useFonts({
-    VT323_400Regular,
+    Bungee_400Regular,
   });
 
   const route = useRoute();

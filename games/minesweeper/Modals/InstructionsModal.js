@@ -7,9 +7,11 @@ const InstructionsModal = ({ visible, onClose }) => (
     <View style={ModalStyles.modalOverlay}>
       <View style={ModalStyles.modalContent}>
         <Text style={ModalStyles.title}>How to Play</Text>
+        <View style={ModalStyles.instructionContent}>
         <Text style={ModalStyles.instruction}>- Press to reveal the square</Text>
         <Text style={ModalStyles.instruction}>- Press and hold to set the flag</Text>
-        <Text style={ModalStyles.instruction}>- If you want to delete a flag, long press</Text>
+        <Text style={ModalStyles.instruction}>- If you want to delete a flag, long press again</Text>
+        </View>
         <TouchableOpacity onPress={onClose} style={ModalStyles.instructionbutton}>
           <Text style={ModalStyles.instructionbuttonText}>Ok</Text>
         </TouchableOpacity>
