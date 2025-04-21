@@ -9,29 +9,24 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 40,
+    fontSize: 50,
     fontWeight: 'bold',
-    marginTop: 30,
+    marginTop: 15,
     color: '#3b2a3a', 
-    textShadowColor: '#fff',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+    fontFamily: 'Audiowide_400Regular',
   },
   title2: {
-    fontSize: 25,
+    fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 20,
     marginTop: 10,
     color: '#3b2a3a', 
-    textShadowColor: '#fff',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+    fontFamily: 'Audiowide_400Regular',
   },
   board: {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
   },
   row: {
     flexDirection: 'row',
@@ -41,10 +36,10 @@ const styles = StyleSheet.create({
     height: 100,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
+    borderWidth: 5,
     borderColor: "rgb(252, 109, 90)", 
     backgroundColor: '#f9f2e7', 
-    margin: 10,
+    margin: 5,
     borderRadius: 20,
     shadowColor: '#000',
     shadowOpacity: 0.2,
@@ -52,30 +47,38 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   squareText: {
-    fontSize: 50,
+    fontSize: 65,
     fontWeight: 'bold',
     color: '#3b2a3a', 
+    fontFamily: 'Audiowide_400Regular',
   },
   turnText: {
-    fontSize: 22,
+    fontSize: 25,
     marginTop: 30,
+    marginBottom: 10,
     color: '#3b2a3a', 
+    fontFamily: 'Audiowide_400Regular',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
   },
   button: {
     backgroundColor: "rgb(252, 109, 90)", 
-    width: 120,
-    height: 45,
     padding: 12,
     borderRadius: 8,
     marginTop: 20,
     elevation: 3,
+    flexDirection: 'row',
+    alignItems: 'center', 
+    marginHorizontal: 8, 
   },
   
   buttonText: {
     color: '#fff', 
-    fontSize: 18,
+    fontSize: 22,
     textAlign: 'center',
     fontWeight: 'bold',
+    fontFamily: 'Audiowide_400Regular',
   },
 
   // Modal styles
@@ -105,11 +108,12 @@ const styles = StyleSheet.create({
   },
 
   modalText: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: "bold",
     marginBottom: 15,
     textAlign: "center",
-    color: "white",
+    color: "black",
+    fontFamily: 'Audiowide_400Regular',
   },
 
   modalButton: {
@@ -121,8 +125,9 @@ const styles = StyleSheet.create({
 
   modalButtonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "bold",
+    fontFamily: 'Audiowide_400Regular',
   }
 });
 

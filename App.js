@@ -31,6 +31,7 @@ import { Kavoon_400Regular } from '@expo-google-fonts/kavoon';
 import { ConcertOne_400Regular } from '@expo-google-fonts/concert-one';
 import { Silkscreen_400Regular } from '@expo-google-fonts/silkscreen';
 import { Bungee_400Regular } from '@expo-google-fonts/bungee';
+import { Audiowide_400Regular } from '@expo-google-fonts/audiowide';
 
 
 
@@ -48,6 +49,7 @@ const App = () => {
     ConcertOne_400Regular,
     Silkscreen_400Regular,
     Bungee_400Regular,
+    Audiowide_400Regular,
   });
 
   if (!fontsLoaded) {
