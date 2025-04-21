@@ -45,6 +45,8 @@ const BubbleShooter = ({ navigation }) => {
   const rafIdRef = useRef(null);
   const aggregatedTimeoutRef = useRef(null);
 
+  const lastPosUpdate = useRef(0);
+
   const engineRef = useRef(null);
   const worldRef = useRef(null);
   const ceilingRef = useRef(null);
@@ -375,7 +377,7 @@ const BubbleShooter = ({ navigation }) => {
         </View>
   
         {/* Nuoli piirretään ensin → jää pallon alle */}
-        {shooterBall.current && (
+          {shooterBall.current && isBallAtCenter && (
           <ShooterArrow
             shooterPosition={shooterBall.current.position}
             touchStart={touchStart}
@@ -386,6 +388,7 @@ const BubbleShooter = ({ navigation }) => {
             ballRadius={BALL_RADIUS}
           />
         )}
+
   
         {/* Staattiset pallot */}
         {staticBalls.map(ball => (
