@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
-    width: "90%",
+    width: "80%",
     alignItems: "center",
     borderColor: "rgb(0, 105, 53)",
     borderWidth: 3,
@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
     color: "rgb(0, 105, 53)", 
     marginBottom: 5,
     fontFamily: "Bungee_400Regular",
+    alignSelf: "flex-start",
   },
   scrollView: {
     width: "90%",
