@@ -56,7 +56,7 @@ button: {
 
 buttonText: {
   color: "white",
-  fontSize: width * 0.055,
+  fontSize: width * 0.075,
   fontWeight: "bold",
   textAlign: "center",
   fontFamily: 'CuteFont_400Regular',

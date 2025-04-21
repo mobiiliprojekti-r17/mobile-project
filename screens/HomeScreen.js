@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView, ImageBackground } from 'react-native';
-import { db, collection, addDoc } from '../firebase/Config';
 import styles from "../styles/HomeScreenStyles";
 import { useNickname } from '../context/context';
 import { useFonts, PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
@@ -20,13 +19,6 @@ const HomeScreen = ({ navigation }) => {
 
   if (!fontsLoaded) return null;
 
-  const addNickname = async () => {
-    if (!nickname.trim()) {
-      showModal('Error', 'Nickname cannot be empty!', 'error');
-      return;
-    }
-
-  };
 
   const showModal = (title, message, type) => {
     setModalMessage(message);
