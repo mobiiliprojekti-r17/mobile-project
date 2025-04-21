@@ -17,6 +17,9 @@ import { db } from "../../../firebase/Config";
 import { collection, addDoc } from "firebase/firestore";
 import { useNickname } from "../../../context/context";
 import  BreakerStyles from "../styles/BreakerStyles";
+import { useFocusEffect } from "@react-navigation/native";//PElimoottorin outfocus stoppi
+import { useCallback } from "react";//PElimoottorin outfocus stoppi
+
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const BASE_WIDTH = 400; 
@@ -152,6 +155,17 @@ export default function BrickBreaker() {
   const { nickname } = useNickname();
 
   const gameEngine = useRef(null);
+  //---------------------------------------Lisätty pelin outfocus stoppi---
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        if (gameEngine.current) {
+          gameEngine.current.stop();
+        }
+      };
+    }, [])
+  );
+  //-------------------------------------------------------------------------
   const initialState = setupWorld();
   const [gameState, setGameState] = useState(initialState);
   const [score, setScore] = useState(0);
