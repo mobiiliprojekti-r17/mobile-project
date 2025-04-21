@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   },
 
   modalContent: {
-    backgroundColor: "rgb(255, 234, 0)", 
+    backgroundColor: "rgb(255, 216, 130)", 
     padding: 20,
     borderRadius: 12,
     alignItems: "center",
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
 
   modalText: {
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: "bold",
     marginBottom: 15,
     textAlign: "center",

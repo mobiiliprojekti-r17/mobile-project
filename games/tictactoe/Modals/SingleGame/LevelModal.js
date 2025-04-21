@@ -2,12 +2,12 @@ import React from 'react';
 import { Modal, View, Text, TouchableOpacity } from 'react-native';
 import styles from '../../styles/TictactoeSingleStyles';
 
-export default function LevelModal({ visible, onSelect }) {
+export default function LevelModal({ visible, onSelect, onCancel }) {
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.modalOverlay}>
         <View style={[styles.modalContent, { width: '80%' }]}>
-          <Text style={styles.modalText}>Valitse vaikeustaso</Text>
+          <Text style={styles.modalText}>Choose difficulty</Text>
           {['easy','medium','impossible'].map(l => (
             <TouchableOpacity
               key={l}
@@ -19,6 +19,13 @@ export default function LevelModal({ visible, onSelect }) {
               </Text>
             </TouchableOpacity>
           ))}
+
+          <TouchableOpacity
+            style={styles.levelButton}
+            onPress={onCancel}
+          >
+            <Text style={styles.levelButtonText}>Cancel</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Vibration } from 'react-native';
 import { useFonts, Audiowide_400Regular } from '@expo-google-fonts/audiowide';
 import checkWinner from '../Utils/MultiGame/checkWinner';
 import Board from '../components/MultiGame/Board';
@@ -23,12 +23,14 @@ export default function TictactoeMultiplayer({ navigation }) {
 
     const win = checkWinner(newBoard);
     if (win) {
+      Vibration.vibrate(500); 
       setWinner(win);
       setGameOver(true);
       setModalVisible(true);
       return;
     }
     if (!newBoard.includes(null)) {
+      Vibration.vibrate(500); 
       setWinner('Tie');
       setGameOver(true);
       setModalVisible(true);

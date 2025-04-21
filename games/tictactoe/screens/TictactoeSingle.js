@@ -1,5 +1,6 @@
+// src/screens/TictactoeSingleplayer.js
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Vibration } from 'react-native';
 import { useFonts, Audiowide_400Regular } from '@expo-google-fonts/audiowide';
 import styles from '../styles/TictactoeSingleStyles';
 import Board from '../components/SingleGame/Board';
@@ -17,10 +18,29 @@ export default function TictactoeSingleplayer({ navigation }) {
   const [resultModalVisible, setResultModalVisible] = useState(false);
   const [level, setLevel] = useState('medium');
   const [resultMessage, setResultMessage] = useState('');
+  const [modalSource, setModalSource] = useState('initial'); 
+
+  const restart = () => {
+    setModalSource('restart');
+    setLevelModalVisible(true);
+  };
 
   const handleSelectLevel = l => {
     setLevel(l);
     setLevelModalVisible(false);
+
+    if (modalSource === 'restart') {
+      setBoard(Array(9).fill(null));
+      setIsPlayerTurn(true);
+      setGameOver(false);
+    }
+  };
+
+  const handleCancelLevel = () => {
+    setLevelModalVisible(false);
+    if (modalSource === 'initial') {
+      navigation.goBack();
+    }
   };
 
   const handleSquarePress = idx => {
@@ -47,6 +67,7 @@ export default function TictactoeSingleplayer({ navigation }) {
   };
 
   const endGame = winner => {
+    Vibration.vibrate(500);
     setGameOver(true);
     setResultMessage(
       winner ? (winner === 'X' ? 'You' : 'AI') + ' win!' : 'It is a tie!'
@@ -55,12 +76,6 @@ export default function TictactoeSingleplayer({ navigation }) {
   };
 
   const closeResult = () => setResultModalVisible(false);
-  const restart = () => {
-    setBoard(Array(9).fill(null));
-    setIsPlayerTurn(true);
-    setGameOver(false);
-    setLevelModalVisible(true);
-  };
 
   if (!fontsLoaded) return null;
   return (
@@ -68,15 +83,17 @@ export default function TictactoeSingleplayer({ navigation }) {
       <Text style={styles.title}>Tic-Tac-Toe</Text>
       <Text style={styles.title2}>Singleplayer</Text>
 
-      <LevelModal visible={levelModalVisible} onSelect={handleSelectLevel} />
-
+      <LevelModal
+        visible={levelModalVisible}
+        onSelect={handleSelectLevel}
+        onCancel={handleCancelLevel}  
+      />
 
       <Text style={styles.turnText}>
-      {gameOver
-        ? resultMessage
-        : `Whose turn: ${isPlayerTurn ? 'You' : 'AI'}`}
-    </Text>
-
+        {gameOver
+          ? resultMessage
+          : `Whose turn: ${isPlayerTurn ? 'You' : 'AI'}`}
+      </Text>
 
       <Board
         board={board}
