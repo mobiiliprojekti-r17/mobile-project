@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text } from 'react-native';
 import shooterStyles from '../styles/shooterStyles';
 
@@ -32,4 +32,12 @@ const Ball = ({ x, y, size, color }) => {
   );
 };
 
-export default Ball;
+// Memoize: rerenderöi vain jos X, Y, koko tai väri muuttuvat
+export default memo(
+  Ball,
+  (prev, next) =>
+    prev.x === next.x &&
+    prev.y === next.y &&
+    prev.size === next.size &&
+    prev.color === next.color
+);

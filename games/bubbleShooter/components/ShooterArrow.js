@@ -1,57 +1,44 @@
 import React, { useMemo } from 'react';
-import Svg, { Line } from 'react-native-svg';
-import { snapToGrid } from '../utils/shooterPhysics';
+import { View, Dimensions } from 'react-native';
 import shooterStyles from '../styles/shooterStyles';
+import { snapToGrid } from '../utils/shooterPhysics';
 
-const ShooterArrow = ({
+const { width, height } = Dimensions.get('window');
+const STEP = 4;
+const MAX_STEPS = 500;
+const MAX_BOUNCES = 2;
+
+export default function ShooterArrow({
   shooterPosition,
   touchStart,
   touchCurrent,
   staticBalls,
-  width,
   numCols,
-  ballRadius
-}) => {
+  ballRadius,
+}) {
   if (!touchStart || !touchCurrent || !shooterPosition) return null;
 
-  const STEP = 4;
-  const MAX_STEPS = 500;
-  const MAX_BOUNCES = 2;
-  const shortenBy = ballRadius;
-
-  // Start simulation from bottom center of the shooter ball, matching velocity origin
-  const posX = shooterPosition.x;
-  const posY = shooterPosition.y + ballRadius;
-
-  // Compute initial direction based on same origin point
-  const dx = touchCurrent.x - posX;
-  const dy = touchCurrent.y - posY;
-  const dirLength = Math.hypot(dx, dy);
-  if (dirLength === 0) return null;
-
-  const dirX = dx / dirLength;
-  const dirY = dy / dirLength;
-
-  // Memoize segment calculation for performance
   const segments = useMemo(() => {
-    let x = posX;
-    let y = posY;
-    let simDirX = dirX;
-    let simDirY = dirY;
+    let x = shooterPosition.x;
+    let y = shooterPosition.y + ballRadius;
+    const dx = touchCurrent.x - x;
+    const dy = touchCurrent.y - y;
+    const length = Math.hypot(dx, dy);
+    if (length === 0) return [];
+    let vx = dx / length;
+    let vy = dy / length;
     let bounces = 0;
-    let hitPoint = null;
     const segs = [];
+    let hitPoint = null;
 
     for (let i = 0; i < MAX_STEPS; i++) {
-      const nextX = x + simDirX * STEP;
-      const nextY = y + simDirY * STEP;
+      const nextX = x + vx * STEP;
+      const nextY = y + vy * STEP;
+      if (nextY < 0) break;
 
-      // Stop simulation if arrow goes above top edge
-      if (nextY < ballRadius) break;
-
-      // Check collision with static balls
+      // check ball collisions
       let collided = false;
-      for (let ball of staticBalls) {
+      for (const ball of staticBalls) {
         const dist = Math.hypot(nextX - ball.position.x, nextY - ball.position.y);
         if (dist <= ballRadius * 2) {
           hitPoint = { x: nextX, y: nextY };
@@ -61,68 +48,62 @@ const ShooterArrow = ({
       }
       if (collided) break;
 
-      // Wall bounce logic with division-by-zero guard
-      if (
-        simDirX !== 0 &&
-        (nextX <= ballRadius || nextX >= width - ballRadius) &&
-        bounces < MAX_BOUNCES
-      ) {
+      // wall bounce
+      if ((nextX <= ballRadius || nextX >= width - ballRadius) && bounces < MAX_BOUNCES) {
         const wallX = nextX <= ballRadius ? ballRadius : width - ballRadius;
-        const t = (wallX - x) / simDirX; // safe because simDirX !== 0
-        const wallY = y + simDirY * t;
+        const t = (wallX - x) / vx;
+        const wallY = y + vy * t;
         segs.push({ x1: x, y1: y, x2: wallX, y2: wallY });
-        x = wallX;
-        y = wallY;
-        simDirX = -simDirX;
+        x = wallX; y = wallY;
+        vx = -vx;
         bounces++;
         continue;
       }
 
-      // Regular trajectory segment
       segs.push({ x1: x, y1: y, x2: nextX, y2: nextY });
-      x = nextX;
-      y = nextY;
+      x = nextX; y = nextY;
     }
 
-    // Final snap-to-grid segment if collision detected
     if (hitPoint) {
-      const tempBody = { position: hitPoint };
-      const snap = snapToGrid(tempBody, width, numCols);
-      const toSnapX = snap.x - x;
-      const toSnapY = snap.y - y;
-      const toSnapLen = Math.hypot(toSnapX, toSnapY);
-      const ratio = Math.max(0, (toSnapLen - shortenBy) / toSnapLen);
-      const finalX = x + toSnapX * ratio;
-      const finalY = y + toSnapY * ratio;
-      segs.push({ x1: x, y1: y, x2: finalX, y2: finalY });
+      const snap = snapToGrid({ position: hitPoint }, width, numCols);
+      const tx = snap.x - x;
+      const ty = snap.y - y;
+      const dist = Math.hypot(tx, ty);
+      const ratio = Math.max(0, (dist - ballRadius) / dist);
+      segs.push({ x1: x, y1: y, x2: x + tx * ratio, y2: y + ty * ratio });
     }
 
     return segs;
-  }, [posX, posY, dirX, dirY, staticBalls, width, numCols, ballRadius]);
-
-  const arrowStyle = {
-    stroke: '#FF70C0',
-    strokeWidth: 4,
-    strokeLinecap: 'round',
-    strokeDasharray: '6, 4',
-  };
-
-  const shadowStyle = {
-    stroke: 'rgba(0,0,0,0.1)',
-    strokeWidth: 6,
-    strokeLinecap: 'round',
-  };
+  }, [shooterPosition, touchStart, touchCurrent, staticBalls, numCols, ballRadius]);
 
   return (
-    <Svg style={shooterStyles.arrowLine}>
-      {segments.map((seg, i) => (
-        <React.Fragment key={`seg-${i}`}>
-          <Line x1={seg.x1} y1={seg.y1} x2={seg.x2} y2={seg.y2} {...shadowStyle} />
-          <Line x1={seg.x1} y1={seg.y1} x2={seg.x2} y2={seg.y2} {...arrowStyle} />
-        </React.Fragment>
-      ))}
-    </Svg>
+    <View pointerEvents="none" style={shooterStyles.arrowLine}>
+      {segments.map((seg, i) => {
+        const dx = seg.x2 - seg.x1;
+        const dy = seg.y2 - seg.y1;
+        const length = Math.hypot(dx, dy);
+        const angle = Math.atan2(dy, dx);
+        return (
+          <View
+            key={i}
+            style={{
+              position: 'absolute',
+              left: seg.x1,
+              top: seg.y1,
+              width: length,
+              height: 0,
+              borderColor: '#FF70C0',
+              borderWidth: 4,
+              borderStyle: 'dashed',
+              borderRadius: 2,
+              transform: [
+                { translateY: -2 },
+                { rotate: `${angle}rad` },
+              ],
+            }}
+          />
+        );
+      })}
+    </View>
   );
-};
-
-export default ShooterArrow;
+}

@@ -89,16 +89,14 @@ const shooterStyles = StyleSheet.create({
 
     arrowLine: {
       color: '#FF70C0',
-      position: 'absolute', // Asetetaan absoluuttinen sijainti
+      position: 'absolute',
       top: 45,
       left: 0,
-      width: '100%', // Esimerkki, voi asettaa muuksi, kuten '50%'
-      height: '100%', // Esimerkki, voi asettaa muuksi
-      zIndex: 0
+      width: '100%',
+      height: '100%',
+      zIndex: 0,
+      pointerEvents: 'none',  // estää kosketusten sieppauksen
     },
-  
-  
-  
 });
 
 
