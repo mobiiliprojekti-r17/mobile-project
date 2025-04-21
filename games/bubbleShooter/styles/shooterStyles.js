@@ -44,7 +44,7 @@ const shooterStyles = StyleSheet.create({
   },
   
   shooterScoreText: {
-    fontSize: 40,
+    fontSize: 30 ,
     color: '#FF70C0',
     marginBottom: 35,
     fontWeight: 'bold',
