@@ -1,154 +1,97 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal } from 'react-native';
-import styles from "../styles/TictactoeSingleStyles";
-
-const checkWinner = (board) => {
-  const lines = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8], 
-    [0, 3, 6], [1, 4, 7], [2, 5, 8], 
-    [0, 4, 8], [2, 4, 6]
-  ];
-
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return board[a];
-    }
-  }
-  return null;
-};
-
-const makeAIMove = (newBoard) => {
-  for (let i = 0; i < 9; i++) {
-    if (!newBoard[i]) {
-      newBoard[i] = 'O';
-      if (checkWinner(newBoard) === 'O') return i;
-      newBoard[i] = null;
-    }
-  }
-
-  for (let i = 0; i < 9; i++) {
-    if (!newBoard[i]) {
-      newBoard[i] = 'X';
-      if (checkWinner(newBoard) === 'X') return i;
-      newBoard[i] = null;
-    }
-  }
-
-  const bestMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
-  for (let i of bestMoves) {
-    if (!newBoard[i]) return i;
-  }
-
-  return null;
-};
+import { View, Text } from 'react-native';
+import { useFonts, Audiowide_400Regular } from '@expo-google-fonts/audiowide';
+import styles from '../styles/TictactoeSingleStyles';
+import Board from '../components/SingleGame/Board';
+import GameControls from '../components/SingleGame/GameControls';
+import LevelModal from '../Modals/SingleGame/LevelModal';
+import ResultModal from '../Modals/SingleGame/ResultModal';
+import { checkWinner, makeAIMove } from '../Utils/SingleGame/gameUtils';
 
 export default function TictactoeSingleplayer({ navigation }) {
+  const [fontsLoaded] = useFonts({ Audiowide_400Regular });
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [gameOver, setGameOver] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [levelModalVisible, setLevelModalVisible] = useState(true);
+  const [resultModalVisible, setResultModalVisible] = useState(false);
+  const [level, setLevel] = useState('medium');
   const [resultMessage, setResultMessage] = useState('');
 
-  const [playerName, setPlayerName] = useState("You");
-  const [AIName, setAIName] = useState("AI");
+  const handleSelectLevel = l => {
+    setLevel(l);
+    setLevelModalVisible(false);
+  };
 
-  const handlePress = (index) => {
-    if (board[index] || gameOver || !isPlayerTurn) return;
-
+  const handleSquarePress = idx => {
+    if (board[idx] || gameOver) return;
     const newBoard = [...board];
-    newBoard[index] = 'X';
+    newBoard[idx] = 'X';
     setBoard(newBoard);
     setIsPlayerTurn(false);
 
     const winner = checkWinner(newBoard);
-    if (winner) {
-      setGameOver(true);
-      setResultMessage(`${winner === 'X' ? playerName : AIName} wins!`);
-      setModalVisible(true);
-      return;
-    }
-
-    if (!newBoard.includes(null)) {
-      setGameOver(true);
-      setResultMessage('It is a tie!');
-      setModalVisible(true);
-      return;
-    }
+    if (winner) return endGame(winner);
+    if (!newBoard.includes(null)) return endGame(null);
 
     setTimeout(() => {
-      const computerMove = makeAIMove(newBoard);
-      if (computerMove !== null) {
-        newBoard[computerMove] = 'O';
-        setBoard([...newBoard]);
-
-        const winner = checkWinner(newBoard);
-        if (winner) {
-          setGameOver(true);
-          setResultMessage(`${winner === 'O' ? AIName : playerName} wins!`);
-          setModalVisible(true);
-          return;
-        }
+      const aiIdx = makeAIMove([...newBoard], level);
+      if (aiIdx != null) {
+        newBoard[aiIdx] = 'O';
+        setBoard(newBoard);
+        const w = checkWinner(newBoard);
+        if (w) return endGame(w);
       }
       setIsPlayerTurn(true);
-    }, 1000);
+    }, 500);
   };
 
-  const resetGame = () => {
+  const endGame = winner => {
+    setGameOver(true);
+    setResultMessage(
+      winner ? (winner === 'X' ? 'You' : 'AI') + ' win!' : 'It is a tie!'
+    );
+    setResultModalVisible(true);
+  };
+
+  const closeResult = () => setResultModalVisible(false);
+  const restart = () => {
     setBoard(Array(9).fill(null));
     setIsPlayerTurn(true);
     setGameOver(false);
-    setModalVisible(false);
+    setLevelModalVisible(true);
   };
 
-  const renderSquare = (index) => (
-    <TouchableOpacity
-      key={index} 
-      style={styles.square}
-      onPress={() => handlePress(index)}
-      disabled={!!board[index] || gameOver}
-    >
-      <Text style={styles.squareText}>{board[index]}</Text>
-    </TouchableOpacity>
-  );
-
+  if (!fontsLoaded) return null;
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tic-Tac-Toe</Text>
       <Text style={styles.title2}>Singleplayer</Text>
-      <Text style={styles.turnText}>Whose turn: {isPlayerTurn ? playerName : AIName}</Text>
-      <View style={styles.board}>
-        {[0, 1, 2].map((row) => (
-          <View style={styles.row} key={row}>
-            {[0, 1, 2].map((col) => renderSquare(row * 3 + col))}
-          </View>
-        ))}
-      </View>
-      
-      <TouchableOpacity style={styles.button} onPress={resetGame}>
-        <Text style={styles.buttonText}>Restart</Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
-        <Text style={styles.buttonText}>Home</Text>
-      </TouchableOpacity>
+      <LevelModal visible={levelModalVisible} onSelect={handleSelectLevel} />
 
-      {/* Modal */}
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={resetGame}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>{resultMessage}</Text>
-            <TouchableOpacity style={styles.modalButton} onPress={resetGame}>
-              <Text style={styles.modalButtonText}>OK</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+
+      <Text style={styles.turnText}>
+      {gameOver
+        ? resultMessage
+        : `Whose turn: ${isPlayerTurn ? 'You' : 'AI'}`}
+    </Text>
+
+
+      <Board
+        board={board}
+        onSquarePress={handleSquarePress}
+        disabled={gameOver}
+      />
+      <GameControls
+        onRestart={restart}
+        onHome={() => navigation.navigate('Home')}
+      />
+      <ResultModal
+        visible={resultModalVisible}
+        message={resultMessage}
+        onClose={closeResult}
+      />
     </View>
   );
 }
