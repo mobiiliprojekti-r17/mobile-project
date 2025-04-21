@@ -71,10 +71,6 @@ const BubbleShooter = ({ navigation }) => {
   const [touchCurrent, setTouchCurrent] = useState(null);
   const [canShoot, setCanShoot] = useState(true);// estetään peräkkäiset laukaukset
 
-  const [currentColor, setCurrentColor] = useState(null);
-  const [nextColor, setNextColor] = useState(null);
-
-
   const route = useRoute(); //Reititys
   const { nickname } = useNickname(); //Firebasen käyttäjänimi kontekstista
 
