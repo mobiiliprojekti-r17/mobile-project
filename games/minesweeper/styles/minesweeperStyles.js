@@ -65,12 +65,14 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "rgb(63, 210, 136)",
     padding: 10,
-    marginHorizontal: 10,
+    marginHorizontal: 5,
     borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',  
   },
   buttonText: {
     color: "#fff",
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: "bold",
     fontFamily: "VT323_400Regular",
   },
@@ -82,16 +84,11 @@ const styles = StyleSheet.create({
   },
   resultButtonText: {
     color: "#fff",
-    fontSize: 25,
+    fontSize: 20,
     fontFamily: "VT323_400Regular",
   },
 
-  resultButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    width: "100%",
-    marginVertical: 10,
-  },
+
 
 });
 

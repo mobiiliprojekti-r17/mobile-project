@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import Sky from '../components/Sky';
 import FlappyBird from '../components/FlappyBird';
 import FlappyStyles from '../FlappyStyles/FlappyStyles';
+import { useFonts, Silkscreen_400Regular } from '@expo-google-fonts/silkscreen';
 
 const styles = StyleSheet.create({
   ...FlappyStyles,
@@ -21,6 +22,13 @@ const styles = StyleSheet.create({
 });
 
 export default function FlappyBirdScreen({ navigation }) {
+  const [fontsLoaded] = useFonts({
+    Silkscreen_400Regular,
+  });
+
+  if (!fontsLoaded) {
+    return null; 
+  }
   return (
     <View style={styles.container}>
       <Sky />

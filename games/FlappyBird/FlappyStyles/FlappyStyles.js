@@ -25,9 +25,10 @@ const FlappyStyles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 22,
     textAlign: 'center',
     fontWeight: 'bold',
+    fontFamily: 'Silkscreen_400Regular',
   },
   overlay: {
     position: 'absolute',
@@ -46,6 +47,7 @@ const FlappyStyles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: 'Silkscreen_400Regular',
   },
 });
 

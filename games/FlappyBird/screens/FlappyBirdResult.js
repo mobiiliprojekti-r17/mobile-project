@@ -8,33 +8,47 @@ import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { useNickname } from '../../../context/context';
 import FlappyStyles from '../FlappyStyles/FlappyStyles';
 
-const base = FlappyStyles;              
+const base = FlappyStyles;
 
 export default function FlappyResult({ route, navigation }) {
   const { nickname } = useNickname();
   const { score }    = route.params;
-  const [results, setResults] = useState([]);
+  const [results, setResults]   = useState([]);
+  const [ownRank, setOwnRank]   = useState(null);
+
+  useEffect(() => {
+    navigation.setOptions({ headerLeft: () => null, gestureEnabled: false });
+  }, [navigation]);
 
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const q = query(
+        // 1) Hae TOP10
+        const topQ = query(
           collection(db, 'FlappyBirdResults'),
           orderBy('score', 'desc'),
           limit(10)
         );
-        const snap = await getDocs(q);
-        setResults(snap.docs.map(d => d.data()));
+        const topSnap = await getDocs(topQ);
+        setResults(topSnap.docs.map(d => d.data()));
+
+        // 2) Hae koko lista rankingin laskua varten
+        const allQ = query(
+          collection(db, 'FlappyBirdResults'),
+          orderBy('score', 'desc')
+        );
+        const allSnap = await getDocs(allQ);
+        const allList = allSnap.docs.map(d => d.data());
+
+        // 3) Laske oma sijasi
+        const idx = allList.findIndex(r => r.Nickname === nickname && r.score === score);
+        setOwnRank(idx >= 0 ? idx + 1 : allList.length + 1);
       } catch (err) {
         console.error('Fetching results failed:', err);
       }
     };
     fetchResults();
-  }, [navigation]);
-
-  useEffect(() => {
-    navigation.setOptions({ headerLeft: () => null, gestureEnabled: false });
-  }, [navigation]);
+  }, [navigation, nickname, score]);
 
   const medal = (idx) => (['🥇','🥈','🥉'][idx] ?? `${idx+1}.`);
 
@@ -44,7 +58,7 @@ export default function FlappyResult({ route, navigation }) {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <Text style={[styles.title]}>Game Over!</Text>
+        <Text style={styles.title}>Game Over!</Text>
 
         <View style={styles.scoreCard}>
           <Text style={styles.playerLine}>
@@ -53,9 +67,14 @@ export default function FlappyResult({ route, navigation }) {
           <Text style={styles.playerLine}>
             <Text style={styles.label}>Score: </Text>{score}
           </Text>
+          {ownRank !== null && (
+            <Text style={styles.playerLine}>
+              <Text style={styles.label}>Ranking: </Text>#{ownRank}
+            </Text>
+          )}
         </View>
 
-        <Text style={styles.leaderTitle}>Top 10</Text>
+        <Text style={styles.leaderTitle}>Top 10</Text>
 
         <ScrollView
           style={styles.scroll}
@@ -106,7 +125,7 @@ export default function FlappyResult({ route, navigation }) {
 
 const styles = {
   title: {
-    fontSize: 32,
+    fontSize: 40,
     fontWeight: '900',
     color: '#fff',
     alignSelf: 'center',
@@ -114,6 +133,7 @@ const styles = {
     textShadowColor: '#0008',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
+    fontFamily: 'Silkscreen_400Regular',
   },
   scoreCard: {
     backgroundColor: '#ffffffaa',
@@ -123,15 +143,16 @@ const styles = {
     alignSelf: 'stretch',
   },
   playerLine: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
     color: '#333',
     marginVertical: 2,
+    fontFamily: 'Silkscreen_400Regular',
   },
-  label: { fontWeight: '800', color: '#000' },
+  label: { fontWeight: '800', color: '#000', fontFamily: 'Silkscreen_400Regular'},
 
   leaderTitle: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: '800',
     color: '#fff',
     marginBottom: 6,
@@ -139,6 +160,7 @@ const styles = {
     textShadowColor: '#0008',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
+    fontFamily: 'Silkscreen_400Regular',
   },
   scroll: { flex: 1, alignSelf: 'stretch' },
 
@@ -151,14 +173,15 @@ const styles = {
     borderRadius: 8,
     marginVertical: 3,
   },
-  rowText: { fontSize: 18, fontWeight: '700', color: '#333' },
+  rowText: { fontSize: 25, fontWeight: '700', color: '#333', fontFamily: 'Silkscreen_400Regular', },
 
   noScores: {
     alignSelf: 'center',
     marginTop: 20,
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: '700',
     color: '#fff',
+    fontFamily: 'Silkscreen_400Regular',
   },
 
   rowGold:   { backgroundColor: '#ffeb3baa' },

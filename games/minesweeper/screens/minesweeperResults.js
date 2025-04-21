@@ -4,6 +4,7 @@ import styles from "../styles/minesweeperResultsStyles";
 import { useNickname } from "../../../context/context";
 import DifficultySelectorModal from "../Modals/difficultyModals";
 import Icon from "react-native-vector-icons/Feather";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ScoreList from "../components/ScoreList";
 import { useFonts, VT323_400Regular } from "@expo-google-fonts/vt323";
 import { formattedTime } from "../utils/Time";
@@ -29,8 +30,7 @@ const MinesweeperResultScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>GAME OVER!</Text>
-      <Text style={styles.title2}>Your result:</Text>
+      <Text style={styles.title}>Your result:</Text>
       <View style={styles.resultBox}>
         <Text style={styles.infoText}>Nickname: {nickname}</Text>
         <Text style={styles.infoText}>Difficulty: {difficulty}</Text>
@@ -41,10 +41,12 @@ const MinesweeperResultScreen = ({ route, navigation }) => {
 
       <View style={styles.resultButtonContainer}>
         <TouchableOpacity style={styles.Button} onPress={() => setPlayAgainModalVisible(true)}>
+                <MaterialCommunityIcons name="restart" size={25} color="rgb(0, 105, 53)" />
           <Text style={styles.ButtonText}>Play Again</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.Button} onPress={() => navigation.navigate("Home")}>
-          <Icon name="home" size={24} color="rgb(0, 105, 53)" />
+              <MaterialCommunityIcons name="home" size={25} color="rgb(0, 105, 53)" />
+              <Text style={styles.ButtonText}>Home</Text>
         </TouchableOpacity>
       </View>
 
