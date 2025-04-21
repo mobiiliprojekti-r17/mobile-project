@@ -6,7 +6,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useNickname } from "../../../context/context";
 import { db, collection, addDoc } from "../../../firebase/Config";
 import { useNavigation } from "@react-navigation/native";
-import { useFonts, Pacifico_400Regular } from '@expo-google-fonts/pacifico';
+import { useFonts, ConcertOne_400Regular } from '@expo-google-fonts/concert-one';
 
 const LEVEL_CONFIGS = [
   { numColors: 4, layersPerBottle: 4, emptyBottles: 2 },
@@ -105,7 +105,7 @@ const saveColorSortResult = async (nickname, timeInSeconds, moves) => {
 
 export default function ColorSortGame() {
   const [fontsLoaded] = useFonts({
-    Pacifico_400Regular,
+    ConcertOne_400Regular,
   });
   const navigation = useNavigation();
   const { nickname } = useNickname();
@@ -198,7 +198,7 @@ export default function ColorSortGame() {
 
     if (level === LEVEL_CONFIGS.length - 1) {
       saveColorSortResult(nickname, elapsedTime, mv);
-      showGameOverModal("Game Over", `Time: ${formatTime(elapsedTime)}\nMoves: ${mv}`);
+      showGameOverModal("Game Over!", `Time: ${formatTime(elapsedTime)}\nMoves: ${mv}`);
     } else {
       showLevelModal(
         `Level ${level + 1} complete!`,

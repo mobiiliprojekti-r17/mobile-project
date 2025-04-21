@@ -10,15 +10,15 @@ export default StyleSheet.create({
     backgroundColor:'#B09AFF'
   },
   title1: {
-    fontSize: 60, 
-    fontFamily: 'Pacifico_400Regular',
+    fontSize: 70, 
+    fontFamily: 'ConcertOne_400Regular',
     alignSelf: 'center',
     color: '#4A148C', 
   },
   title2: {
-    fontSize: 35, 
+    fontSize: 40, 
     marginBottom: 20,
-    fontFamily: 'Pacifico_400Regular',
+    fontFamily: 'ConcertOne_400Regular',
     alignSelf: 'center',
     color: '#4A148C', 
   },
@@ -34,14 +34,14 @@ export default StyleSheet.create({
     marginBottom: 20,
     alignItems: 'center',
     borderColor: "rgb(74, 20, 140)",
-    borderWidth: 2,
+    borderWidth: 3,
     borderRadius: 10,
     width: '95%'
   },
   statusText: {
     fontSize: 25,
     color: '#4A148C', 
-    fontFamily: 'Pacifico_400Regular',
+    fontFamily: 'ConcertOne_400Regular',
     marginLeft: 30,
     marginRight: 30,
   },
@@ -54,8 +54,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 2,
-    padding: 10,
+    gap: 1,
   },
   bottleWrapper: {
     width: width * 0.15,
@@ -98,8 +97,7 @@ export default StyleSheet.create({
   overlay: {
     position: 'absolute',
     top: 0,
-    left: -4,
-    right: -4,
+    left: -1,
     width: width,
     height: height,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -114,10 +112,10 @@ export default StyleSheet.create({
     borderRadius: 10
   },
   startButtonText: {
-    fontSize: 25,
+    fontSize: 30,
     fontWeight: 'bold',
     color: 'white',
-    fontFamily: 'Pacifico_400Regular',
+    fontFamily: 'ConcertOne_400Regular',
   },
   actionsContainer: {
     flexDirection: 'row',
@@ -135,10 +133,10 @@ export default StyleSheet.create({
     marginHorizontal: 5,
   },
   actionButtonText: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
     marginLeft: 8,
-    fontFamily: 'Pacifico_400Regular',
+    fontFamily: 'ConcertOne_400Regular',
   },
 });
