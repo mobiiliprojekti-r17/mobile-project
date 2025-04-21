@@ -9,10 +9,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 70,
+    fontSize: 60,
     fontWeight: "bold",
     color:  "rgb(4, 201, 103)", 
-    marginBottom: 20,
+    marginBottom: 10,
     marginTop: 60,
     fontFamily: "VT323_400Regular",
   },  
@@ -20,8 +20,8 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: "bold",
     color:  "rgb(4, 201, 103)", 
-    marginBottom: 10,
-    marginTop: 10,
+    marginBottom: 5,
+    marginTop: 20,
     fontFamily: "VT323_400Regular",
   },
   resultBox: {
@@ -123,6 +123,8 @@ const styles = StyleSheet.create({
   padding: 10,
   marginHorizontal: 10,
   borderRadius: 5,
+  flexDirection: 'row',
+  alignItems: 'center', 
   },
   ButtonText: {
     color: "rgb(0, 105, 53)", 
