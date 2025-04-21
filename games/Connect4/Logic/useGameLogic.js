@@ -1,9 +1,9 @@
-// useGameLogic.js
 import { useState, useEffect } from 'react';
-import { checkWinner, checkDraw, minimax, dropDisc } from '../Logic/Connect4Logic';
+import { checkWinner, checkDraw, minimax, dropDisc, getValidColumns, 
+} from '../Logic/Connect4Logic';
 import { getLandingRowAndToY } from '../Logic/BoardUtils';
 
-export const useGameLogic = (ROWS, COLS, TOTAL_CELL_WIDTH, BOARD_PADDING, CELL_MARGIN, X_OFFSET_CORRECTION) => {
+export const useGameLogic = ( ROWS, COLS, TOTAL_CELL_WIDTH, BOARD_PADDING, CELL_MARGIN, X_OFFSET_CORRECTION, difficulty = 'medium') => {
   const [board, setBoard] = useState(
     Array(ROWS).fill(null).map(() => Array(COLS).fill(null))
   );
@@ -15,12 +15,9 @@ export const useGameLogic = (ROWS, COLS, TOTAL_CELL_WIDTH, BOARD_PADDING, CELL_M
 
   const handlePlayerMove = (col) => {
     if (winner || currentPlayer !== 'Yellow' || flyingDisc) return;
-
     const landingData = getLandingRowAndToY(board, TOTAL_CELL_WIDTH, col);
     if (!landingData) return;
-
     const xOffset = BOARD_PADDING + CELL_MARGIN + col * TOTAL_CELL_WIDTH + X_OFFSET_CORRECTION;
-
     setFlyingDisc({
       color: 'rgb(255, 234, 0)',
       col,
@@ -52,20 +49,29 @@ export const useGameLogic = (ROWS, COLS, TOTAL_CELL_WIDTH, BOARD_PADDING, CELL_M
   useEffect(() => {
     if (currentPlayer === 'Orange' && !winner && !flyingDisc) {
       const aiMove = () => {
-        const { column } = minimax(board, 4, true, -Infinity, Infinity);
-        const landingData = getLandingRowAndToY(board, TOTAL_CELL_WIDTH, column);
+        let chosenColumn;
+        if (difficulty === 'easy') {
+          const valid = getValidColumns(board);
+          chosenColumn = valid[Math.floor(Math.random() * valid.length)];
+        } else if (difficulty === 'medium') {
+          chosenColumn = minimax(board, 3, true, -Infinity, Infinity).column;
+        } else {
+          chosenColumn = minimax(board, 5, true, -Infinity, Infinity).column;
+        }
+
+        const landingData = getLandingRowAndToY(board, TOTAL_CELL_WIDTH, chosenColumn);
         if (!landingData) return;
-        const xOffset = BOARD_PADDING + CELL_MARGIN + column * TOTAL_CELL_WIDTH + X_OFFSET_CORRECTION;
+        const xOffset = BOARD_PADDING + CELL_MARGIN + chosenColumn * TOTAL_CELL_WIDTH + X_OFFSET_CORRECTION;
 
         setFlyingDisc({
           color: 'rgb(255, 94, 0)',
-          col: column,
+          col: chosenColumn,
           xOffset,
           toY: landingData.toY,
           cellSize: TOTAL_CELL_WIDTH - 2 * CELL_MARGIN,
           onEnd: () => {
             setFlyingDisc(null);
-            const result = dropDisc(board, column, 'Orange');
+            const result = dropDisc(board, chosenColumn, 'Orange');
             if (!result) return;
             const { newBoard } = result;
             setBoard(newBoard);
@@ -84,10 +90,11 @@ export const useGameLogic = (ROWS, COLS, TOTAL_CELL_WIDTH, BOARD_PADDING, CELL_M
           },
         });
       };
-      const timer = setTimeout(aiMove, 500);
+       const delay = difficulty === 'impossible' ? 10 : 500;
+       const timer = setTimeout(aiMove, delay);
       return () => clearTimeout(timer);
     }
-  }, [currentPlayer, board, winner, flyingDisc, BOARD_PADDING, CELL_MARGIN, TOTAL_CELL_WIDTH, X_OFFSET_CORRECTION]);
+  }, [ currentPlayer, board, winner, flyingDisc, difficulty, BOARD_PADDING, CELL_MARGIN, TOTAL_CELL_WIDTH, X_OFFSET_CORRECTION ]);
 
   const startNewGame = () => {
     setBoard(Array(ROWS).fill(null).map(() => Array(COLS).fill(null)));
@@ -98,16 +105,5 @@ export const useGameLogic = (ROWS, COLS, TOTAL_CELL_WIDTH, BOARD_PADDING, CELL_M
     setFlyingDisc(null);
   };
 
-  return {
-    board,
-    currentPlayer,
-    winner,
-    modalVisible,
-    winnerCoords,
-    flyingDisc,
-    handlePlayerMove,
-    startNewGame,
-    setModalVisible,
-  };
-  
+  return { board, currentPlayer, winner, modalVisible, winnerCoords, flyingDisc, handlePlayerMove, startNewGame,  setModalVisible };
 };

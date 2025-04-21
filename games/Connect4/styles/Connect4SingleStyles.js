@@ -8,11 +8,18 @@ export default StyleSheet.create({
     backgroundColor: "rgb(255, 246, 143)", 
   },
   title: {
-    fontSize: 60,
+    fontSize: 65,
     fontWeight: 'bold',
     marginTop: 20,
-    marginBottom: 20,
-    color: '#3b2a3a',  
+    marginBottom: 5,
+    color: '#3b2a3a', 
+    fontFamily: 'FredokaOne_400Regular',
+  },
+  title2: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginBottom: 50,
+    color: '#3b2a3a', 
     fontFamily: 'FredokaOne_400Regular',
   },
   player: {
@@ -54,15 +61,21 @@ export default StyleSheet.create({
     shadowRadius: 2,
     elevation: 3,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+  },
   button: {
     marginTop: 20,
     padding: 10,
     backgroundColor:"rgb(255, 204, 0)", 
     borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center', 
+    marginHorizontal: 8, 
   },
   buttonText: {
     color: 'white', 
-    fontSize: 25,
+    fontSize: 20,
     fontFamily: 'FredokaOne_400Regular',
   },
 // Modal styles

@@ -9,12 +9,19 @@ export const ResultModalsingle = ({ visible, winner, onClose }) => {
   let resultText = 'Game Draw!';
   if(winner === 'Orange') resultText = 'AI win!';
   if(winner === 'Yellow') resultText = 'You win!';
-  
+
+  const resultTextColor = winner === 'Orange'
+  ? '#000'
+  : winner === 'Yellow'
+    ? '#000'
+    : '#000';
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
       <View style={[modalStyles.modalOverlay, { backgroundColor: "rgba(0, 0, 0, 0.4)" }]}>
         <View style={[modalStyles.modalContent, { backgroundColor: modalBackgroundColor }]}>
-          <Text style={modalStyles.modalText}>{resultText}</Text>
+        <Text style={[modalStyles.modalText, { color: resultTextColor, fontSize: 32 }]}>
+            {resultText}
+          </Text>
           <TouchableOpacity
             style={[modalStyles.modalButton, { backgroundColor: modalButtonBackgroundColor }]}
             onPress={onClose}
@@ -34,12 +41,19 @@ export const ResultModalmulti = ({ visible, winner, onClose }) => {
   let resultText = 'Game Draw!';
   if(winner === 'Orange') resultText = 'Orange win!';
   if(winner === 'Yellow') resultText = 'Yellow win!';
-  
+
+  const resultTextColor = winner === 'Orange'
+  ? '#000'
+  : winner === 'Yellow'
+    ? '#000'
+    : '#000';
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
       <View style={[modalStyles.modalOverlay, { backgroundColor: "rgba(0, 0, 0, 0.4)" }]}>
         <View style={[modalStyles.modalContent, { backgroundColor: modalBackgroundColor }]}>
-          <Text style={modalStyles.modalText}>{resultText}</Text>
+        <Text style={[modalStyles.modalText, { color: resultTextColor, fontSize: 32  }]}>
+            {resultText}
+          </Text>
           <TouchableOpacity
             style={[modalStyles.modalButton, { backgroundColor: modalButtonBackgroundColor }]}
             onPress={onClose}
