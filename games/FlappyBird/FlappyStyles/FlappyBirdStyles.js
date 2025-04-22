@@ -1,43 +1,52 @@
-
-
 import { StyleSheet, Dimensions } from 'react-native';
 
+// Haetaan näytön korkeus, jotta overlay voi kattaa koko ruudun
 const { height } = Dimensions.get('window');
 
 
+//  FlappyBird-tyylit yhtenäisessä StyleSheetissä:
+//  - Pelinäkymän pohja (container, gameContainer)
+//  - Pisteiden esitys (scoreText)
+//  - Overlay-käyttöliittymä (overlay, gameOverText, button jne.)
+//  - FlappyBirdScreen-napin ja containerin tyylit (HomeButton, buttonContainer)
+//  - FlappyResult-näkymän komponenttien tyylit (resultContainer, title, scoreCard, ym.)
+
 const FlappyStyles = StyleSheet.create({
-  // Styles for FlappyBird.js
+  // Yleistasot pelikomponentille
   container: {
-    flex: 1,
+    flex: 1, // Täyttää koko näytön
   },
   gameContainer: {
-    flex: 1,
+    flex: 1, //Täyttää koko näytön
   },
+
+  // Piste teksti
   scoreText: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    fontSize: 60,
+    position: 'absolute',      // Asetetaan vapaasti päällekkäin
+    top: 50,                   // Ylälaitaan 50 px
+    left: 20,                  // Vasen marginaali 20 px
+    fontSize: 60,              // Suuri fonttikoko
     fontWeight: 'bold',
     color: 'white',
-    fontFamily: 'Silkscreen_400Regular',
+    fontFamily: 'Silkscreen_400Regular', // Pelityylinen fontti
     textShadowColor: 'black',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 10,
   },
+
+  // Yleinen overlay tila-näytöille (Game Over, aloita-näyttö)
   overlay: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: height,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    top: 0, left: 0, right: 0, bottom: 0,
+    height: height,           // Kattaa koko näytön
+    justifyContent: 'center', // Keskittää sisällön pystysuunnassa
+    alignItems: 'center',     // Keskittää vaakasuunnassa
+    backgroundColor: 'rgba(0,0,0,0.4)', // Läpinäkyvä musta tausta
     zIndex: 20,
     width: '100%',
   },
+
+  // Peli ohi -teksti overlayssä
   gameOverText: {
     fontSize: 30,
     color: 'white',
@@ -46,6 +55,8 @@ const FlappyStyles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Silkscreen_400Regular',
   },
+
+  // Nappien perusmuoto overlayssa
   button: {
     backgroundColor: 'rgb(159,228,70)',
     width: 150,
@@ -62,8 +73,7 @@ const FlappyStyles = StyleSheet.create({
     fontFamily: 'Silkscreen_400Regular',
   },
 
-
-  // Styles for FlappyBirdScreen.js
+  // FlappyBirdScreenin kotinappi
   HomeButton: {
     backgroundColor: 'rgb(136, 255, 0)',
     width: 90,
@@ -72,17 +82,15 @@ const FlappyStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 10,
-  }, 
-
+  },
   buttonContainer: {
-    alignItems: 'center',
     position: 'absolute',
-    bottom: 50,
-    left: 0,
-    right: 0,
+    bottom: 50,             // 50 px alareunasta
+    left: 0, right: 0,
+    alignItems: 'center',
   },
 
-  // Styles for FlappyBirdResult.js
+  // FlappyResult-näkymän container ja otsikko
   resultContainer: {
     flex: 1,
     paddingHorizontal: 24,
@@ -98,8 +106,10 @@ const FlappyStyles = StyleSheet.create({
     textShadowRadius: 3,
     fontFamily: 'Silkscreen_400Regular',
   },
+
+  // Pelaajan tuloskortin tyyli
   scoreCard: {
-    backgroundColor: '#ffffffaa',
+    backgroundColor: '#ffffffaa', 
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -117,6 +127,8 @@ const FlappyStyles = StyleSheet.create({
     color: '#000',
     fontFamily: 'Silkscreen_400Regular',
   },
+
+  // Top 10 -listan otsikko
   leaderTitle: {
     fontSize: 30,
     fontWeight: '800',
@@ -128,6 +140,8 @@ const FlappyStyles = StyleSheet.create({
     textShadowRadius: 3,
     fontFamily: 'Silkscreen_400Regular',
   },
+
+  // Vieritettävän listan tyyli
   scroll: {
     flex: 1,
     alignSelf: 'stretch',
@@ -155,6 +169,8 @@ const FlappyStyles = StyleSheet.create({
     color: '#fff',
     fontFamily: 'Silkscreen_400Regular',
   },
+
+  // Top 3 korostukset
   rowGold: {
     backgroundColor: '#ffeb3baa',
   },
@@ -164,14 +180,19 @@ const FlappyStyles = StyleSheet.create({
   rowBronze: {
     backgroundColor: '#ffd180aa',
   },
+
+  // Oma rivi korostetaan keltaisella reunalla
   rowSelf: {
     borderWidth: 2,
     borderColor: '#FFD700',
   },
+
+  // Napit rivissä Alapalkissa
   buttonBar: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     paddingVertical: 12,
   },
 });
+
 export default FlappyStyles;
