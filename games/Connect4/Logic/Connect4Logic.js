@@ -1,6 +1,7 @@
 const ROWS = 6;
 const COLS = 7;
 
+// Tarkistaa neljän peräkkäisen kiekon voittoyhdistelmän laudalta
 export const checkWinner = (board) => {
 
     // vaakasuora tarkistus
@@ -41,11 +42,13 @@ export const checkWinner = (board) => {
     }
     return null;
   };
-  
+  // Tarkistaa, onko laudalla enää yhtään tyhjää ruutua → tasapeli
   export const checkDraw = (board) => board.flat().every(cell => cell !== null);
 
+  // Heuristinen arvio laudan tilasta 
   export const evaluateBoard = (board, player) => {
     let score = 0;
+      // Keskisarakkeen kontrollointi: keskiruutu on arvokkaampi
     const centerArray = [];
     for (let row = 0; row < ROWS; row++) {
       centerArray.push(board[row][Math.floor(COLS / 2)]);
@@ -53,6 +56,7 @@ export const checkWinner = (board) => {
     const centerCount = centerArray.filter(cell => cell === player).length;
     score += centerCount * 3;
   
+      // Käy läpi kaikki 4-ruudun ikkunat vaakaan, pystyyn ja vinoihin
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS - 3; col++) {
         const window = board[row].slice(col, col + 4);
@@ -89,6 +93,7 @@ export const checkWinner = (board) => {
     }
     return score;
   };
+  // Tiputtaa kiekon sarakkeeseen, palauttaa uuden laudan ja sijoitusrivin
   export const dropDisc = (board, col, player) => {
     const newBoard = board.map(r => [...r]);
   
@@ -98,9 +103,12 @@ export const checkWinner = (board) => {
         return { newBoard, row };
       }
     }
+      // Sarake täynnä
     return null;
   };
   
+  
+// Arvioi yhden neljän ruudun mittaisen ikkunan tilan pistein
   export const evaluateWindow = (window, player) => {
     let score = 0;
     const opponent = player === 'Orange' ? 'Yellow' : 'Orange';
@@ -108,7 +116,7 @@ export const checkWinner = (board) => {
     const countOpponent = window.filter(cell => cell === opponent).length;
     const countEmpty = window.filter(cell => cell === null).length;
   
-    if (countPlayer === 4) {
+    if (countPlayer === 4) {   // nelosketju -> max
       score += 1000;
     } else if (countPlayer === 3 && countEmpty === 1) {
       score += 10;
@@ -116,11 +124,12 @@ export const checkWinner = (board) => {
       score += 5;
     }
     if (countOpponent === 3 && countEmpty === 1) {
-      score -= 80;
+      score -= 80; // estää vastustajan
     }
     return score;
   };
 
+// Palauttaa listan sarakkeista, joihin voi vielä tiputtaa kiekon
   export const getValidColumns = (board) => {
     let validCols = [];
     for (let col = 0; col < COLS; col++) {
@@ -131,6 +140,7 @@ export const checkWinner = (board) => {
     return validCols;
   };
 
+// Tiputtaa kiekon ilman rividataa, käytetään minimaxissa
   export const dropDiscInBoard = (board, col, player) => {
     let newBoard = board.map(row => row.slice());
     for (let row = ROWS - 1; row >= 0; row--) {
@@ -141,7 +151,7 @@ export const checkWinner = (board) => {
     }
     return newBoard;
   };
-
+// Minimax-algoritmi tekoälylle impossible vaikeustasossa
   export const minimax = (board, depth, maximizingPlayer, alpha, beta) => {
     const validColumns = getValidColumns(board);
     const winner = checkWinner(board);
@@ -152,14 +162,14 @@ export const checkWinner = (board) => {
       else return { score: evaluateBoard(board, 'Orange') };
     }
     if (maximizingPlayer) {
-      // Jos AI voi voittaa välittömästi, valitse se.
+      // Jos tekoäly voi voittaa välittömästi, valitaan se siirto
       for (let col of validColumns) {
         const newBoard = dropDiscInBoard(board, col, 'Orange');
         if (checkWinner(newBoard) === 'Orange') {
           return { score: 1000000, column: col };
         }
       }
-      // Tarkistetaan, jos pelaaja voi voittaa seuraavalla siirrolla, pyritään estämään se.
+      // Tarkistetaan, jos pelaaja voi voittaa seuraavalla siirrolla, pyritään estämään se
       for (let col of validColumns) {
         const newBoard = dropDiscInBoard(board, col, 'Yellow');
         if (checkWinner(newBoard) === 'Yellow') {
@@ -167,14 +177,14 @@ export const checkWinner = (board) => {
         }
       }
     } else {
-      // Minimointipuolella: Pelaaja yrittää voittaa.
+      // Minimointipuolella: Pelaaja yrittää voittaa
       for (let col of validColumns) {
         const newBoard = dropDiscInBoard(board, col, 'Yellow');
         if (checkWinner(newBoard) === 'Yellow') {
           return { score: -1000000, column: col };
         }
       }
-      // Jos AI voisi voittaa seuraavalla siirrolla, yritetään estää se minimoimalla tilannetta.
+      // Jos tekoäly voisi voittaa seuraavalla siirrolla, yritetään estää se minimoimalla tilannetta
       for (let col of validColumns) {
         const newBoard = dropDiscInBoard(board, col, 'Orange');
         if (checkWinner(newBoard) === 'Orange') {
