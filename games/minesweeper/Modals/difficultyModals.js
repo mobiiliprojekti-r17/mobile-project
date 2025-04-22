@@ -1,23 +1,34 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Modal } from "react-native";
-import  ModalStyles  from "../styles/ModalStyles";
+import ModalStyles from "../styles/ModalStyles";
 
+// Modal-ikkuna, jossa valitaan vaikeustaso uudelle pelille
 const DifficultySelectorModal = ({ visible, onSelect, onCancel }) => {
   return (
-    <Modal transparent animationType="fade" visible={visible}>
+    <Modal
+      transparent 
+      animationType="fade"  
+      visible={visible} 
+    >
       <View style={ModalStyles.modalOverlay}>
         <View style={ModalStyles.difficultyModalContent}>
+          {/* Ohjeteksti */}
           <Text style={ModalStyles.modalText}>Choose difficulty</Text>
-          {["EASY", "MEDIUM", "HARD"].map((level) => (
+          {/* Kolme nappia eri vaikeustasoille */}
+          {["EASY", "MEDIUM", "HARD"].map(level => (
             <TouchableOpacity
               key={level}
-              onPress={() => onSelect(level)}
+              onPress={() => onSelect(level)}  // Kutsutaan, kun taso valitaan
               style={ModalStyles.difficultyModalButton}
             >
               <Text style={ModalStyles.modalButtonText}>{level}</Text>
             </TouchableOpacity>
           ))}
-          <TouchableOpacity onPress={onCancel} style={ModalStyles.difficultyModalButton}>
+          {/* Peruuta-painike sulkee modalin ilman valintaa */}
+          <TouchableOpacity
+            onPress={onCancel}
+            style={ModalStyles.difficultyModalButton}
+          >
             <Text style={ModalStyles.modalButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>

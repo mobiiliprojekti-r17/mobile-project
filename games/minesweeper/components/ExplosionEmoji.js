@@ -2,18 +2,20 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text } from 'react-native';
 
 const ExplosionEmoji = ({ size = 32, onComplete }) => {
+  // Luo muuttujat animoitaville arvoille
   const scale = useRef(new Animated.Value(0.5)).current;
   const opacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
+    // Käynnistää samanaikaisesti animaatiot
     Animated.parallel([
       Animated.timing(scale, {
-        toValue: 1.8,
-        duration: 400,
+        toValue: 1.8, 
+        duration: 400,           // animaation kesto millisekunteina
         useNativeDriver: true,
       }),
       Animated.timing(opacity, {
-        toValue: 0,
+        toValue: 0, 
         duration: 400,
         useNativeDriver: true,
       }),
@@ -24,12 +26,12 @@ const ExplosionEmoji = ({ size = 32, onComplete }) => {
 
   return (
     <Animated.Text
-      style={[
-        styles.emoji,
+      style={[ // animaation tyylit
+        styles.emoji, 
         {
-          fontSize: size,
+          fontSize: size, 
           transform: [{ scale }],
-          opacity,
+          opacity, 
         },
       ]}
     >
@@ -40,8 +42,8 @@ const ExplosionEmoji = ({ size = 32, onComplete }) => {
 
 const styles = StyleSheet.create({
   emoji: {
-    position: 'absolute',
-    zIndex: 10,
+    position: 'absolute',      // päällekkäin muu sisältö
+    zIndex: 10,                // ettei jää muiden elementtien taakse
   },
 });
 
