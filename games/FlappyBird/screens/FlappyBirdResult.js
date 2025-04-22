@@ -164,7 +164,6 @@ const styles = {
   rowGold:   { backgroundColor: '#ffeb3baa' },
   rowSilver: { backgroundColor: '#e0e0e0aa' },
   rowBronze: { backgroundColor: '#ffd180aa' },
-  rowSelf:   { borderWidth: 2, borderColor: '#4caf50' },
 
   buttonBar: {
     flexDirection: 'row',
