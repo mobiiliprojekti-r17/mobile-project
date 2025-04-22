@@ -32,7 +32,7 @@ const Ball = ({ x, y, size, color }) => {
   );
 };
 
-// Memoize: rerenderöi vain jos X, Y, koko tai väri muuttuvat
+// Renderöidään vain jos X, Y, koko tai väri muuttuvat
 export default memo(
   Ball,
   (prev, next) =>

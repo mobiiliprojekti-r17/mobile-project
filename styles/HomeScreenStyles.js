@@ -1,6 +1,7 @@
 import { Dimensions, StyleSheet } from 'react-native';
- 
+// Haetaan laitteen koko näytön mitat
 const { width, height } = Dimensions.get("window");
+// Lasketaan nappien leveys dynaamisesti ruudun koon mukaan
 const buttonsPerRow = 3;
 const containerWidth = width * 0.80;
 const spacing = width * 0.05;
@@ -8,11 +9,13 @@ const totalSpacing = spacing * (buttonsPerRow - 1);
 const buttonWidth = (containerWidth - totalSpacing) / buttonsPerRow;
  
 export default StyleSheet.create({
+  //Kontainerin perusasettelu
   container: {
     flexGrow: 1,
     alignItems: "center",
     backgroundColor: "rgb(157, 226, 255)",
   },
+  //Logon tyyli
   logoImage: {
     width: width,
     height: height * 0.29,
@@ -24,7 +27,7 @@ inputRow: {
   alignItems: 'center',
   marginVertical: height * 0.015,
 },
-
+//Nimimerkkikentän tyyli
 input: {
   flex: 1,
   height: height * 0.045,
@@ -39,7 +42,7 @@ input: {
   marginBottom: 0,
   marginLeft: width * 0.05,   
 },
-
+//Clear-napin tyyli
 button: {
   height: height * 0.045,
   justifyContent: 'center',
@@ -53,7 +56,7 @@ button: {
   elevation: 3,
 },
 
-
+//Clear tekstin tyyli
 buttonText: {
   color: "white",
   fontSize: width * 0.075,
@@ -61,7 +64,7 @@ buttonText: {
   textAlign: "center",
   fontFamily: 'CuteFont_400Regular',
 },
-
+//Pelisektion kontainerin tyyli
   gameSection: {
     width: width * 0.9,
     backgroundColor: "rgb(252, 130, 240)",
@@ -71,6 +74,7 @@ buttonText: {
     marginBottom: height * 0.025,
     borderRadius: 10,
   },
+  //Otsikko
   sectionTitle: {
     fontSize: width * 0.10,
     fontWeight: "bold",
@@ -81,6 +85,7 @@ buttonText: {
     fontFamily: 'CuteFont_400Regular',
     color: "rgb(127, 0, 255)"
   },
+  // Gradientin koko näkymän koko
   fullScreen: {
     flex: 1,
     width: width,
@@ -89,6 +94,7 @@ buttonText: {
   scrollContainer: {
     flex: 1,
   },
+  // Yksinpelien nappirivien asettelu
   gameButtonsContainerSingleplayer: {
     width: containerWidth,
     flexDirection: 'row',
@@ -96,11 +102,13 @@ buttonText: {
     justifyContent: 'space-between',
     alignSelf: 'center',
   },
+  // Moninpelin nappirivin asettelu
   gameButtonsContainerMultiplayer: {
     flexDirection: 'row',
     justifyContent: 'center',  
     alignItems: 'center',
   },
+  //Kuva
   backgroundImage: {
     flex: 1,
     justifyContent: 'center',
@@ -108,6 +116,7 @@ buttonText: {
     width: width,
     height: height,
   },
+  // Yksinpelin nappien tyyli
   gameButtonSingleplayer: {
     width: buttonWidth,
     aspectRatio: 1,
@@ -119,6 +128,7 @@ buttonText: {
     overflow: 'hidden',
     marginBottom: height * 0.02,
   },
+  // Moninpelin nappien tyyli
   gameButtonMultiplayer: {
     width: buttonWidth,
     aspectRatio: 1,
@@ -131,7 +141,7 @@ buttonText: {
     marginBottom: height * 0.02,
     marginHorizontal: width * 0.06,
   },
- 
+  //Modaalin tausta
   modalOverlay: {
     position: "absolute",
     top: 0,
@@ -144,6 +154,7 @@ buttonText: {
     backgroundColor: "rgba(0, 0, 0, 0.4)",
     zIndex: 100,
   },
+  //Modaali-ikkunan sisältö
   modalContent: {
     backgroundColor: "rgb(204, 159, 254)",
     padding: width * 0.05,
@@ -158,6 +169,7 @@ buttonText: {
     borderWidth: 2,
     borderRadius: 10,
   },
+  //Modaali-tekstin tyyli
   modalText: {
     fontSize: width * 0.085,
     fontWeight: "bold",
@@ -166,12 +178,14 @@ buttonText: {
     color: "rgb(127, 0, 255)",
     fontFamily: 'CuteFont_400Regular',
   },
+  //Modaali-napin tyyli
   ModalButton: {
     backgroundColor: "rgb(127, 0, 255)",
     paddingHorizontal: width * 0.03,
     paddingVertical: height * 0.01,
     borderRadius: 8,
   },
+  //Napin tekstin tyyli
   ModalButtonText: {
     color: "white",
     fontSize: width * 0.06,
@@ -179,6 +193,7 @@ buttonText: {
     textAlign: 'center',
     fontFamily: 'CuteFont_400Regular',
   },
+  // Vaikeustasovalintamodaalin sisältö
   difficultyModalContent: {
     backgroundColor: "rgb(204, 159, 254)",
     padding: width * 0.05,
@@ -195,6 +210,7 @@ buttonText: {
     borderWidth: 5,
     borderRadius: 10,
   },
+  // Vaikeustason nappien tyyli
   difficultyModalButton: {
     backgroundColor: "rgb(127, 0, 255)",
     paddingVertical: height * 0.01,
