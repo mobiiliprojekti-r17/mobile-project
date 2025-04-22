@@ -62,7 +62,7 @@ const ShooterGameOver = ({ navigation, route }) => {
         iterationCount="infinite"
         direction="alternate"
         delay={500}
-        style={{ fontSize: 26, position: 'absolute', top: 120, right: 50 }}
+        style={{ fontSize: 26, position: 'absolute', top: 50, right: 50 }}
       >
         🌟
       </Animatable.Text>
@@ -93,17 +93,24 @@ const ShooterGameOver = ({ navigation, route }) => {
         </Animatable.Text>
       )}
 
-      <Animatable.View animation="zoomIn" delay={1000} style={[shooterGoStyles.gameOverButtonContainer, shooterGoStyles.glowEffect]}>
-        <TouchableOpacity onPress={() => navigation.replace('BubbleShooter')}>
+      <Animatable.View animation="zoomIn" delay={1000}>
+        <TouchableOpacity
+          onPress={() => navigation.replace('BubbleShooter')}
+          style={[shooterGoStyles.gameOverButtonContainer, shooterGoStyles.glowEffect]}
+        >
           <Text style={shooterGoStyles.gameOverButtonText}>▶ Play Again</Text>
         </TouchableOpacity>
       </Animatable.View>
 
-      <Animatable.View animation="zoomIn" delay={1200} style={[shooterGoStyles.gameOverButtonContainer, shooterGoStyles.glowEffect]}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+      <Animatable.View animation="zoomIn" delay={1200}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Home')}
+          style={[shooterGoStyles.gameOverButtonContainer, shooterGoStyles.glowEffect]}
+        >
           <Text style={shooterGoStyles.gameOverButtonText}>🏡 Back to Menu</Text>
         </TouchableOpacity>
       </Animatable.View>
+
 
       <Animatable.Text animation="fadeInUp" delay={1400} style={shooterGoStyles.topListTitle}>
         ✨ Top List ✨
