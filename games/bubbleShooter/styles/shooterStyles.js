@@ -97,6 +97,22 @@ const shooterStyles = StyleSheet.create({
       zIndex: 0,
       pointerEvents: 'none',  // estää kosketusten sieppauksen
     },
+    nextPreview: {
+      position: 'absolute',
+      bottom: 20,
+      left: 20,
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      borderWidth: 2,
+      borderColor: '#fff',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 3,
+      elevation: 4,
+    },
+    
 });
 
 

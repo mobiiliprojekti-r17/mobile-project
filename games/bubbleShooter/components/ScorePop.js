@@ -2,16 +2,17 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Text, StyleSheet } from 'react-native';
 
 const ScorePopUp = ({ score, x, y, onAnimationEnd }) => {
-  // Animaatioarvot: aloitusliike ja himmennys
+  // Animaatioarvot aloitusliike ja himmennys
   const translateY = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
+    //Käynnistetään kaksi animaatiota rinnakkain: translateY(nousee ylöspäin) ja opacity(häipyy)
     Animated.parallel([
       Animated.timing(translateY, {
         toValue: -30, 
         duration: 100000, 
-        useNativeDriver: true,
+        useNativeDriver: true, //Natiividriverin hyödyntäminen parhaan suorituskyvyn saamiseksi
       }),
       Animated.timing(opacity, {
         toValue: 0, 
@@ -19,6 +20,7 @@ const ScorePopUp = ({ score, x, y, onAnimationEnd }) => {
         useNativeDriver: true,
       }),
     ]).start(() => {
+       // Kun molemmat animaatiot ovat valmistuneet, kutsutaan callback
       if (onAnimationEnd) {
         onAnimationEnd();
       }
@@ -30,13 +32,14 @@ const ScorePopUp = ({ score, x, y, onAnimationEnd }) => {
       style={[
         styles.popUp,
         {
-          left: x, 
-          top: y, 
-          transform: [{ translateY }],
-          opacity,
+          left: x, //vaakasijainti
+          top: y, //pystysijainti
+          transform: [{ translateY }], //pystysiirto
+          opacity, //läpinäkyvyys
         },
       ]}
     >
+      {/* Näytettävä pisteluku tekstinä */}
       <Text style={styles.text}>+{score}</Text>
     </Animated.View>
   );
