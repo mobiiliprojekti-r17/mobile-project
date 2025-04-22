@@ -4,6 +4,7 @@ import styles from '../../styles/TictactoeSingleStyles';
 
 export default function ResultModal({ visible, message, onClose }) {
   return (
+        // näyttää Result-ikkunan pelin päätyttyä
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
