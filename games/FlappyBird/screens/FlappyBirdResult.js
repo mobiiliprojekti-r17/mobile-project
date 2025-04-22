@@ -6,9 +6,8 @@ import {
 import { db } from '../../../firebase/Config';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { useNickname } from '../../../context/context';
-import FlappyStyles from '../FlappyStyles/FlappyStyles';
+import FlappyStyles from '../FlappyStyles/FlappyBirdStyles';
 
-const base = FlappyStyles;
 
 export default function FlappyResult({ route, navigation }) {
   const { nickname } = useNickname();
@@ -53,31 +52,31 @@ export default function FlappyResult({ route, navigation }) {
   const medal = (idx) => (['🥇','🥈','🥉'][idx] ?? `${idx+1}.`);
 
   return (
-    <SafeAreaView style={[base.container, { paddingHorizontal: 24 }]}>
+    <SafeAreaView style={[FlappyStyles.container, { backgroundColor: '#71c5cf', paddingHorizontal: 24 }]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <Text style={styles.title}>Game Over!</Text>
+        <Text style={FlappyStyles.title}>Game Over!</Text>
 
-        <View style={styles.scoreCard}>
-          <Text style={styles.playerLine}>
-            <Text style={styles.label}>Player: </Text>{nickname}
+        <View style={FlappyStyles.scoreCard}>
+          <Text style={FlappyStyles.playerLine}>
+            <Text style={FlappyStyles.label}>Player: </Text>{nickname}
           </Text>
-          <Text style={styles.playerLine}>
-            <Text style={styles.label}>Score: </Text>{score}
+          <Text style={FlappyStyles.playerLine}>
+            <Text style={FlappyStyles.label}>Score: </Text>{score}
           </Text>
           {ownRank !== null && (
-            <Text style={styles.playerLine}>
-              <Text style={styles.label}>Ranking: </Text>#{ownRank}
+            <Text style={FlappyStyles.playerLine}>
+              <Text style={FlappyStyles.label}>Ranking: </Text>#{ownRank}
             </Text>
           )}
         </View>
 
-        <Text style={styles.leaderTitle}>Top 10</Text>
+        <Text style={FlappyStyles.leaderTitle}>Top 10</Text>
 
         <ScrollView
-          style={styles.scroll}
+          style={FlappyStyles.scroll}
           contentContainerStyle={{ paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}
         >
@@ -86,111 +85,39 @@ export default function FlappyResult({ route, navigation }) {
               <View
                 key={i}
                 style={[
-                  styles.row,
-                  i === 0 && styles.rowGold,
-                  i === 1 && styles.rowSilver,
-                  i === 2 && styles.rowBronze,
-                  r.Nickname === nickname && styles.rowSelf,
+                  FlappyStyles.row,
+                  i === 0 && FlappyStyles.rowGold,
+                  i === 1 && FlappyStyles.rowSilver,
+                  i === 2 && FlappyStyles.rowBronze,
+                  r.Nickname === nickname && FlappyStyles.rowSelf,
                 ]}
               >
-                <Text style={styles.rowText}>{medal(i)}</Text>
-                <Text style={[styles.rowText, { flex: 1 }]}>{r.Nickname}</Text>
-                <Text style={styles.rowText}>{r.score}</Text>
+                <Text style={FlappyStyles.rowText}>{medal(i)}</Text>
+                <Text style={[FlappyStyles.rowText, { flex: 1 }]}>{r.Nickname}</Text>
+                <Text style={FlappyStyles.rowText}>{r.score}</Text>
               </View>
             ))
           ) : (
-            <Text style={styles.noScores}>No scores yet!</Text>
+            <Text style={FlappyStyles.noScores}>No scores yet!</Text>
           )}
         </ScrollView>
 
-        <View style={styles.buttonBar}>
+        <View style={FlappyStyles.buttonBar}>
           <TouchableOpacity
-            style={base.button}
+            style={FlappyStyles.button}
             onPress={() => navigation.goBack()}
           >
-            <Text style={base.buttonText}>Back</Text>
+            <Text style={FlappyStyles.buttonText}>Back</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={base.button}
+            style={FlappyStyles.button}
             onPress={() => navigation.navigate('Home')}
           >
-            <Text style={base.buttonText}>Home</Text>
+            <Text style={FlappyStyles.buttonText}>Home</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
-const styles = {
-  title: {
-    fontSize: 40,
-    fontWeight: '900',
-    color: '#fff',
-    alignSelf: 'center',
-    marginVertical: 12,
-    textShadowColor: '#0008',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 3,
-    fontFamily: 'Silkscreen_400Regular',
-  },
-  scoreCard: {
-    backgroundColor: '#ffffffaa',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    alignSelf: 'stretch',
-  },
-  playerLine: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#333',
-    marginVertical: 2,
-    fontFamily: 'Silkscreen_400Regular',
-  },
-  label: { fontWeight: '800', color: '#000', fontFamily: 'Silkscreen_400Regular'},
-
-  leaderTitle: {
-    fontSize: 30,
-    fontWeight: '800',
-    color: '#fff',
-    marginBottom: 6,
-    alignSelf: 'center',
-    textShadowColor: '#0008',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 3,
-    fontFamily: 'Silkscreen_400Regular',
-  },
-  scroll: { flex: 1, alignSelf: 'stretch' },
-
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    backgroundColor: '#ffffffcc',
-    borderRadius: 8,
-    marginVertical: 3,
-  },
-  rowText: { fontSize: 25, fontWeight: '700', color: '#333', fontFamily: 'Silkscreen_400Regular', },
-
-  noScores: {
-    alignSelf: 'center',
-    marginTop: 20,
-    fontSize: 25,
-    fontWeight: '700',
-    color: '#fff',
-    fontFamily: 'Silkscreen_400Regular',
-  },
-
-  rowGold:   { backgroundColor: '#ffeb3baa' },
-  rowSilver: { backgroundColor: '#e0e0e0aa' },
-  rowBronze: { backgroundColor: '#ffd180aa' },
-
-  buttonBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    paddingVertical: 12,
-  },
-};
