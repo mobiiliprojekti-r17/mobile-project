@@ -110,7 +110,7 @@ export default function TictactoeSingleplayer({ navigation }) {
         onCancel={handleCancelLevel}
       />
 
-      {/* Näyttää, kenen vuoro on tai pelin päätyttyä lopputuloksen */}
+      {/* Näyttää, kenen vuoro on ja pelin päätyttyä lopputuloksen */}
       <Text style={styles.turnText}>
         {gameOver
           ? resultMessage
