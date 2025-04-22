@@ -1,3 +1,5 @@
+
+
 import { StyleSheet, Dimensions } from 'react-native';
 
 const { height } = Dimensions.get('window');
@@ -59,6 +61,27 @@ const FlappyStyles = StyleSheet.create({
     fontWeight: 'bold',
     fontFamily: 'Silkscreen_400Regular',
   },
+
+
+  // Styles for FlappyBirdScreen.js
+  HomeButton: {
+    backgroundColor: 'rgb(136, 255, 0)',
+    width: 90,
+    height: 35,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 10,
+  }, 
+
+  buttonContainer: {
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 50,
+    left: 0,
+    right: 0,
+  },
+
   // Styles for FlappyBirdResult.js
   resultContainer: {
     flex: 1,
