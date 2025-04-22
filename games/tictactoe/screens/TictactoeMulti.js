@@ -1,59 +1,53 @@
 import React, { useState } from 'react';
 import { View, Text, Vibration } from 'react-native';
-import checkWinner from '../Utils/MultiGame/checkWinner';     // Funktio tarkistamaan voittaja
-import Board from '../components/MultiGame/Board';            // Pelilaudan näyttävä komponentti
-import GameModal from '../Modals/MultiGame/ResultModal';      // Lopputulos‑ikkuna
-import GameControls from '../components/MultiGame/GameControls'; // Uudelleenkäynnistys‑ ja kotipainikkeet
-import styles from '../styles/TictactoeMultiStyles';            //tyylit
+import { useFonts, Audiowide_400Regular } from '@expo-google-fonts/audiowide';
+import checkWinner from '../Utils/MultiGame/checkWinner';      // Voiton tarkistus
+import Board from '../components/MultiGame/Board';             // Luo pelilaudan
+import GameModal from '../Modals/MultiGame/ResultModal';       // Lopputulos-modaali
+import GameControls from '../components/MultiGame/GameControls'; // uudelleenpelaus- ja kotinappi
+import styles from '../styles/TictactoeMultiStyles';    // Tyylit 
 
 export default function TictactoeMultiplayer({ navigation }) {
-  // Pelilauta: 9 kohtaa, null = tyhjä, 'X' tai 'O' = pelimerkki
+  // Pelilauta-tila: 9 kohtaa, null = tyhjä ruutu
   const [board, setBoard] = useState(Array(9).fill(null));
-
-  // KTeito kuka on seuraavana vuorossa, X:llä (true) ja O:lla (false)
+  // Kertoo, kumpi pelaa seuraavaksi (true = X, false = O)
   const [isXNext, setIsXNext] = useState(true);
-
-  // Tila, onko peli jo päättynyt (true) vai ei (false)
+  // Estää lisäsiirtoja pelin päätyttyä
   const [gameOver, setGameOver] = useState(false);
-
-  // lopputulos‑ikkuna
+  // Näyttää lopputulos‑modaalin
   const [modalVisible, setModalVisible] = useState(false);
-
-  // Tallentaa voittajan ('X', 'O' tai 'Tie')
+  // Tallentaa voittajan merkin x tai O, tasapelitilanteessa 'Tie'
   const [winner, setWinner] = useState(null);
 
-  // Kun pelaaja napauttaa peliruudun
+  // Käsittelee ruudun painalluksen
   const handlePress = (index) => {
-    if (board[index] || gameOver) return;   // Jos ruutu on täynnä tai peli päättynyt, ei tehdä mitään
+    if (board[index] || gameOver) return;  // Ei tee mitään, jos ruutu varattu tai peli ohi
 
     const newBoard = [...board];
-    newBoard[index] = isXNext ? 'X' : 'O';   // Asetetaan sopiva merkki eli se kenen vuoro on
+    newBoard[index] = isXNext ? 'X' : 'O'; // Asettaa X tai O riippuu kumman vuoro on
     setBoard(newBoard);
 
-    // Tarkistetaan, onko uusi lauta johdattanut voittoon
     const win = checkWinner(newBoard);
     if (win) {
-      Vibration.vibrate(500);   // Lyhyt värinä kun peli päättyy
-      setWinner(win);           // Merkitään voittaja
-      setGameOver(true);        // Estetään lisää siirtoja
-      setModalVisible(true);    // Näytetään lopputulos‑ikkuna
+      Vibration.vibrate(500);              // Värähdys, kun pelin päättymisen merkiksi
+      setWinner(win);                      // Merkitään voittaja
+      setGameOver(true);                   // Lopetetaan peli
+      setModalVisible(true);               // Näytetään lopputulos‑modaali
       return;
     }
 
-    // Jos laudalta ei löydy yhtään tyhjää ruutua, peli on tasan
-    if (!newBoard.includes(null)) {
+    if (!newBoard.includes(null)) {        // Jos laudalla ei enää tyhjiä ruutuja
       Vibration.vibrate(500);
-      setWinner('Tie');
+      setWinner('Tie');                    // Tasapeli
       setGameOver(true);
       setModalVisible(true);
       return;
     }
 
-    // Vaihdetaan vuoro seuraavalle pelaajalle
-    setIsXNext(!isXNext);
+    setIsXNext(!isXNext);                  // Vaihdetaan vuoroa
   };
 
-  // Aloita peli alusta: tyhjennä lauta ja piilota modaalit
+  // Nollaa pelin: tyhjentää laudan ja piilotaa modaalit
   const restart = () => {
     setBoard(Array(9).fill(null));
     setIsXNext(true);
@@ -61,29 +55,30 @@ export default function TictactoeMultiplayer({ navigation }) {
     setWinner(null);
     setModalVisible(false);
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tic-Tac-Toe</Text>
       <Text style={styles.title2}>Multiplayer</Text>
 
-      {/* Näyttää, kenen vuoro on tai pelin päätyttyä lopputuloksen */}
+     {/* Näyttää, kenen vuoro on ja pelin päätyttyä lopputuloksen */}
       <Text style={styles.turnText}>
         {gameOver
           ? (winner === 'Tie' ? "It's a tie!" : `${winner} wins!`)
           : `Whose turn: ${isXNext ? 'X' : 'O'}`}
       </Text>
 
-      {/* Pelilauta, jossa voi napauttaa ruutuja */}
+      {/* Pelilauta-komponentti */}
       <Board board={board} onSquarePress={handlePress} disabled={gameOver} />
 
-      {/* Lopputulos‑ikkuna */}
+      {/* Lopputulos‑modal */}
       <GameModal
         visible={modalVisible}
         message={winner === 'Tie' ? "It's a tie!" : `${winner} wins!`}
-        onClose={() => setModalVisible(false)}  // Piilota ikkuna kun suljetaan
+        onClose={() => setModalVisible(false)}  // Piilottaa modaalin
       />
 
-      {/* Painikkeet: uudelleenkäynnistys ja kotinäkymään palaaminen */}
+      {/* Ohjauspainikkeet: pelaa uudelleen tai palaaminen kotinäyttöön */}
       <GameControls
         onRestart={restart}
         onHome={() => navigation.navigate('Home')}
