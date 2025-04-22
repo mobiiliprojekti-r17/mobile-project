@@ -30,18 +30,7 @@ const FlappyStyles = StyleSheet.create({
     fontWeight: 'bold',
     fontFamily: 'Silkscreen_400Regular',
   },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'black',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-    width: '100%',
-  },
+
   overlayText: {
     color: 'white',
     fontSize: 28,

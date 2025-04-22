@@ -15,4 +15,4 @@ export default function ResultModal({ visible, message, onClose }) {
       </View>
     </Modal>
   );
-}
+} 
