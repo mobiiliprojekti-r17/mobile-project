@@ -35,10 +35,10 @@ import { Audiowide_400Regular } from '@expo-google-fonts/audiowide';
 
 
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator(); // Stack-navigaattori koko sovellukselle
 
 const App = () => {
-
+   // Fonttien lataus, ennen kuin näkymät piirretään
   const [fontsLoaded] = useFonts({
     ChangaOne_400Regular,
     CuteFont_400Regular,
@@ -51,15 +51,17 @@ const App = () => {
     Bungee_400Regular,
     Audiowide_400Regular,
   });
-
+   // Odotetaan fonttien latausta ennen renderöintiä
   if (!fontsLoaded) {
     return null; 
   }
 
   return (
+    //NicknameContexti koko sovelluksen käyttöön
     <NicknameProvider> 
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, gestureEnabled: false }}>
+          {/* Kaikki eri näkymät ja pelit Stackissa nimettyinä ruutuina */}
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="BubbleShooter" component={BubbleShooterScreen} />
           <Stack.Screen name="ShooterGameOver" component={ShooterGameOver} />
