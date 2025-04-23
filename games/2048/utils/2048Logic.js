@@ -1,30 +1,33 @@
+// Uuden 4x4 ruudukon luonti ja kahden aloituslaatan lisäys
 export const initializeGrid = () => {
   let grid = Array(4)
     .fill()
-    .map(() => Array(4).fill(0));
+    .map(() => Array(4).fill(0)); // 4x4 ruudukko, kaikki nollia
 
   addSpecificTile(grid, 2);
-  addSpecificTile(grid, 2);
+  addSpecificTile(grid, 2); // Lisää kaksi 2-laattaa satunnaisiin kohtiin
 
   return grid;
 };
 
+// Laattojen yhdistyessä lisää satunnaisesti joko 2- tai 4-laatan tyhjään ruutuun
 const addSingleTile = (grid) => {
   let emptyTiles = [];
   grid.forEach((row, i) => {
     row.forEach((cell, j) => {
-      if (cell === 0) emptyTiles.push({ i, j });
+      if (cell === 0) emptyTiles.push({ i, j }); // Etsi tyhjät ruudut
     });
   });
 
   if (emptyTiles.length > 0) {
     let { i, j } = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
-    grid[i][j] = Math.random() > 0.1 ? 2 : 4;
+    grid[i][j] = Math.random() > 0.1 ? 2 : 4; // 90 % todennäköisyys 2-laatalla
     return { i, j };
   }
   return null;
 };
 
+// Lisää tietty arvo satunnaiseen tyhjään ruutuun
 const addSpecificTile = (grid, value) => {
   let emptyTiles = [];
   grid.forEach((row, i) => {
@@ -39,8 +42,9 @@ const addSpecificTile = (grid, value) => {
   }
 };
 
+// Siirtää ja yhdistää yhden rivin numerot (vasemmalle)
 const slide = (row) => {
-  let newRow = row.filter((num) => num !== 0);
+  let newRow = row.filter((num) => num !== 0); // Poistaa nollat
   let result = [];
   let skipNext = false;
   let pointsEarned = 0;
@@ -56,7 +60,7 @@ const slide = (row) => {
       let mergedValue = newRow[i] * 2;
       result.push(mergedValue);
       pointsEarned += mergedValue;
-      mergedIndexes.push(result.length - 1);
+      mergedIndexes.push(result.length - 1); // Tallennetaan yhdistetyn indeksin paikka
       skipNext = true;
     } else {
       result.push(newRow[i]);
@@ -64,15 +68,16 @@ const slide = (row) => {
   }
 
   while (result.length < 4) {
-    result.push(0);
+    result.push(0); // Täydennetään tyhjät paikat nollilla
   }
 
   return { newRow: result, pointsEarned, mergedIndexes };
 };
 
+// Hoitaa laatojen liikuttamisen ja yhdistämisen valittuun suuntaan
 export const moveTiles = (grid, direction) => {
-  let newGrid = grid.map((row) => [...row]);
-  let originalGrid = JSON.stringify(grid);
+  let newGrid = grid.map((row) => [...row]); // Kopioi ruudukko
+  let originalGrid = JSON.stringify(grid); // Tarkistaa myöhemmin onko ruudukko muuttunut
   let totalPoints = 0;
   let mergedTiles = [];
 
@@ -117,6 +122,7 @@ export const moveTiles = (grid, direction) => {
     }
   }
 
+  // Jos ruudukko muuttui, lisätään uusi laatta
   if (JSON.stringify(newGrid) !== originalGrid) {
     const newTile = addSingleTile(newGrid);
     return { newGrid, totalPoints, newTile, mergedTiles };
@@ -125,10 +131,11 @@ export const moveTiles = (grid, direction) => {
   return { newGrid, totalPoints, newTile: null, mergedTiles: [] };
 };
 
+// Tarkistaa onko peli ohi (ei tyhjiä eikä mahdollisia yhdistämisiä)
 export const checkGameOver = (grid) => {
   for (let i = 0; i < 4; i++) {
     for (let j = 0; j < 4; j++) {
-      if (grid[i][j] === 0) return false;
+      if (grid[i][j] === 0) return false; // Tyhjä ruutu = peli ei ole ohi
       if (j < 3 && grid[i][j] === grid[i][j + 1]) return false;
       if (i < 3 && grid[i][j] === grid[i + 1][j]) return false;
     }
