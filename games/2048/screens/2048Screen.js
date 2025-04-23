@@ -1,3 +1,4 @@
+// Tuodaan tarvittavat kirjastot ja komponentit
 import React, { useState, useEffect, useRef } from "react"; 
 import { View, Text, Alert, Button, Animated } from "react-native";
 import { useNickname } from "../../../context/context";
@@ -14,30 +15,36 @@ import { ChangaOne_400Regular } from '@expo-google-fonts/changa-one';
 const Game2048Screen = ({ route }) => {
   const navigation = useNavigation();
   const { nickname, setNickname } = useNickname();
-  const [grid, setGrid] = useState(initializeGrid());
-  const [score, setScore] = useState(0);
-  const [time, setTime] = useState(0);
-  const [isGameActive, setIsGameActive] = useState(true);
-  const [gameOverHandled, setGameOverHandled] = useState(false);
-  const [swipeCooldown, setSwipeCooldown] = useState(false);
-  const [previousGrid, setPreviousGrid] = useState(null);
-  const [previousScore, setPreviousScore] = useState(0);
-  const [newTile, setNewTile] = useState(null);
-  const [mergedTiles, setMergedTiles] = useState([]);
 
+  // Tilamuuttujat pelin tilan ja animoitujen efektien hallintaan
+  const [grid, setGrid] = useState(initializeGrid()); // pelilauta
+  const [score, setScore] = useState(0); // pistemäärä
+  const [time, setTime] = useState(0); // ajastin
+  const [isGameActive, setIsGameActive] = useState(true); // onko peli käynnissä
+  const [gameOverHandled, setGameOverHandled] = useState(false); // game over tarkistus
+  const [swipeCooldown, setSwipeCooldown] = useState(false); // rajoittaa pyyhkäisyjä
+  const [previousGrid, setPreviousGrid] = useState(null); // edellinen pelitila undo-napista
+  const [previousScore, setPreviousScore] = useState(0); // edelliset pisteet
+  const [newTile, setNewTile] = useState(null); // uusi laatta animaatioihin
+  const [mergedTiles, setMergedTiles] = useState([]); // yhdistetyt laatat animaatioihin
+
+  // Animaatioiden tilat
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const mergeAnim = useRef(new Animated.Value(1)).current;
 
+  // Fontin lataus
   let [fontsLoaded] = useFonts({
     ChangaOne_400Regular,
   });
 
+  // Asetetaan käyttäjänimi navigoinnin kautta, jos tulee parametreissa
   useEffect(() => {
     if (route.params?.nickname) {
       setNickname(route.params.nickname);
     }
   }, [route.params?.nickname]);
 
+  // Käynnistetään ajastin pelin alkaessa
   useEffect(() => {
     let timer;
     if (isGameActive) {
@@ -50,6 +57,7 @@ const Game2048Screen = ({ route }) => {
     return () => clearInterval(timer);
   }, [isGameActive]);
 
+  // Tallennetaan tulokset Firebaseen kun peli päättyy
   useEffect(() => {
     if (isGameActive || gameOverHandled) return;
 
@@ -79,6 +87,7 @@ const Game2048Screen = ({ route }) => {
     handleGameOver();
   }, [isGameActive]);
 
+// Uuden laatan animaatio
   useEffect(() => {
     if (newTile) {
       scaleAnim.setValue(0.9);
@@ -90,6 +99,7 @@ const Game2048Screen = ({ route }) => {
     }
   }, [newTile]);
 
+  // Laattojen yhdistymisen animaatio
   useEffect(() => {
     if (mergedTiles.length > 0) {
       mergeAnim.setValue(0.9);
@@ -101,12 +111,14 @@ const Game2048Screen = ({ route }) => {
     }
   }, [mergedTiles]);
 
+  // Ajan muotoilu mm:ss -muotoon
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // Näytön pyyhkäisyjen käsittely ja ruudukon päivitys
   const handleSwipe = (event) => {
     if (swipeCooldown || !isGameActive || gameOverHandled) return;
     setSwipeCooldown(true);
@@ -134,9 +146,11 @@ const Game2048Screen = ({ route }) => {
       setIsGameActive(false);
     }
 
+    // Estetään liian nopeat pyyhkäisyt
     setTimeout(() => setSwipeCooldown(false), 150);
   };
 
+  // Undo-toiminto
   const handleUndo = () => {
     if (previousGrid) {
       setGrid(previousGrid);
@@ -146,6 +160,7 @@ const Game2048Screen = ({ route }) => {
     }
   };
 
+  // Pelin resetointi
   const resetGame = () => {
     setGrid(initializeGrid());
     setScore(0);
@@ -154,15 +169,18 @@ const Game2048Screen = ({ route }) => {
     setGameOverHandled(false);
   };
 
+  // Jos fontti ei ole ladannut
   if (!fontsLoaded) {
     return <Text>Loading...</Text>;
   }
 
+  // Varsinainen pelinäkymä
   return (
     <PanGestureHandler onGestureEvent={handleSwipe}>
       <View style={styles.container}>
         <Text style={[styles.ChangaOneText, { fontFamily: 'ChangaOne_400Regular' }]}>2048</Text>
 
+        {/* Yläpalkki – koti ja undo */}
         <View style={styles.topButtonsContainer}>
           <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate("Home")}>
             <Icon name="home" size={24} color="#fff" />
@@ -172,12 +190,14 @@ const Game2048Screen = ({ route }) => {
             <Icon name="corner-up-left" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
-
+        
+        {/* Pistelaskuri ja ajastin */}
         <View style={styles.topBar}>
           <Text style={styles.scoreText}>Score: {score}</Text>
           <Text style={styles.timerText}>Time: {formatTime(time)}</Text>
         </View>
 
+        {/* Pelilauta */}
         <View style={styles.gridContainer}>
           {grid.map((row, rowIndex) => (
             <View key={rowIndex} style={styles.row}>
