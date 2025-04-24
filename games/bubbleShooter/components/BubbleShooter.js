@@ -53,7 +53,7 @@ const BubbleShooter = ({ navigation }) => {
   const ceilingRef = useRef(null); //Tallentaa katon
 
   //Pallon sijainnin sekä staattisten pallojen tila
-  const [ballPosition, setBallPosition] = useState({ x: width / 2, y: SHOOTER_BALL_Y }); //Pallon on-screen sijainti sekä staattisten pallojen lista
+  const [ballPosition, setBallPosition] = useState({ x: width / 2, y: SHOOTER_BALL_Y }); //Pallon sijainti näytöllä sekä staattisten pallojen lista
   const [staticBalls, setStaticBalls] = useState([]);
   const [ballsInitialized, setBallsInitialized] = useState(false); //Onko pallot valmiiksi luotu?
   const [isBallAtCenter, setIsBallAtCenter] = useState(true); //Onko pallo lähtöasennossa?
@@ -156,7 +156,7 @@ const BubbleShooter = ({ navigation }) => {
     setCanShoot(true); //Sallitaan uusi laukaus
   };
 
-  //Lisätään ruudukkoon rivejä 
+  //Lisätään ruudukkoon uusia pallorivejä 
   const addRows = (numRows = 1) => {
     setStaticBalls(prevBalls => {
       return addRowsToGrid({
@@ -174,7 +174,7 @@ const BubbleShooter = ({ navigation }) => {
     // Jos peli päättynyt tai laukaisu ei ole sallittu, keskeytetään
     if (
       gameOver ||
-      !canShoot || // << uusi ehto
+      !canShoot ||
       !shooterBall.current ||
       !shooterBall.current.isStatic
     ) {
@@ -270,7 +270,7 @@ const BubbleShooter = ({ navigation }) => {
                 setPoppedBalls(prev => [...prev, { id: ball.id, x: ball.position.x, y: ball.position.y, color: ball.color }]);
                 Matter.World.remove(world, ball);
               });
-              //äivitetään staattisten pallojen lista ja pistemäärä
+              //päivitetään staattisten pallojen lista ja pistemäärä
               setStaticBalls(prev => prev.filter(ball => !cluster.includes(ball)));
               setScore(prev => {
                 const newScore = prev + totalPoints;

@@ -25,7 +25,7 @@ export default function ShooterArrow({
     //Aloituskohta
     let x = shooterPosition.x;
     let y = shooterPosition.y + ballRadius;
-    //Suuntaverktori kosketuksen j aaloituspisteen välillä
+    //Suuntaverktori kosketuksen ja aloituspisteen välillä
     const dx = touchCurrent.x - x;
     const dy = touchCurrent.y - y;
     const length = Math.hypot(dx, dy);
@@ -59,7 +59,7 @@ export default function ShooterArrow({
 
       // Pomppu seinästä
       if ((nextX <= ballRadius || nextX >= width - ballRadius) && bounces < MAX_BOUNCES) {
-        // Lasketaan tarkka pomppukohta seinällä
+        // Lasketaan mahdollisimman tarkka pomppukohta seinällä
         const wallX = nextX <= ballRadius ? ballRadius : width - ballRadius;
         const t = (wallX - x) / vx;
         const wallY = y + vy * t;

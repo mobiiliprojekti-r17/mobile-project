@@ -206,7 +206,7 @@ export const getGridRow = (y) => {
 //Lisätään uusia rivejä ruudukon yläosaan ja poistetaan varmistuksena vielä leijujvat pallot
 export const addRowsToGrid = ({
   staticBalls,
-  numRows = 1,
+  numRows = 1, //montako riviä lisätään
   world,
   numCols,
   width,

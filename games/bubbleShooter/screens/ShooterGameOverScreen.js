@@ -7,13 +7,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import shooterGoStyles from '../styles/shooterGoStyles';
 
 const ShooterGameOver = ({ navigation, route }) => {
-  const { finalScore = 0, nickname = "Player" } = route.params || {};
+  const { finalScore = 0, nickname = "Player" } = route.params || {}; // Haetaan pelaajan pistemäärä ja nimimerkki 
   const [results, setResults] = useState([]);
   const [ranking, setRanking] = useState(null);
-
+  //Komponentin renderöityessä haetaan tulokset tietokannasta
   useEffect(() => {
     const fetchResults = async () => {
       try {
+         // Haetaan tulokset "ShooterResults"-collectionista järjestettynä laskevasti
         const resultsQuery = query(
           collection(db, "ShooterResults"),
           orderBy("score", "desc")
@@ -22,7 +23,7 @@ const ShooterGameOver = ({ navigation, route }) => {
         const querySnapshot = await getDocs(resultsQuery);
         const resultsList = querySnapshot.docs.map((doc) => doc.data());
         setResults(resultsList);
-
+         // Etsitään pelaajan sijoitus tuloslistassa
         const index = resultsList.findIndex(
           (res) => res.Nickname === nickname && res.score === finalScore
         );
@@ -34,9 +35,9 @@ const ShooterGameOver = ({ navigation, route }) => {
       }
     };
 
-    fetchResults();
+    fetchResults(); //Haetaan tiedot
   }, []);
-
+   // Funktio yksittäisen tulosrivin renderöintiin
   const renderTopListItem = (result, index) => (
     <Animatable.View animation="fadeInUp" delay={index * 100} key={index} style={shooterGoStyles.topListItem}>
       <Text style={shooterGoStyles.topListName}>
@@ -45,10 +46,10 @@ const ShooterGameOver = ({ navigation, route }) => {
       <Text style={shooterGoStyles.topListScore}>Score: {result.score}</Text>
     </Animatable.View>
   );
-
+  // Varsinainen renderöinti
   return (
     <LinearGradient colors={['rgb(255, 158, 226)', '#fac3e9']} style={shooterGoStyles.gameOverContainer}>
-      {/* Sparkle Emojis */}
+      {/* Sparkle Emojit */}
       <Animatable.Text
         animation="pulse"
         iterationCount="infinite"

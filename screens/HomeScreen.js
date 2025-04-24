@@ -8,18 +8,18 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 
 const HomeScreen = ({ navigation }) => {
-  const { nickname, setNickname } = useNickname();
+  const { nickname, setNickname } = useNickname(); // Haetaan ja asetetaan nimimerkki kontekstista
   const [restartModalVisible, setRestartModalVisible] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
+  const [modalMessage, setModalMessage] = useState(''); // Modaaliin viesti
   const [modalType, setModalType] = useState('');
-  const [selectedGame, setSelectedGame] = useState('');
+  const [selectedGame, setSelectedGame] = useState('');// Valittu peli ennen vaikeustason valintaa
 
   const [fontsLoaded] = useFonts({
     PressStart2P_400Regular,
   });
 
   if (!fontsLoaded) return null;
-
+  // Funktio nimimerkin lisäämiseen tietokantaan
   const addNickname = async () => {
     if (!nickname.trim()) {
       showModal('Error', 'Nickname cannot be empty!', 'error');
@@ -27,13 +27,13 @@ const HomeScreen = ({ navigation }) => {
     }
 
   };
-
+  // Näyttää modaali-ikkunan
   const showModal = (title, message, type) => {
     setModalMessage(message);
     setModalType(type);
     setRestartModalVisible(true);
   };
-
+  // Siirtyy pelinäkymään->joissain peleissä myös vaikeustaso mukana.
   const startGame = (game, difficulty) => {
     if (game === 'Sudoku') {
       navigation.navigate('Sudoku', { nickname, difficulty });
@@ -43,7 +43,7 @@ const HomeScreen = ({ navigation }) => {
       navigation.navigate(game, { nickname });
     }
   };
-
+  // Tarkistaa nimimerkin ja avaa vaikeustason valinnan / siirtyy peliin
   const checkNicknameAndProceed = (game) => {
     if (!nickname.trim()) {
       showModal('Warning', 'Please enter your nickname first!', 'error');
@@ -58,7 +58,7 @@ const HomeScreen = ({ navigation }) => {
       }
     }
   };
-
+  // Funktiot pelien käynnistämiseen
   const newSudokuGame = () => checkNicknameAndProceed('Sudoku');
   const new2048Game = () => checkNicknameAndProceed('2048');
   const startBubbleShooter = () => checkNicknameAndProceed('BubbleShooter');
@@ -66,7 +66,7 @@ const HomeScreen = ({ navigation }) => {
   const startMinesweeper = () => checkNicknameAndProceed('Minesweeper');
   const startFlappyBird = () => checkNicknameAndProceed('FlappyBird');
   const startColorSort = () => checkNicknameAndProceed('ColorGame');
-
+  //käsitellään vaikeustason valinta ja käynnistetään peli
   const handleDifficultyChange = (level) => {
     startGame(selectedGame, level);
     setRestartModalVisible(false);

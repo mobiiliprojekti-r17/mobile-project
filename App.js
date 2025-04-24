@@ -32,11 +32,11 @@ import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { Satisfy_400Regular } from '@expo-google-fonts/satisfy';
 
 
-
+//Luodaan stack-navigator
 const Stack = createStackNavigator();
 
 const App = () => {
-
+  //fonttien lataus
   const [fontsLoaded] = useFonts({
     ChangaOne_400Regular,
     CuteFont_400Regular,
@@ -47,12 +47,13 @@ const App = () => {
     Pacifico_400Regular,
     Satisfy_400Regular,
   });
-
+  //Ei renderöidä mitään ennen fonttien lataamista
   if (!fontsLoaded) {
     return null; 
   }
 
   return (
+    //Nicname konteksti koko sovellukselle,stack navigointi ja näkymien määrittely
     <NicknameProvider> 
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, gestureEnabled: false }}>
