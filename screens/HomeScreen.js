@@ -7,10 +7,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 //Sovelluksen aloitusnäkymä
 const HomeScreen = ({ navigation }) => {
-  const { nickname, setNickname } = useNickname(); // Haetaan ja asetetaan nimimerkki contextista
-  // Modaalin ja sen sisällön tilat
+  const { nickname, setNickname } = useNickname(); // Haetaan ja asetetaan nimimerkki kontekstista
   const [restartModalVisible, setRestartModalVisible] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
+  const [modalMessage, setModalMessage] = useState(''); // Modaaliin viesti
   const [modalType, setModalType] = useState('');
   const [selectedGame, setSelectedGame] = useState('');
  //Fontti
@@ -19,8 +18,15 @@ const HomeScreen = ({ navigation }) => {
   });
 
   if (!fontsLoaded) return null;
+  // Funktio nimimerkin lisäämiseen tietokantaan
+  const addNickname = async () => {
+    if (!nickname.trim()) {
+      showModal('Error', 'Nickname cannot be empty!', 'error');
+      return;
+    }
 
-
+  };
+  // Näyttää modaali-ikkunan
   const showModal = (title, message, type) => {
     setModalMessage(message);
     setModalType(type);
@@ -59,8 +65,7 @@ const HomeScreen = ({ navigation }) => {
   const startMinesweeper = () => checkNicknameAndProceed('Minesweeper');
   const startFlappyBird = () => checkNicknameAndProceed('FlappyBird');
   const startColorSort = () => checkNicknameAndProceed('ColorGame');
-
-  //Vaikeustason valinta modaalista
+  //käsitellään vaikeustason valinta ja käynnistetään peli
   const handleDifficultyChange = (level) => {
     startGame(selectedGame, level);
     setRestartModalVisible(false);

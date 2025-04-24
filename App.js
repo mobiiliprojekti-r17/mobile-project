@@ -57,7 +57,7 @@ const App = () => {
   }
 
   return (
-    //NicknameContexti koko sovelluksen käyttöön
+    //Nicname konteksti koko sovellukselle,stack navigointi ja näkymien määrittely
     <NicknameProvider> 
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, gestureEnabled: false }}>
