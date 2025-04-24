@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobile-project",
-    "slug": "mobile-project",
+    "name": "Minigames by Gamebits",
+    "slug": "minigames-by-gamebits",
     "owner": "mobiiliprojekti_r17",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,8 +9,8 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/icon.png",
-      "resizeMode": "contain",
+      "image": "./assets/icon-large.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "ios": {

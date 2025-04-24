@@ -9,7 +9,10 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/audiowide": "^0.3.0",
+    "@expo-google-fonts/bungee": "^0.3.0",
     "@expo-google-fonts/changa-one": "^0.3.0",
+    "@expo-google-fonts/concert-one": "^0.3.0",
     "@expo-google-fonts/cute-font": "^0.3.0",
     "@expo-google-fonts/fredoka-one": "^0.2.3",
     "@expo-google-fonts/kavoon": "^0.3.0",

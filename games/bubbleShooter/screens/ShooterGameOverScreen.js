@@ -5,16 +5,16 @@ import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient';
 import shooterGoStyles from '../styles/shooterGoStyles';
-
+//Pelin lopetusnäkymän pääkomponentti
 const ShooterGameOver = ({ navigation, route }) => {
-  const { finalScore = 0, nickname = "Player" } = route.params || {}; // Haetaan pelaajan pistemäärä ja nimimerkki 
-  const [results, setResults] = useState([]);
-  const [ranking, setRanking] = useState(null);
-  //Komponentin renderöityessä haetaan tulokset tietokannasta
+  const { finalScore = 0, nickname = "Player" } = route.params || {}; //Saadaan pisteet ja nimimerkki
+  const [results, setResults] = useState([]); //Tuloslista
+  const [ranking, setRanking] = useState(null); //Nykyisen pelaajan sijoitus
+  //Haetaan tulokset Firestoresta
   useEffect(() => {
     const fetchResults = async () => {
       try {
-         // Haetaan tulokset "ShooterResults"-collectionista järjestettynä laskevasti
+        //Haetaan tulokset suurimmasta pienimpään
         const resultsQuery = query(
           collection(db, "ShooterResults"),
           orderBy("score", "desc")
@@ -27,6 +27,7 @@ const ShooterGameOver = ({ navigation, route }) => {
         const index = resultsList.findIndex(
           (res) => res.Nickname === nickname && res.score === finalScore
         );
+        //Haetaan pelaajan sijoitus listasta
         if (index !== -1) {
           setRanking(index + 1);
         }
@@ -63,7 +64,7 @@ const ShooterGameOver = ({ navigation, route }) => {
         iterationCount="infinite"
         direction="alternate"
         delay={500}
-        style={{ fontSize: 26, position: 'absolute', top: 120, right: 50 }}
+        style={{ fontSize: 26, position: 'absolute', top: 50, right: 50 }}
       >
         🌟
       </Animatable.Text>
@@ -87,25 +88,32 @@ const ShooterGameOver = ({ navigation, route }) => {
       <Animatable.Text animation="fadeIn" delay={700} style={shooterGoStyles.gameOverScore}>
         🎯 Score: {finalScore}
       </Animatable.Text>
-
+      {/* Pelaajan sijoitus top-listalla (jos löydetty) */}
       {ranking !== null && (
         <Animatable.Text animation="fadeIn" delay={900} style={shooterGoStyles.gameOverRank}>
           🏅 Ranking: {ranking}
         </Animatable.Text>
       )}
 
-      <Animatable.View animation="zoomIn" delay={1000} style={[shooterGoStyles.gameOverButtonContainer, shooterGoStyles.glowEffect]}>
-        <TouchableOpacity onPress={() => navigation.replace('BubbleShooter')}>
+      <Animatable.View animation="zoomIn" delay={1000}>
+        <TouchableOpacity
+          onPress={() => navigation.replace('BubbleShooter')}
+          style={[shooterGoStyles.gameOverButtonContainer, shooterGoStyles.glowEffect]}
+        >
           <Text style={shooterGoStyles.gameOverButtonText}>▶ Play Again</Text>
         </TouchableOpacity>
       </Animatable.View>
 
-      <Animatable.View animation="zoomIn" delay={1200} style={[shooterGoStyles.gameOverButtonContainer, shooterGoStyles.glowEffect]}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+      <Animatable.View animation="zoomIn" delay={1200}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Home')}
+          style={[shooterGoStyles.gameOverButtonContainer, shooterGoStyles.glowEffect]}
+        >
           <Text style={shooterGoStyles.gameOverButtonText}>🏡 Back to Menu</Text>
         </TouchableOpacity>
       </Animatable.View>
 
+      {/* Top-lista tuloksista */}
       <Animatable.Text animation="fadeInUp" delay={1400} style={shooterGoStyles.topListTitle}>
         ✨ Top List ✨
       </Animatable.Text>

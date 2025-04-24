@@ -10,7 +10,7 @@ const shooterGoStyles = StyleSheet.create({
   },
 
   gameOverTitle: {
-    fontSize: 45,
+    fontSize: 40,
     color: '#FF70C0',
     marginBottom: 35,
     fontWeight: 'bold',

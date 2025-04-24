@@ -28,15 +28,17 @@ import { PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
 import { FredokaOne_400Regular } from '@expo-google-fonts/fredoka-one';
 import { VT323_400Regular } from '@expo-google-fonts/vt323';
 import { Kavoon_400Regular } from '@expo-google-fonts/kavoon';
-import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
-import { Satisfy_400Regular } from '@expo-google-fonts/satisfy';
+import { ConcertOne_400Regular } from '@expo-google-fonts/concert-one';
+import { Silkscreen_400Regular } from '@expo-google-fonts/silkscreen';
+import { Bungee_400Regular } from '@expo-google-fonts/bungee';
+import { Audiowide_400Regular } from '@expo-google-fonts/audiowide';
 
 
-//Luodaan stack-navigator
-const Stack = createStackNavigator();
+
+const Stack = createStackNavigator(); // Stack-navigaattori koko sovellukselle
 
 const App = () => {
-  //fonttien lataus
+   // Fonttien lataus, ennen kuin näkymät piirretään
   const [fontsLoaded] = useFonts({
     ChangaOne_400Regular,
     CuteFont_400Regular,
@@ -44,10 +46,12 @@ const App = () => {
     FredokaOne_400Regular,
     VT323_400Regular,
     Kavoon_400Regular,
-    Pacifico_400Regular,
-    Satisfy_400Regular,
+    ConcertOne_400Regular,
+    Silkscreen_400Regular,
+    Bungee_400Regular,
+    Audiowide_400Regular,
   });
-  //Ei renderöidä mitään ennen fonttien lataamista
+   // Odotetaan fonttien latausta ennen renderöintiä
   if (!fontsLoaded) {
     return null; 
   }
@@ -57,6 +61,7 @@ const App = () => {
     <NicknameProvider> 
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, gestureEnabled: false }}>
+          {/* Kaikki eri näkymät ja pelit Stackissa nimettyinä ruutuina */}
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="BubbleShooter" component={BubbleShooterScreen} />
           <Stack.Screen name="ShooterGameOver" component={ShooterGameOver} />
