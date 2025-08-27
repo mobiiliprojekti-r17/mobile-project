@@ -33,12 +33,10 @@ import { Silkscreen_400Regular } from '@expo-google-fonts/silkscreen';
 import { Bungee_400Regular } from '@expo-google-fonts/bungee';
 import { Audiowide_400Regular } from '@expo-google-fonts/audiowide';
 
-
-
 const Stack = createStackNavigator(); // Stack-navigaattori koko sovellukselle
 
 const App = () => {
-   // Fonttien lataus, ennen kuin näkymät piirretään
+  // Fonttien lataus, ennen kuin näkymät piirretään
   const [fontsLoaded] = useFonts({
     ChangaOne_400Regular,
     CuteFont_400Regular,
@@ -55,7 +53,6 @@ const App = () => {
   if (!fontsLoaded) {
     return null; 
   }
-
   return (
     //Nicname konteksti koko sovellukselle,stack navigointi ja näkymien määrittely
     <NicknameProvider> 

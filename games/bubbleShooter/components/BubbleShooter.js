@@ -26,6 +26,9 @@ import { useNickname } from '../../../context/context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import ShooterArrow from './ShooterArrow';
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs(['useInsertionEffect must not schedule updates']);
+
 
 const { width, height } = Dimensions.get('window'); //Näytön leveys ja korkeus
 const BALL_RADIUS = 20; //Ampumispallon säde
