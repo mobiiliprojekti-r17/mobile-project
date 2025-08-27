@@ -23,7 +23,7 @@ const ShooterGameOver = ({ navigation, route }) => {
         const querySnapshot = await getDocs(resultsQuery);
         const resultsList = querySnapshot.docs.map((doc) => doc.data());
         setResults(resultsList);
-
+         // Etsitään pelaajan sijoitus tuloslistassa
         const index = resultsList.findIndex(
           (res) => res.Nickname === nickname && res.score === finalScore
         );
@@ -36,9 +36,9 @@ const ShooterGameOver = ({ navigation, route }) => {
       }
     };
 
-    fetchResults(); //Käynnistetään haku
+    fetchResults(); //Haetaan tiedot
   }, []);
-  //Renderöidään yksittäiset top-listan pelaajat
+   // Funktio yksittäisen tulosrivin renderöintiin
   const renderTopListItem = (result, index) => (
     <Animatable.View animation="fadeInUp" delay={index * 100} key={index} style={shooterGoStyles.topListItem}>
       <Text style={shooterGoStyles.topListName}>
@@ -47,10 +47,10 @@ const ShooterGameOver = ({ navigation, route }) => {
       <Text style={shooterGoStyles.topListScore}>Score: {result.score}</Text>
     </Animatable.View>
   );
-
+  // Varsinainen renderöinti
   return (
     <LinearGradient colors={['rgb(255, 158, 226)', '#fac3e9']} style={shooterGoStyles.gameOverContainer}>
-      {/* Emojit */}
+      {/* Sparkle Emojit */}
       <Animatable.Text
         animation="pulse"
         iterationCount="infinite"

@@ -2,8 +2,10 @@ import React, { memo } from 'react';
 import { View, Text } from 'react-native';
 import shooterStyles from '../styles/shooterStyles';
 
+//Piirretään pallo
 const Ball = ({ x, y, size, color }) => {
   return (
+    //Määritellään asema ja koko props arvojen avulla
     <View
       style={[
         shooterStyles.shooterBall,
@@ -27,12 +29,13 @@ const Ball = ({ x, y, size, color }) => {
           },
         ]}
       />
+      {/* Hymiö */}
       <Text style={shooterStyles.face}>{'₍꒢  ̣̮꒢₎'}</Text>
     </View>
   );
 };
 
-// Renderöidään vain jos X, Y, koko tai väri muuttuvat
+// Rerenderöidään vaan jos X, Y, koko tai väri muuttuvat
 export default memo(
   Ball,
   (prev, next) =>

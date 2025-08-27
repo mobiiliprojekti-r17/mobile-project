@@ -3,7 +3,7 @@ import { ScrollView, View, Text, TouchableOpacity } from "react-native";
 import styles from "../styles/minesweeperResultsStyles";
 
 const ScoreList = ({ scores, selectedDifficulty, formattedTime }) => {
-
+  // Ryhmittelee pisteet vaikeustason mukaan 
   const groupedScores = useMemo(() => {
     return scores.reduce((acc, score) => {
       const level = score.difficulty || "Unknown";
@@ -17,25 +17,25 @@ const ScoreList = ({ scores, selectedDifficulty, formattedTime }) => {
     <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
       {Object.keys(groupedScores).length > 0 ? (
         Object.keys(groupedScores)
-          .filter(
-            (diffLevel) => !selectedDifficulty || diffLevel === selectedDifficulty
-          )
-          .map((diffLevel) => (
+          // Näytä vain valittu vaikeustaso, jos sellainen on
+          .filter(diffLevel => !selectedDifficulty || diffLevel === selectedDifficulty)
+          .map(diffLevel => (
             <View key={diffLevel} style={styles.difficultySection}>
+              {/* Otsikko: vaikeustaso */}
               <Text style={styles.difficultyTitle}>
-                {diffLevel ? diffLevel.toUpperCase() : "ALL"}
+                {diffLevel.toUpperCase()}
               </Text>
-              {(groupedScores[diffLevel] || [])
+              {/* Lajittele ajan mukaan ja listaa top-pelaajat */}
+              {groupedScores[diffLevel]
                 .sort((a, b) => a.timeInSeconds - b.timeInSeconds)
                 .map((score, index) => (
                   <View key={index} style={styles.scoreItem}>
-                    <Text style={styles.rank}>#{index + 1}</Text>
+                    <Text style={styles.rank}>#{index + 1}</Text>          
                     <Text style={styles.scoreText}>
-                      Nickname: {score.nickname ?? "Unknown"}
+                      Nickname: {score.nickname ?? "Unknown"} 
                     </Text>
                     <Text style={styles.scoreText}>
-                      Time:{" "}
-                      {score.timeInSeconds != null
+                      Time: {score.timeInSeconds != null
                         ? formattedTime(score.timeInSeconds)
                         : "N/A"}
                     </Text>
@@ -44,6 +44,7 @@ const ScoreList = ({ scores, selectedDifficulty, formattedTime }) => {
             </View>
           ))
       ) : (
+        // Viesti, jos ei vielä tuloksia
         <Text style={styles.noScores}>No scores yet!</Text>
       )}
     </ScrollView>
